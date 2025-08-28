@@ -34,7 +34,7 @@ class ProductService
     
     public function getAttribute()
     {
-        return $this->attributeService->getAttributesWithValues(20);
+        return $this->attributeService->getAttributesWithValues();
     }
 
     /**
@@ -70,7 +70,7 @@ class ProductService
                 $product->variants()->create([
                     'sku' => $data['code'] ?? null,
                     'price' => $data['price_discount'] ?? 0,
-                    'compare_price' => $data['price'] ?? 0,
+                    'compare_at_price' => $data['price'] ?? 0,
                     'stock' => 0,
                     'is_default' => true,
                 ]);
@@ -119,7 +119,7 @@ class ProductService
                 $product->variants()->create([
                     'sku' => $productData['code'] ?? null,
                     'price' => $productData['price_discount'] ?? 0,
-                    'compare_price' => $productData['price'] ?? 0,
+                    'compare_at_price' => $productData['price'] ?? 0,
                     'stock' => 0,
                     'is_default' => true,
                 ]);
@@ -140,42 +140,101 @@ class ProductService
     }
 
     /**
-     * Đồng bộ (tạo, cập nhật, xóa) các biến thể của sản phẩm.
-     *
-     * @param Product $product
-     * @param array $variantsData
-     * @param array $attributeValuesData
-     */
-    public function syncVariants(Product $product, array $variantsData, array $attributeValuesData)
-    {
-        // Lấy tất cả các ID của biến thể hiện có
-        $existingVariantIds = $product->variants()->pluck('id')->toArray();
-        $submittedVariantIds = [];
+         * Đồng bộ (tạo, cập nhật, xóa) các biến thể của sản phẩm một cách thông minh.
+         * [ĐÃ VIẾT LẠI] Logic dựa trên tổ hợp thuộc tính để tìm và cập nhật,
+         * thay vì dựa vào ID, giải quyết triệt để vấn đề biến thể trùng lặp.
+         *
+         * @param Product $product
+         * @param array $variantsData
+         */
+        public function syncVariants(Product $product, array $variantsData)
+        {
+            // 1. Lấy tất cả biến thể hiện có và tạo một map để tra cứu hiệu quả
+            // Key của map là một chuỗi được tạo từ các ID giá trị thuộc tính đã sắp xếp (ví dụ: "10-25")
+            $existingVariants = $product->variants()->with('attributeValues')->get();
+            $existingVariantsMap = $existingVariants->keyBy(function ($variant) {
+                return $variant->attributeValues->pluck('id')->sort()->implode('-');
+            });
 
-        foreach ($variantsData as $variantKey => $variantData) {
-            $valueIds = explode('_', $variantKey);
-            sort($valueIds);
-            $valueIds = array_map('intval', $valueIds);
-            
-            // Tìm biến thể dựa trên ID hoặc tạo mới
-            $variant = $product->variants()->updateOrCreate(
-                ['id' => $variantData['id'] ?? null],
-                [
-                    'sku' => $variantData['sku'] ?? null,
-                    'price' => $variantData['price'] ?? 0,
-                    'compare_price' => $variantData['compare_price'] ?? 0,
-                    'stock' => $variantData['stock'] ?? 0,
-                    'is_default' => false,
-                ]
-            );
+            $submittedVariantIds = [];
+            $defaultVariantKey = request()->input('variants_default_key');
 
-            $variant->attributeValues()->sync($valueIds);
-            $submittedVariantIds[] = $variant->id;
+            // 2. Duyệt qua dữ liệu biến thể gửi từ form
+            foreach ($variantsData as $canonicalKey => $variantData) {
+                // Lấy và sắp xếp các ID giá trị thuộc tính từ canonicalKey
+                $valueIds = collect(explode('|', $canonicalKey))
+                    ->map(fn($pair) => (int)explode(':', $pair)[1])
+                    ->sort()
+                    ->values(); // Sử dụng values() để reset key sau khi sort
+
+                if ($valueIds->isEmpty()) {
+                    continue;
+                }
+                
+                // Tạo key tra cứu từ các ID đã sắp xếp
+                $lookupKey = $valueIds->implode('-');
+                
+                $variant = null;
+
+                // 3. Tìm biến thể trong map. Nếu có thì cập nhật, không thì tạo mới.
+                if ($existingVariantsMap->has($lookupKey)) {
+                    // TÌM THẤY -> Cập nhật biến thể đã có
+                    $variant = $existingVariantsMap->get($lookupKey);
+                    $variant->update([
+                        'price'            => $variantData['price'] ?? 0,
+                        'compare_at_price' => $variantData['compare_at_price'] ?? 0,
+                        'stock'            => $variantData['stock'] ?? 0,
+                        'is_default'       => ($canonicalKey === $defaultVariantKey),
+                        // Chỉ cập nhật SKU nếu người dùng có nhập, nếu không thì giữ nguyên
+                        'sku'              => $variantData['sku'] ?? $variant->sku, 
+                    ]);
+                } else {
+                    // KHÔNG TÌM THẤY -> Tạo biến thể mới
+                    $sku = $variantData['sku'] ?? null;
+                    if (empty($sku)) {
+                        // Logic tạo SKU tự động chỉ chạy cho biến thể mới
+                        $values = AttributeValue::whereIn('id', $valueIds)->orderBy('attribute_id')->get();
+                        $skuSuffixes = $values->map(fn($v) => Str::upper(Str::substr(Str::slug($v->value), 0, 1)))->implode('-');
+                        $sku = $product->code . '-' . $skuSuffixes;
+                    }
+                    
+                    // Đảm bảo SKU này không bị trùng với bất kỳ biến thể nào khác trong hệ thống
+                    $originalSku = $sku;
+                    $counter = 2;
+                    while (ProductVariant::where('sku', $sku)->exists()) {
+                        $sku = $originalSku . '-' . $counter++;
+                    }
+
+                    $variant = $product->variants()->create([
+                        'sku'              => $sku,
+                        'price'            => $variantData['price'] ?? 0,
+                        'compare_at_price' => $variantData['compare_at_price'] ?? 0,
+                        'stock'            => $variantData['stock'] ?? 0,
+                        'is_default'       => ($canonicalKey === $defaultVariantKey),
+                    ]);
+
+                    // Gán các giá trị thuộc tính cho biến thể mới tạo
+                    $variant->attributeValues()->sync($valueIds->all());
+                }
+
+                if ($variant) {
+                    $submittedVariantIds[] = $variant->id;
+                }
+            }
+
+            // 4. Xóa các biến thể cũ không còn tồn tại trong dữ liệu gửi lên
+            $variantsToDelete = $existingVariants->pluck('id')->diff($submittedVariantIds);
+            if ($variantsToDelete->isNotEmpty()) {
+                $product->variants()->whereIn('id', $variantsToDelete->all())->delete();
+            }
+
+            // 5. Đảm bảo luôn có một biến thể mặc định
+            $product->refresh(); // Tải lại quan hệ variants sau khi xóa
+            if ($product->variants()->count() > 0 && $product->variants()->where('is_default', true)->doesntExist()) {
+                $firstVariant = $product->variants()->first();
+                if ($firstVariant) {
+                    $firstVariant->update(['is_default' => true]);
+                }
+            }
         }
-
-        $variantsToDelete = array_diff($existingVariantIds, $submittedVariantIds);
-        if (!empty($variantsToDelete)) {
-            $product->variants()->whereIn('id', $variantsToDelete)->delete();
-        }
-    }
 }

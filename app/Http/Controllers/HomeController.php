@@ -16,10 +16,10 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $categoriesWithProducts = Category::where('status', 1)
+        $categoriesWithProducts = Category::where('status', 1)->where('is_home',1)
             ->whereHas('products') 
             ->with(['products' => function ($query) {
-                $query->where('status', 1)->take(8);
+                $query->where('status', 1)->where('is_home',1)->take(8);
             }])->get();
         $allCategoriesHome = Category::where('status', 1)->where('is_home',1)->get();
         $featuredCategories = Category::where('status', 1)
@@ -63,60 +63,25 @@ class HomeController extends Controller
         ));
     }
     public function search(Request $request)
-        {
-            $keyword = trim($request->input('q'));
-            if (empty($keyword)) {
-                return redirect()->back();
-            }
-            $posts = Post::where('status', 1)
-                ->where(function ($query) use ($keyword) {
-                    $query->where('title', 'LIKE', "%{$keyword}%")
-                        ->orWhere('content', 'LIKE', "%{$keyword}%");
-                })
-                ->get()
-                ->map(function ($item) {
-                    $item->type = 'Bài viết';
-                    $item->url = route('frontend.post.detail', $item->slug); 
-                    return $item;
-                });
-            $products = Product::where('status', 1)
-                ->where(function ($query) use ($keyword) {
-                    $query->where('name', 'LIKE', "%{$keyword}%")
-                        ->orWhere('description', 'LIKE', "%{$keyword}%");
-                })
-                ->get()
-                ->map(function ($item) {
-                    $item->type = 'Sản phẩm';
-                    $item->url = route('frontend.product.detail', $item->slug);
-                    $item->title = $item->name; 
-                    return $item;
-                });
-            $services = Service::where('status', 1)
-                ->where(function ($query) use ($keyword) {
-                    $query->where('name', 'LIKE', "%{$keyword}%")
-                        ->orWhere('description', 'LIKE', "%{$keyword}%");
-                })
-                ->get()
-                ->map(function ($item) {
-                    $item->type = 'Dịch vụ';
-                    $item->url = route('frontend.service.detail', $item->slug); 
-                    $item->title = $item->name; 
-                    return $item;
-                });
-            $results = collect($posts)->concat($products)->concat($services)->sortByDesc('created_at');
-            $perPage = 10;
-            $currentPage = $request->input('page', 1);
-            $pagedResults = $results->slice(($currentPage - 1) * $perPage, $perPage)->all();
-            $paginatedResults = new LengthAwarePaginator(
-                $pagedResults,
-                $results->count(),
-                $perPage,
-                $currentPage,
-                ['path' => $request->url(), 'query' => $request->query()]
-            );
-            return view('frontend.search_result', [
-                'results' => $paginatedResults,
-                'keyword' => $keyword
-            ]);
+    {
+        $keyword = trim($request->input('q'));
+
+        if (empty($keyword)) {
+            return redirect()->back();
         }
+
+        // Tìm kiếm và phân trang trực tiếp từ database
+        $products = Product::where('status', 1)
+            ->where(function ($query) use ($keyword) {
+                $query->where('name', 'LIKE', "%{$keyword}%")
+                      ->orWhere('description', 'LIKE', "%{$keyword}%");
+            })
+            ->latest() // Sắp xếp theo ngày tạo mới nhất (tùy chọn)
+            ->paginate(10); // Lấy 10 sản phẩm mỗi trang
+
+        return view('frontend.search_result', [
+            'results' => $products,
+            'keyword' => $keyword
+        ]);
+    }
 }

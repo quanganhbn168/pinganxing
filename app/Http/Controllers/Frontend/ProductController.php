@@ -42,7 +42,8 @@ class ProductController extends Controller
         $categoryIds = collect($descendantIds)->push($category->id);
         $products = Product::whereIn('category_id', $categoryIds)
                             ->with('category')
-                            ->latest()
+                            ->where("status",1)
+                            ->orderByDesc('id')
                             ->paginate(12);
         $categories = Category::where('status', true)->whereNull('parent_id')->get();
         $tags = Tag::all();

@@ -12,7 +12,11 @@ class AttributeService
     {
         return Attribute::with('values')->latest()->paginate($perPage);
     }
-
+    public function getAttributesWithValues()
+    {
+        return Attribute::with('values')->latest()->get();
+    }
+    
     public function createAttribute(array $data): Attribute
     {
         return Attribute::create($data);

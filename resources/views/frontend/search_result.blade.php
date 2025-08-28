@@ -1,5 +1,5 @@
 {{-- Giả sử bạn có layout chung là 'frontend.layouts.app' --}}
-@extends('ayouts.master') 
+@extends('layouts.master') 
 
 @section('title', 'Kết quả tìm kiếm cho: ' . $keyword)
 

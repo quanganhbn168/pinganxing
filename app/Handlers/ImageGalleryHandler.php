@@ -3,37 +3,46 @@
 namespace App\Handlers;
 
 use Illuminate\Http\Request;
-
+use App\Traits\UploadImageTrait;
 class ImageGalleryHandler
 {
+    use UploadImageTrait;
     public function sync(object $model, Request $request, string $field = 'gallery', string $folder = 'uploads/gallery', int $resize = 800): void
     {
-        $pathsToKeep  = $request->input("{$field}_old", []);
-        $currentPaths = $model->images()->pluck('image')->toArray();
-        $newImages    = $request->file($field, []);
+        // Lấy ra ID các ảnh cũ cần giữ lại và ép kiểu sang integer
+        $idsToKeep = array_map('intval', $request->input("{$field}_old", []));
 
-        $nothingChanged = empty($newImages)
-            && count($pathsToKeep) === count($currentPaths)
-            && empty(array_diff($currentPaths, $pathsToKeep));
+        // Lấy ra ID của tất cả ảnh hiện tại trong DB
+        $currentIds = $model->images()->pluck('id')->toArray();
+        
+        $newImages = $request->file($field, []);
 
-        if ($nothingChanged) {
+        // Tối ưu: Nếu không có ảnh mới và danh sách ảnh cũ không đổi thì không làm gì cả
+        if (empty($newImages) && count($idsToKeep) === count($currentIds) && empty(array_diff($currentIds, $idsToKeep))) {
             return;
         }
 
-        // Xoá ảnh cũ không giữ lại
-        $deletedPaths = array_diff($currentPaths, $pathsToKeep);
-        foreach ($deletedPaths as $oldPath) {
-            if (method_exists($model, 'deleteImage')) {
-                $model->deleteImage($oldPath);
+        // Tìm ra các ID cần xóa
+        $idsToDelete = array_diff($currentIds, $idsToKeep);
+
+        if (!empty($idsToDelete)) {
+            $imagesToDelete = $model->images()->whereIn('id', $idsToDelete)->get();
+            foreach ($imagesToDelete as $imageRecord) {
+                // Xóa file vật lý bằng phương thức từ Trait
+                $this->deleteImage($imageRecord->image);
             }
-            $model->images()->where('image', $oldPath)->delete();
+            // Xóa các bản ghi khỏi CSDL
+            $model->images()->whereIn('id', $idsToDelete)->delete();
         }
 
         // Thêm ảnh mới
-        foreach ($newImages as $image) {
-            if (method_exists($model, 'uploadImage')) {
-                $path = $model->uploadImage($image, $folder, $resize,800, true);
-                $model->addImage($path);
+        if (!empty($newImages)) {
+            foreach ($newImages as $imageFile) {
+                // Sử dụng Trait uploadImage đã có sẵn
+                $path = $this->uploadImage($imageFile, $folder, $resize, $resize, true);
+                
+                // [SỬA LỖI] Sử dụng relationship "images()" để tạo bản ghi ảnh mới
+                $model->images()->create(['image' => $path]);
             }
         }
     }

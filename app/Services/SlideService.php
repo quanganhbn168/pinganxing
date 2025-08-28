@@ -83,7 +83,7 @@ class SlideService
             Slide::TYPE_PARTNER       => $this->uploadImage($request->file('image'), 'uploads/slides', 350, 60, true),
             Slide::TYPE_POPUP         => $this->uploadImage($request->file('image'), 'uploads/slides', 800, 1000, true),
             Slide::TYPE_ADVERTISEMENT => $this->uploadImage($request->file('image'), 'uploads/slides', 500, 250, true),
-            default                   => $this->uploadImage($request->file('image'), 'uploads/slides', 800, 400, true),
+            default                   => $this->uploadImage($request->file('image'), 'uploads/slides', 1920, 640, false),
         };
     }
 

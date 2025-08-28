@@ -8,19 +8,34 @@ use App\Models\Category;
 
 class ProductRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     * [THÊM MỚI] Chuẩn bị dữ liệu trước khi validate.
+     * Tự động tạo mảng 'variant_attribute_ids' từ dữ liệu của 'variants'.
      */
+    protected function prepareForValidation()
+    {
+        if ($this->boolean('has_variants') && $this->input('variants')) {
+            $attributeIds = [];
+            foreach ($this->input('variants') as $key => $variantData) {
+                $pairs = explode('|', $key);
+                foreach ($pairs as $pair) {
+                    $parts = explode(':', $pair);
+                    if (isset($parts[0]) && is_numeric($parts[0])) {
+                        $attributeIds[] = (int)$parts[0];
+                    }
+                }
+            }
+            $this->merge([
+                'variant_attribute_ids' => array_values(array_unique($attributeIds)),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         $productId = $this->route('product')->id ?? null;
@@ -29,41 +44,39 @@ class ProductRequest extends FormRequest
             'code' => ['required', 'string', 'max:255', Rule::unique('products', 'code')->ignore($productId)],
             'brand_id' => ['nullable', 'integer', 'exists:brands,id'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
-            'cate_type' => ['required', Rule::in([Category::TYPE_PHYSICS, Category::TYPE_SERVICE])],
             'status' => ['required', 'boolean'],
             'description' => ['nullable', 'string'],
             'content' => ['nullable', 'string'],
-            'image' => $productId ? ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'] : ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'image' => [$productId ? 'nullable' : 'required'],
             'gallery' => ['nullable', 'array'],
             'gallery.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             
-            'price' => ['required_if:has_variants,false', 'nullable', 'numeric', 'min:0'],
-            'compare_at_price' => ['required_if:has_variants,false', 'nullable', 'numeric', 'min:0', 'gte:price_discount'],
+            'price_discount' => ['required_if:has_variants,false', 'nullable', 'numeric', 'min:0'],
+            'price' => ['required_if:has_variants,false', 'nullable', 'numeric', 'min:0', 'gte:price_discount'],
             'has_variants' => ['nullable', 'boolean'],
         ];
 
         if ($this->boolean('has_variants')) {
             $rules['variants'] = ['required', 'array', 'min:1'];
             
+            
             foreach ($this->input('variants', []) as $key => $variant) {
-                if (empty($variant['_delete'])) {
-                    $rules["variants.{$key}.price"] = ['required', 'numeric', 'min:0'];
-                    $rules["variants.{$key}.stock"] = ['nullable', 'integer', 'min:0'];
-                    $rules["variants.{$key}.sku"] = [
-                        'nullable',
-                        'string',
-                        'max:255',
-                        Rule::unique('product_variants', 'sku')
-                            ->ignore($variant['id'] ?? null),
-                        ];
-                }
+                $rules["variants.{$key}.price"] = ['required', 'numeric', 'min:0'];
+                $rules["variants.{$key}.compare_at_price"] = ['nullable', 'numeric', 'min:0'];
+                $rules["variants.{$key}.stock"] = ['nullable', 'integer', 'min:0'];
+                $rules["variants.{$key}.sku"] = [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('product_variants', 'sku')->ignore($variant['id'] ?? null),
+                ];
             }
+            
             
             $rules['variant_attribute_ids'] = ['required', 'array', 'min:1', 'max:3'];
             $rules['variant_attribute_ids.*'] = ['integer', 'exists:attributes,id'];
-            $rules['attribute_values'] = ['nullable', 'array'];
-            $rules['attribute_values.*'] = ['required', 'array', 'min:1'];
-            $rules['attribute_values.*.*'] = ['integer', 'exists:attribute_values,id'];
+            
+            
         }
 
         return $rules;

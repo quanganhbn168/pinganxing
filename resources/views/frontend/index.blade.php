@@ -66,7 +66,6 @@
                 <div class="swiper-button-next"></div>
             </div>
         </div>
-
         <div class="swiper_category swiper">
             <div class="swiper-wrapper">
                 @foreach($allCategoriesHome as $key => $allCategoyHome)
@@ -112,14 +111,11 @@
                     </svg>
                 </a>
             </div>
-
             <div class="block-product-list col-lg-9 col-xl-10">
                 <div class="product-slider swiper">
                     <div class="swiper-wrapper">
-                        {{-- Giả sử anh có biến $products từ controller --}}
                         @foreach($category->products as $product)
                             <div class="swiper-slide">
-                                {{-- Gọi partial item sản phẩm đã sửa ở Bước 1 --}}
                                 @include('partials.frontend.product_item', ['product' => $product])
                             </div>
                         @endforeach
@@ -144,10 +140,8 @@
 @endphp
 @if(isset($featuredCategories) && $featuredCategories->count() >= 4)
 <section class="section-index section_group_banner">
-    <div class="container-fluid"> {{-- Hoặc container nếu anh muốn có khoảng cách hai bên --}}
+    <div class="container-fluid"> 
         <div class="grid">
-            
-            {{-- CỘT BÊN TRÁI (Ảnh lớn nhất) --}}
             <div class="col-left">
                 <div class="banner_1 banner-box">
                     @php $cat = $featuredCategories[0]; @endphp
@@ -159,12 +153,8 @@
                     </a>
                 </div>
             </div>
-
-            {{-- CỘT BÊN PHẢI (3 ảnh còn lại) --}}
             <div class="col-right">
                 <div class="grid-sub">
-                    
-                    {{-- Ảnh trên --}}
                     <div class="banner_2 banner-box">
                         @php $cat = $featuredCategories[1]; @endphp
                         <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
@@ -174,8 +164,6 @@
                             </div>
                         </a>
                     </div>
-                    
-                    {{-- Ảnh dưới bên trái --}}
                     <div class="banner_3 banner-box">
                         @php $cat = $featuredCategories[2]; @endphp
                         <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
@@ -185,8 +173,6 @@
                             </div>
                         </a>
                     </div>
-
-                    {{-- Ảnh dưới bên phải --}}
                     <div class="banner_4 banner-box">
                         @php $cat = $featuredCategories[3]; @endphp
                         <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
@@ -196,7 +182,6 @@
                             </div>
                         </a>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -224,14 +209,11 @@
                     </svg>
                 </a>
             </div>
-
             <div class="block-product-list col-lg-9 col-xl-10">
                 <div class="product-slider swiper">
                     <div class="swiper-wrapper">
-                        {{-- Giả sử anh có biến $products từ controller --}}
                         @foreach($saleProducts as $product)
                             <div class="swiper-slide">
-                                {{-- Gọi partial item sản phẩm đã sửa ở Bước 1 --}}
                                 @include('partials.frontend.product_item', ['product' => $product])
                             </div>
                         @endforeach
@@ -250,11 +232,9 @@
     </div>
 </section>
 @endif
-
 <section class="section-index section_feedback">
     <div class="bg-section">
         <div class="container">
-            {{-- PHẦN TIÊU ĐỀ --}}
             <div class="section-title side-left has-control">
                 <h2>
                     Khách hàng nói về chúng tôi
@@ -267,26 +247,18 @@
                     <div class="swiper-button-next"></div>
                 </div>
             </div>
-
-            {{-- PHẦN SLIDER --}}
             <div class="swiper_feedback swiper-container control-top">
                 <div class="swiper-wrapper">
-                    
-                    {{-- DÙNG VÒNG LẶP ĐỂ HIỂN THỊ CÁC ĐÁNH GIÁ --}}
                     @foreach($testimonials as $testimonial)
                         <div class="swiper-slide">
-                            {{-- Gọi partial đã được sửa ở trên --}}
                             @include('partials.frontend.feedback_item', ['feedback' => $testimonial])
                         </div>
                     @endforeach
-                    
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-
 <section class="section-index section-blog">
     <div class="container">
         <div class="section-title side-left has-control">
@@ -298,7 +270,6 @@
                 <div class="swiper-button-next"></div>
             </div>
             <div class="swiper_blog swiper">
-                
             </div>
         </div>
     </div>
@@ -315,13 +286,11 @@
             </div>
             <div class="swiper_brand swiper">
                 <div class="swiper-wrapper">
-                                  
                 </div>
             </div>
         </div>
     </div>
 </section>
-
 @endsection
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
@@ -376,7 +345,6 @@
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     // --- 1. KHỞI TẠO SLIDER CHÍNH (LUÔN CHẠY) ---
     const mainSliderEl = document.querySelector('.main-slider');
     if (mainSliderEl) {
@@ -402,18 +370,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // Tìm đến section cha chứa cả slider và các nút điều khiển
     const feedbackSection = document.querySelector('.section_feedback');
-
     if (feedbackSection) {
         // Tìm đến element của slider bên trong section đó
         const swiperFeedbackEl = feedbackSection.querySelector('.swiper_feedback');
-
         if (swiperFeedbackEl) {
             const swiperFeedback = new Swiper(swiperFeedbackEl, {
                 // Hiển thị 3 slide trên màn hình lớn (desktop) làm mặc định
                 slidesPerView: 3,
                 // Khoảng cách giữa các slide là 20px
                 spaceBetween: 20,
-
                 loop: true,
                 autoplay: {
                     delay: 5000,
@@ -422,7 +387,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 lazy: {
                     loadPrevNext: true,
                 },
-                
                 // Sửa lỗi: Tìm pagination và navigation bên trong section hiện tại
                 pagination: {
                     el: feedbackSection.querySelector('.swiper-pagination'),
@@ -432,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     nextEl: feedbackSection.querySelector('.swiper-button-next'),
                     prevEl: feedbackSection.querySelector('.swiper-button-prev'),
                 },
-
                 // Responsive: Tùy chỉnh số lượng slide theo kích thước màn hình
                 breakpoints: {
                     // Dưới 768px (Mobile)
@@ -454,28 +417,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
-
     // --- 2. HÀM KHỞI TẠO CÁC SLIDER RESPONSIVE (chỉ chạy trên màn hình lớn) ---
     // Hàm này đã được viết tốt, giữ nguyên
     const setupResponsiveSwiper = (sectionElement, swiperSelector, options, breakpointWidth = 992) => {
         if (!sectionElement) return;
-
         let swiperInstance = null;
         const breakpoint = window.matchMedia(`(min-width: ${breakpointWidth}px)`);
-
         const initializeSwiper = () => {
             if (breakpoint.matches === true && swiperInstance === null) {
                 const swiperEl = sectionElement.querySelector(swiperSelector);
                 const nextEl = sectionElement.querySelector('.swiper-button-next');
                 const prevEl = sectionElement.querySelector('.swiper-button-prev');
                 const paginationEl = sectionElement.querySelector('.swiper-pagination');
-
                 const finalOptions = {
                     ...options,
                     navigation: { nextEl, prevEl },
                     pagination: { el: paginationEl, clickable: true },
                 };
-                
                 if (swiperEl) {
                     swiperInstance = new Swiper(swiperEl, finalOptions);
                 }
@@ -484,11 +442,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperInstance = null;
             }
         };
-
         initializeSwiper();
         window.addEventListener('resize', initializeSwiper);
     };
-
     // --- 3. ÁP DỤNG HÀM RESPONSIVE CHO CÁC SECTION TƯƠNG ỨNG ---
     const categorySection = document.querySelector('.section_category');
     if (categorySection) {
@@ -507,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function () {
             768
         );
     }
-    
     const productSections = document.querySelectorAll('.section_product');
     productSections.forEach(section => {
         setupResponsiveSwiper(
@@ -523,8 +478,6 @@ document.addEventListener('DOMContentLoaded', function () {
             992
         );
     });
-
 });
 </script>
 @endpush
-

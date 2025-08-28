@@ -34,7 +34,7 @@ class OrderController extends Controller
     {
         $users = User::orderBy('name')->get(['id','name']);
         // Thống nhất: status = 1 (boolean/int) hoặc nếu bạn dùng enum/string thì thống nhất lại ở cả 2 nơi
-        $products = Product::where('status', 1)->orderBy('name')->get(['id','name','price','price_discount']);
+        $products = Product::where('status', 1)->orderBy('name')->get(['id','name','price','compare_at_price']);
         return view('admin.orders.create', compact('users', 'products'));
     }
 
@@ -58,7 +58,7 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         $users = User::orderBy('name')->get(['id','name']);
-        $products = Product::where('status', 1)->orderBy('name')->get(['id','name','price','price_discount']);
+        $products = Product::where('status', 1)->orderBy('name')->get(['id','name','price','compare_at_price']);
         $order->load('orderItems');
         return view('admin.orders.edit', compact('order', 'users', 'products'));
     }

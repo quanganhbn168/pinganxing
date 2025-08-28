@@ -33,7 +33,11 @@ Route::middleware(['auth:admin'])->prefix('admin')->as('admin.')->group(function
     Route::resource('intros', IntroController::class);
 
     Route::resource('categories', CategoryController::class);
+    Route::get('products/data', [ProductController::class, 'data'])->name('products.data');
     Route::resource('products', ProductController::class);
+    Route::post('products/validate-uniqueness', [ProductController::class, 'validateUniqueness'])->name('products.validate_uniqueness');
+    Route::post('/ajax/attributes/{attribute}/values', [AttributeController::class, 'storeValue'])
+    ->name('ajax.attributes.values.store');
     Route::resource('services', ServiceController::class);
     Route::resource('post-categories', PostCategoryController::class);
     Route::resource('posts', PostController::class);

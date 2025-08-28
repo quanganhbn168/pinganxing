@@ -16,7 +16,6 @@ class Product extends Model
         'type',
         'category_id',
         'brand_id',
-        'product_type',
         'name',
         'code',
         'slug',
@@ -43,7 +42,7 @@ class Product extends Model
         'has_variants' => 'boolean',
     ];
     const TYPE_PHYSICS         = 'physics';
-    const TYPE_SERVICCE        = 'services';
+    const TYPE_SERVICE        = 'services';
 
 
     // -- Các mối quan hệ (Relationships) --
@@ -105,5 +104,22 @@ class Product extends Model
 
         // Làm tròn số để có một con số nguyên đẹp (ví dụ: 15% thay vì 15.245%)
         return round($discount);
+    }
+
+    public function variantsWithValues()
+    {
+        $this->loadMissing('variants.attributeValues');
+
+        return $this->variants->map(function ($variant) {
+            return [
+                'id'               => $variant->id,
+                'sku'              => $variant->sku,
+                'price'            => (float) $variant->price,
+                'compare_at_price' => (float) $variant->compare_at_price,
+                'stock'            => (int) $variant->stock,
+                'is_default'       => (bool) $variant->is_default,
+                'values'           => $variant->attributeValues->pluck('id')->toArray(),
+            ];
+        });
     }
 }

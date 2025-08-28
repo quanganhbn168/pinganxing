@@ -56,7 +56,7 @@ Route::group(["prefix"=>"dich-vu"], function(){
     Route::get("/danh-muc/{slug}", [ServiceController::class,"serviceByCate"])->name("services.serviceByCate");
     Route::get("/{services:slug}", [ServiceController::class,"detail"])->name("services.show");
 });
-Route::get('/tim-kiem', [HomeController::class, 'search'])->name('frontend.post.search');
+Route::get('/tim-kiem', [HomeController::class, 'search'])->name('frontend.search');
 
 Route::get('gioi-thieu', [IntroController::class,'show'])->name('intro.show');
 Route::get('lien-he',[ContactController::class,'show'])->name('contact.show');
