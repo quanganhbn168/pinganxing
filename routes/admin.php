@@ -40,9 +40,7 @@ use App\Livewire\WorkOrder\CreateWorkOrder;
 
 
 Route::middleware(['auth:admin'])->prefix('admin')->as('admin.')->group(function () {
-     Route::get('/work-orders/create', CreateWorkOrder::class)->name('work-orders.create');
-     Route::get('/my-work-orders', \App\Livewire\WorkOrder\MyWorkOrders::class)->name('my-work-orders.index');
-     Route::get('/work-orders/{id}', \App\Livewire\WorkOrder\WorkOrderDetail::class)->name('work-orders.show');
+
      Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
      Route::get('dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
      Route::post('/toggle', [DashboardController::class, 'toggleField'])->name('toggle');
@@ -142,34 +140,47 @@ Route::middleware(['auth:admin'])->prefix('admin')->as('admin.')->group(function
         'index', 'show', 'destroy'
     ]);
 
-    Route::resource('brands', BrandController::class)->except('show');
-    Route::post('brands/bulk-action', [BrandController::class, 'bulkAction'])
+     Route::resource('brands', BrandController::class)->except('show');
+     Route::post('brands/bulk-action', [BrandController::class, 'bulkAction'])
          ->name('brands.bulk_action');
-    Route::match(['get', 'post'], 'ajax/brands', [BrandController::class, 'ajax'])->name('ajax.brands');
+     Route::match(['get', 'post'], 'ajax/brands', [BrandController::class, 'ajax'])->name('ajax.brands');
 
-    Route::resource('tags', TagController::class)->except('show');
-    Route::get('ajax/tags', [TagController::class, 'ajax'])->name('ajax.tags');
+     Route::resource('tags', TagController::class)->except('show');
+     Route::get('ajax/tags', [TagController::class, 'ajax'])->name('ajax.tags');
 
-    Route::match(['get', 'post'], 'ajax/attributes', [AttributeController::class, 'ajax'])->name('ajax.attributes');
-    Route::match(['get', 'post'], 'ajax/attribute-values', [AttributeValueController::class, 'ajax'])->name('ajax.attribute-values');
+     Route::match(['get', 'post'], 'ajax/attributes', [AttributeController::class, 'ajax'])->name('ajax.attributes');
+     Route::match(['get', 'post'], 'ajax/attribute-values', [AttributeValueController::class, 'ajax'])->name('ajax.attribute-values');
 
-    Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
-    Route::get('/ajax/products/check-code', [ProductController::class, 'checkCodeUniqueness'])->name('ajax.products.check_code');
-    Route::resource('branches', BranchController::class);
+     Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+     Route::get('/ajax/products/check-code', [ProductController::class, 'checkCodeUniqueness'])->name('ajax.products.check_code');
+     Route::resource('branches', BranchController::class);
 
-    Route::get('/warranty', [WarrantyController::class, 'index'])->name('warranty.index');
-    Route::post('/warranty/search', [WarrantyController::class, 'search'])->name('warranty.search');
-    Route::post('/duplicate', [DuplicateController::class, 'duplicate'])->name('duplicate');
+     Route::get('/warranty', [WarrantyController::class, 'index'])->name('warranty.index');
+     Route::post('/warranty/search', [WarrantyController::class, 'search'])->name('warranty.search');
+     Route::post('/duplicate', [DuplicateController::class, 'duplicate'])->name('duplicate');
 
-    Route::get('media', [App\Http\Controllers\Admin\MediaController::class, 'index'])->name('media.index');
+     Route::get('media', [App\Http\Controllers\Admin\MediaController::class, 'index'])->name('media.index');
 
     // 2. Agents (Đại lý)
-    Route::resource('agents', App\Http\Controllers\Admin\AgentController::class);
+     Route::resource('agents', App\Http\Controllers\Admin\AgentController::class);
 
     // 3. Careers (Tin tuyển dụng)
-    Route::resource('careers', App\Http\Controllers\Admin\CareerController::class);
+     Route::resource('careers', App\Http\Controllers\Admin\CareerController::class);
 
     // 4. Career Applications (Hồ sơ ứng tuyển - Thường chỉ cần xem và xóa)
-    Route::resource('career-applications', \App\Http\Controllers\Admin\CareerApplicationController::class)
+     Route::resource('career-applications', \App\Http\Controllers\Admin\CareerApplicationController::class)
          ->except(['create', 'store', 'edit']);
+
+     Route::get('/work-orders/create', CreateWorkOrder::class)->name('work-orders.create');
+     Route::get('/my-work-orders', \App\Livewire\WorkOrder\MyWorkOrders::class)->name('my-work-orders.index');
+     Route::get('/work-orders/{id}', \App\Livewire\WorkOrder\WorkOrderDetail::class)->name('work-orders.show');
+     Route::get('/work-orders/{id}/print', [\App\Http\Controllers\PrintController::class, 'printWorkOrder'])->name('work-orders.print');
+
+     Route::prefix('customers')->name('customers.')->group(function () {
+          Route::get('/', \App\Livewire\Customer\CustomerList::class)->name('index');
+          Route::get('/create', \App\Livewire\Customer\CustomerForm::class)->name('create');
+          Route::get('/{id}/edit', \App\Livewire\Customer\CustomerForm::class)->name('edit');
+          Route::get('/{id}', \App\Livewire\Customer\CustomerDetail::class)->name('show');
+
+     });
 });

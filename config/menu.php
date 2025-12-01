@@ -119,7 +119,13 @@ return [
     ],
     // ===== NHÓM MỚI: QUẢN LÝ CÔNG VIỆC (JOB) =====
     ['type' => 'header', 'title' => 'QUẢN LÝ CÔNG VIỆC'],
-
+    [
+        'title' => 'Khách hàng (CRM)',
+        'icon' => 'bi bi-people-fill', // Icon nhóm người
+        'route' => 'admin.customers.index',
+        'active_pattern' => 'admin.customers.*',
+        // 'permission' => 'manage-customers', // Sau này bật permission thì bỏ comment
+    ],
     [
         'title' => 'Phiếu việc (Job)',
         'icon' => 'bi bi-tools', // Icon công cụ

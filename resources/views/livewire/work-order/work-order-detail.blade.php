@@ -3,9 +3,16 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="d-flex justify-content-between">
-                <h1>Phiếu việc: {{ $this->workOrder->code }}</h1>
-                <a href="{{ route('admin.my-work-orders.index') }}" class="btn btn-secondary">Quay lại</a>
-            </div>
+    <h1>Phiếu việc: {{ $this->workOrder->code }}</h1>
+    <div>
+        {{-- NÚT IN --}}
+        <a href="{{ route('admin.work-orders.print', $this->workOrder->id) }}" target="_blank" class="btn btn-warning mr-2">
+            <i class="fas fa-print"></i> In Biên Bản
+        </a>
+        
+        <a href="{{ route('admin.my-work-orders.index') }}" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>
         </div>
     </section>
 
