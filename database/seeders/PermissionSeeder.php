@@ -3,89 +3,66 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use App\Models\Admin;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Reset cached roles and permissions
+        // 1. Reset cache quyền (quan trọng để không bị lỗi cache cũ)
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // --- QUYỀN VÀ VAI TRÒ CHO GUARD "admin" ---
-
-        // 2. Tạo các Permissions cho trang quản trị
-        $admin_permissions = [
-            'view-dashboard',
-            'manage-users',
-            'manage-roles',
-            'manage-products',
-            'manage-posts',
-            'manage-settings'
-        ];
-        foreach ($admin_permissions as $permission) {
-            // Chỉ định rõ guard_name là 'admin'
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'admin']);
+        // 2. Lấy cấu hình từ file config/permissions.php
+        $modules = config('system_permissions.modules') ?? []; 
+        $actions = config('system_permissions.actions') ?? [];
+        
+        if (empty($modules)) {
+            $this->command->warn("Chưa có config modules trong system_permissions.php");
+            return;
         }
-        echo "Admin permissions created.\n";
+        
+        // Guard mặc định cho trang quản trị là 'admin'
+        $guard = 'admin'; 
 
-        // 3. Tạo vai trò Super Admin và gán quyền
-        $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'admin']);
-        // Ghi chú: Chúng ta sẽ dùng Gate::before để Super Admin có full quyền,
-        // nên không cần gán trực tiếp ở đây.
+        // 3. Auto sinh Permission
+        foreach ($modules as $moduleKey => $moduleName) {
+            foreach ($actions as $actionKey => $actionName) {
+                // Tên quyền: view_product, create_user...
+                $permissionName = "{$actionKey}_{$moduleKey}";
 
-        // Tạo vai trò khác cho admin, ví dụ: "Content Manager"
-        $contentManagerRole = Role::firstOrCreate(['name' => 'Content Manager', 'guard_name' => 'admin']);
-        $contentManagerRole->syncPermissions(['manage-products', 'manage-posts']);
-        echo "Admin roles created and configured.\n";
-
-
-        // --- QUYỀN VÀ VAI TRÒ CHO GUARD "web" ---
-
-        // 4. Tạo các Permissions cho khách hàng
-        $user_permissions = [
-            'view-own-orders',
-            'comment-on-products',
-        ];
-        foreach ($user_permissions as $permission) {
-            // Chỉ định rõ guard_name là 'web'
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+                Permission::firstOrCreate(
+                    ['name' => $permissionName, 'guard_name' => $guard]
+                );
+            }
         }
-        echo "User permissions created.\n";
 
-        // 5. Tạo vai trò cho khách hàng
-        $customerRole = Role::firstOrCreate(['name' => 'Customer', 'guard_name' => 'web']);
-        $customerRole->syncPermissions(['view-own-orders', 'comment-on-products']);
-        echo "User roles created and configured.\n";
-
-
-        // --- TẠO USER MẪU ---
-
-        // 6. Tạo tài khoản Super Admin (lấy từ AdminSeeder của anh)
-        $admin = Admin::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Super Admin',
-                'password' => bcrypt('admin123'),
-            ]
+        // 4. Tạo Role "Super Admin"
+        $roleSuperAdmin = Role::firstOrCreate(
+            ['name' => 'Super Admin', 'guard_name' => $guard]
         );
-        $admin->assignRole($superAdminRole);
-        echo "Super Admin user created.\n";
 
-        // 7. Tạo tài khoản User/Customer mẫu (lấy từ UserSeeder của anh)
-        $user = User::firstOrCreate(
-            ['email' => 'user@example.com'],
-            [
-                'name' => 'Customer User',
-                'phone' => '0123456789',
-                'password' => bcrypt('user123'),
-            ]
-        );
-        $user->assignRole($customerRole);
-        echo "Customer user created.\n";
+        // 5. Tạo tài khoản Admin mẫu (Nếu chưa có) để test
+        $adminEmail = 'admin@gmail.com';
+        $admin = Admin::where('email', $adminEmail)->first();
+
+        if (!$admin) {
+            $admin = Admin::create([
+                'name'     => 'Quản Trị Viên',
+                'email'    => $adminEmail,
+                'password' => Hash::make('password'), // Mật khẩu: password
+            ]);
+        }
+
+        // 6. Gán vai trò Super Admin cho tài khoản này
+        // Vì model Admin có trait HasRoles và $guard_name = 'admin' nên nó sẽ tự hiểu
+        if (!$admin->hasRole('Super Admin')) {
+            $admin->assignRole($roleSuperAdmin);
+        }
+        
+        echo "Done! Đã khởi tạo quyền và Super Admin.\n";
     }
 }

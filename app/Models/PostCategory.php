@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\HasImages;
+use App\Traits\HasSlug;
+use Illuminate\Support\Facades\Cache;
+
 class PostCategory extends Model
 {
     /** @use HasFactory<\Database\Factories\PostCategoryFactory> */
-    use HasFactory;
+    use HasFactory, HasImages, HasSlug;
     protected $fillable = [
         'parent_id',
         'name',
@@ -43,18 +47,59 @@ class PostCategory extends Model
     {
         return $this->hasMany(self::class, 'parent_id');
     }
-
+    public function childrenRecursive()
+    {
+        return $this->children()->with('childrenRecursive');
+    }
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
-    public function slug()
+    
+    public function descendantIds(): array
     {
-        return $this->morphOne(Slug::class, 'sluggable');
+        $ids = [];
+        foreach ($this->children as $child) {
+            $ids[] = $child->id;
+            // nối mảng con cháu
+            $ids = array_merge($ids, $child->descendantIds());
+        }
+        return $ids;
     }
 
-    public function getSlugUrlAttribute()
+    /**
+     * Lấy mảng ID của danh mục hiện tại và tất cả danh mục con cháu
+     * Có sử dụng Cache để tối ưu hiệu năng
+     */
+    public static function getTreeIds($rootId)
     {
-        return url($this->slug->slug ?? '#');
+        // Tạo Cache Key duy nhất cho mỗi ID
+        $cacheKey = "post_category_tree_{$rootId}";
+
+        // Cache trong 1 ngày (86400 giây) hoặc lâu hơn tùy bạn
+        return Cache::remember($cacheKey, 86400, function () use ($rootId) {
+            
+            // Logic lấy dữ liệu (giữ nguyên code cũ của bạn)
+            $rootCategory = self::with('childrenRecursive')->find($rootId);
+
+            if (!$rootCategory) {
+                return [];
+            }
+
+            $ids = [$rootCategory->id];
+
+            $traverse = function ($categories) use (&$ids, &$traverse) {
+                foreach ($categories as $category) {
+                    $ids[] = $category->id;
+                    if ($category->childrenRecursive->isNotEmpty()) {
+                        $traverse($category->childrenRecursive);
+                    }
+                }
+            };
+
+            $traverse($rootCategory->childrenRecursive);
+
+            return $ids;
+        });
     }
 }

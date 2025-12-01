@@ -3,13 +3,29 @@
 namespace App\Services;
 
 use App\Models\Brand;
+use App\Contracts\MediaServiceContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Traits\UploadImageTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\UploadedFile;
+
 class BrandService
 {
-    use UploadImageTrait;
+    protected MediaServiceContract $mediaService;
+
+    /**
+     * Cấu hình cho ảnh brand (logo).
+     */
+    private const BRAND_IMAGE_CONFIG = [
+        'main' => ['width' => 250, 'height' => 250, 'fit' => true],
+        'variants' => ['thumbnail' => ['width' => 100, 'height' => 100, 'fit' => true]],
+        'quality' => 85,
+        'format' => 'webp'
+    ];
+
+    public function __construct(MediaServiceContract $mediaService)
+    {
+        $this->mediaService = $mediaService;
+    }
 
     public function getAll()
     {
@@ -18,37 +34,83 @@ class BrandService
 
     public function create(array $data): Brand
     {
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
-        if (isset($data['image'])) {
-            $data['image'] = $this->uploadImage($data['image'], 'uploads/brands', 250, 53);
+        $brandData = Arr::except($data, ['image_original_path']);
+        
+        // Tạo slug nếu chưa có
+        if (empty($brandData['slug']) && !empty($brandData['name'])) {
+            $brandData['slug'] = $this->generateUniqueSlug($brandData['name']);
         }
-        return Brand::create($data);
+
+        $brand = Brand::create($brandData);
+
+        // Xử lý ảnh brand
+        $this->mediaService->updateMedia(
+            $brand,
+            $data['image_original_path'] ?? null,
+            'brands', 
+            self::BRAND_IMAGE_CONFIG,
+            fn($imgData) => $brand->setMainImage($imgData), 
+            null, 
+            'logo thương hiệu' 
+        );
+
+        return $brand->load('images');
     }
 
     public function update(Brand $brand, array $data): bool
     {
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
-        if (isset($data['image'])) {
-            $this->deleteImage($brand->image);
-            $data['image'] = $this->uploadImage($data['image'], 'uploads/brands', 250, 53);
+        $brandData = Arr::except($data, ['image_original_path']);
+        
+        // Tạo slug mới nếu name thay đổi
+        if (isset($data['name']) && $brand->name !== $data['name'] && empty($data['slug'])) {
+            $brandData['slug'] = $this->generateUniqueSlug($data['name'], $brand->id);
         }
-        return $brand->update($data);
+
+        $updateResult = $brand->update($brandData);
+
+        // Xử lý ảnh brand
+        $this->mediaService->updateMedia(
+            $brand,
+            $data['image_original_path'] ?? null,
+            'brands',
+            self::BRAND_IMAGE_CONFIG,
+            fn($imgData) => $brand->setMainImage($imgData),
+            fn() => $brand->mainImage(), 
+            'logo thương hiệu'
+        );
+
+        return $updateResult;
     }
 
     public function delete(Brand $brand): ?bool
     {
+        // Xóa ảnh liên quan
+        $images = $brand->images()->get(); 
+        foreach ($images as $image) {
+            $this->mediaService->deleteProcessedImages($image);
+            $image->delete(); 
+        }
+
         return $brand->delete();
     }
 
-    public function getById($id): ?Brand
+    /**
+     * Tạo slug duy nhất.
+     */
+    private function generateUniqueSlug(string $name, ?int $exceptId = null): string
     {
-        return Brand::findOrFail($id);
-    }
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
 
-    public function searchAjax(string $query)
-    {
-        return Brand::where('name', 'like', "%{$query}%")
-            ->limit(10)
-            ->get(['id', 'name']);
+        while (Brand::where('slug', $slug)
+            ->when($exceptId, function ($query) use ($exceptId) {
+                return $query->where('id', '!=', $exceptId);
+            })
+            ->exists()) {
+            $slug = $originalSlug . '-' . $count++;
+        }
+
+        return $slug;
     }
 }

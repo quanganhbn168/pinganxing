@@ -31,14 +31,19 @@ class SettingRequest extends FormRequest
             'head_script'      => 'nullable|string',
             'body_script'      => 'nullable|string',
             'logo'             => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
+            'banner'           => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
             'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
             'meta_description' => 'nullable|string|max:500',
-            'meta_keywords'    => 'nullable|string|max:255', 
+            'meta_keywords'    => 'nullable|string|max:255',
             'zalo'             => 'nullable|url',
             'mess'             => 'nullable|url',
             'tiktok'           => 'nullable|url',
             'youtube'          => 'nullable|url',
             'favicon'          => 'nullable|image|mimes:ico,png,jpg,jpeg|max:512',
+            'profile'         => 'nullable|file|mimes:pdf|max:10240',
+            'video_type'      => 'nullable|string|in:youtube,upload',
+            'intro_video'     => 'nullable|file|mimes:mp4,mov,avi|max:51200',
+            'intro_video_url' => 'nullable|url',
         ];
     }
 
@@ -65,10 +70,12 @@ class SettingRequest extends FormRequest
             'logo.image'                => 'Logo phải là tệp hình ảnh.',
             'logo.mimes'                => 'Logo phải có định dạng: jpg, jpeg, png, webp, gif.',
             'logo.max'                  => 'Kích thước logo không được vượt quá :max KB.',
+            'banner.mimes'              => 'banner phải có định dạng: jpg, jpeg, png, webp, gif.',
+            'banner.max'                => 'Kích thước banner không được vượt quá :max KB.',
 
-            'meta_image.image'         => 'Ảnh chia sẻ phải là tệp hình ảnh.',
-            'meta_image.mimes'         => 'Ảnh chia sẻ phải có định dạng: jpg, jpeg, png, webp, gif.',
-            'meta_image.max'           => 'Kích thước ảnh chia sẻ không được vượt quá :max KB.',
+            'meta_image.image'          => 'Ảnh chia sẻ phải là tệp hình ảnh.',
+            'meta_image.mimes'          => 'Ảnh chia sẻ phải có định dạng: jpg, jpeg, png, webp, gif.',
+            'meta_image.max'            => 'Kích thước ảnh chia sẻ không được vượt quá :max KB.',
 
             'meta_description.string'   => 'Mô tả meta phải là chuỗi ký tự.',
             'meta_description.max'      => 'Mô tả meta không được vượt quá :max ký tự.',

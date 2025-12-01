@@ -1,30 +1,177 @@
 @extends('layouts.admin')
 
+
+
 @section('title', 'Thêm danh mục bài viết')
+
 @section('content_header', 'Thêm danh mục bài viết')
 
+
+
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Thêm danh mục bài viết</h3>
+
+<form action="{{ route('admin.post-categories.store') }}" method="POST">
+
+    @csrf
+
+    <div class="row">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header">
+
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin chính</h6>
+
+                </div>
+
+                <div class="card-body">
+
+                    <x-form.input name="name" label="Tên danh mục" required />
+
+                    <x-form.slug
+
+                        name="slug"
+
+                        label="Đường dẫn (slug)"
+
+                        :value="old('slug')"
+
+                        source="#name"
+
+                        table="post_categories"
+
+                        field="slug"
+
+                    />
+
+                    <div class="form-group">
+
+                        <label for="parent_id">Danh mục cha</label>
+
+                        <select id="parent_id" name="parent_id" class="form-control @error('parent_id') is-invalid @enderror">
+
+                            <option value="">— Là danh mục gốc —</option>
+
+                            <x-form.category-tree 
+
+                                :categories="$parentCategories"
+
+                                :selectedId="old('parent_id')"
+
+                            />
+
+                        </select>
+
+                        @error('parent_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+
+                    </div>
+
+
+
+                    
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-lg-4">
+
+            <div class="card shadow mb-4">
+
+                <div class="card-header">
+
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin phụ</h6>
+
+                </div>
+
+                <div class="card-body">
+
+                    <x-form.switch name="status" label="Trạng thái" :checked="true" />
+
+                    <x-form.switch name="is_home" label="Hiển thị trang chủ" :checked="false" />
+
+                    
+
+                    <hr>
+
+
+
+                    <x-admin.form.media-input
+
+                        name="image_original_path"
+
+                        label="Ảnh đại diện"
+
+                        :multiple="false"
+
+                        :value="old('image_original_path')"
+
+                    />
+
+
+
+                    <x-admin.form.media-input
+
+                        name="banner_original_path"
+
+                        label="Banner"
+
+                        :multiple="false"
+
+                        :value="old('banner_original_path')"
+
+                    />
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <form action="{{ route('admin.post-categories.store') }}" method="POST" class="form-horizontal" enctype="multipart/form-data">
-        @csrf
-        <div class="card-body">
-            <x-form.input type="text" name="name" label="Tên danh mục" :value="old('name')" />
-            <x-form.input type="text" name="slug" label="Slug (URL thân thiện)" :value="old('slug')" placeholder="Tự động tạo nếu để trống" />
-            <x-form.select name="parent_id" label="Danh mục cha" :options="$categories" :selected="old('parent_id', 0)" placeholder="-- Không có danh mục cha --" />
-            <x-form.image-input name="image" label="Ảnh đại diện" />
-            <x-form.image-input name="banner" label="Banner (tuỳ chọn)" />
-            <x-form.switch name="status" label="Trạng thái" :checked="old('status', true)" />
+
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-footer text-right">
+
+                    <button type="submit" name="save" class="btn btn-primary">
+
+                        <i class="fas fa-save mr-1"></i> Lưu
+
+                    </button>
+
+                    <button type="submit" name="save_new" class="btn btn-success">
+
+                        <i class="fas fa-plus mr-1"></i> Lưu & Thêm mới
+
+                    </button>
+
+                    <a href="{{ route('admin.post-categories.index') }}" class="btn btn-secondary">
+
+                        <i class="fas fa-arrow-left mr-1"></i> Quay lại
+
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="card-footer">
-            <button type="submit" name="action" value="save" class="btn btn-primary">Lưu</button>
-            <button type="submit" name="action" value="save_new" class="btn btn-secondary">Lưu và thêm mới</button>
-            <a href="{{ route('admin.post-categories.index') }}" class="btn btn-outline-dark">Quay lại</a>
-        </div>
-    </form>
-</div>
+    </div>
+
+</form>
+
 @endsection

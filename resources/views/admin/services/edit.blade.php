@@ -9,7 +9,7 @@
         @method('PUT')
         <div class="card-body">
             <x-form.input type="text" name="name" label="Tên dịch vụ" :value="old('name', $service->name)" required />
-            <x-form.category-select name="service_category_id" label="Danh mục" :options="$categories" :selected="old('service_category_id', $service->service_category_id)" placeholder="-- Chọn danh mục --" required />
+            <x-form.select-best name="service_category_id" label="Danh mục" :collection="$categories" :selected="old('service_category_id', $service->service_category_id)" placeholder="-- Chọn danh mục --" required />
             <x-form.image-input name="image" label="Ảnh đại diện" :value="$service->image" />
             <x-form.image-multi-input
                 name="gallery"

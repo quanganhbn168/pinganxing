@@ -63,37 +63,6 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Xoá dịch vụ thành công.');
     }
 
-    public function serviceByCate($slug)
-    {
-        $category = ServiceCategory::where("slug", $slug)->where("status", 1)->firstOrFail();
-
-        if ($category->parent_id == 0) {
-            // Danh mục cha → lấy toàn bộ service của các danh mục con
-            $childCategoryIds = $category->children()->pluck('id');
-
-            $services = Service::whereIn('service_category_id', $childCategoryIds)
-                ->where('status', 1)
-                ->get();
-        } else {
-            // Danh mục con → lấy service theo id hiện tại
-            $services = Service::where('service_category_id', $category->id)
-                ->where('status', 1)
-                ->get();
-        }
-
-        return view("frontend.services.serviceByCate", compact("category", "services"));
-    }
-
-
-    public function detail(Service $service)
-    {
-        $relatedService = Service::where("status", 1)
-        ->where("id", '!=', $service->id)
-        ->orderBy("updated_at", "DESC")
-        ->limit(6)
-        ->get();
-
-        return view("frontend.services.detail", compact("service", "relatedService"));
-    }
+    
 
 }

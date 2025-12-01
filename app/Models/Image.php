@@ -2,33 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Image extends Model
 {
-    /** @use HasFactory<\Database\Factories\ImageFactory> */
-    
     use HasFactory;
 
     protected $fillable = [
-        'item_type',
-        'item_id',
-        'image',
-        'position',
+        'imageable_type', 'imageable_id', 'role',
+        'dir', 'main_path', 'variants', 'original_path', 'disk',
+        'filename', 'ext', 'mime', 'size', 'width', 'height',
+        'position', 'alt', 'title', 'custom',
     ];
-    protected static function booted(): void
-    {
-        // Auto-assign position liên tiếp
-        static::creating(function ($model) {
-            if (empty($model->position) || $model->position === 0) {
-                $model->position = static::max('position') + 1;
-            }
-        });
-    }
-    public function item()
+
+    protected $casts = [
+        'variants' => 'array',
+        'custom'   => 'array',
+        'size'     => 'integer',
+        'width'    => 'integer',
+        'height'   => 'integer',
+        'position' => 'integer',
+    ];
+
+    public function imageable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    // URL tiện dụng
+    public function url(?string $variant = null): string
+    {
+        $path = $variant ? ($this->variants[$variant] ?? null) : $this->main_path;
+        return $path ? \Storage::disk($this->disk)->url($path) : '';
+    }
 }

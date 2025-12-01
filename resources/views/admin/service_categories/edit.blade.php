@@ -29,12 +29,14 @@
                 :value="old('content', $service_category->content)"
             />
 
-            <x-form.category-select
+        
+
+            <x-form.select-best
                 name="parent_id"
-                label="Danh mục"
-                :options="$categories"
-                :selected="old('parent_id', $service_category->parent_id)"
-            />
+                label="Danh mục cha"
+                :collection="$categories"
+                :selected="$service_category->parent_id"
+                placeholder="-- Danh mục gốc --" />
 
             <x-form.image-input
                 name="image"

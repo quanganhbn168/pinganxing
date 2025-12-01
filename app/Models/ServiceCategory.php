@@ -6,13 +6,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\HasImages;
+use App\Traits\HasSlug;
 class ServiceCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSlug, HasImages;
     protected $table = 'service_categories';
     protected $fillable = [
-        'name','slug', 'image', 'banner', 'parent_id', 'status','is_home', 'description', 'content'
+        'name','slug', 'image', 'banner', 'parent_id', 'status','is_home','is_menu','is_footer', 'description', 'content'
     ];
 
     public function parent()

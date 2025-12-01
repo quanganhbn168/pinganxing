@@ -1,24 +1,20 @@
 <?php return array (
-  'intervention/image' => 
+  'ckfinder/ckfinder-laravel-package' => 
   array (
-    'aliases' => 
-    array (
-      'Image' => 'Intervention\\Image\\Facades\\Image',
-    ),
     'providers' => 
     array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
+      0 => 'CKSource\\CKFinderBridge\\CKFinderServiceProvider',
     ),
   ),
-  'kreait/laravel-firebase' => 
+  'intervention/image-laravel' => 
   array (
     'aliases' => 
     array (
-      'Firebase' => 'Kreait\\Laravel\\Firebase\\Facades\\Firebase',
+      'Image' => 'Intervention\\Image\\Laravel\\Facades\\Image',
     ),
     'providers' => 
     array (
-      0 => 'Kreait\\Laravel\\Firebase\\ServiceProvider',
+      0 => 'Intervention\\Image\\Laravel\\ServiceProvider',
     ),
   ),
   'laravel/sail' => 
@@ -67,17 +63,6 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
-  'simplesoftwareio/simple-qrcode' => 
-  array (
-    'aliases' => 
-    array (
-      'QrCode' => 'SimpleSoftwareIO\\QrCode\\Facades\\QrCode',
-    ),
-    'providers' => 
-    array (
-      0 => 'SimpleSoftwareIO\\QrCode\\QrCodeServiceProvider',
-    ),
-  ),
   'spatie/laravel-ignition' => 
   array (
     'aliases' => 
@@ -101,62 +86,6 @@
     'providers' => 
     array (
       0 => 'Spatie\\Sitemap\\SitemapServiceProvider',
-    ),
-  ),
-  'unisharp/laravel-filemanager' => 
-  array (
-    'aliases' => 
-    array (
-    ),
-    'providers' => 
-    array (
-      0 => 'UniSharp\\LaravelFilemanager\\LaravelFilemanagerServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-buttons' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\ButtonsServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-editor' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\EditorServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-export' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\ExportServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-fractal' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\FractalServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-html' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\HtmlServiceProvider',
-    ),
-  ),
-  'yajra/laravel-datatables-oracle' => 
-  array (
-    'aliases' => 
-    array (
-      'DataTables' => 'Yajra\\DataTables\\Facades\\DataTables',
-    ),
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
     ),
   ),
 );

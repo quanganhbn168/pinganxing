@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Traits\HasImages;
+use App\Enums\SliderType;
 
 class Slide extends Model
 {
-    use HasFactory;
+    use HasFactory, HasImages;
 
     protected $fillable = [
         'title',
@@ -20,29 +22,9 @@ class Slide extends Model
         'is_home',
     ];
     protected $casts = [
-        'image' => 'json',
+        'type' => SliderType::class,
+        'status' => 'boolean',
     ];
-
-    // === Constants for Slide Type ===
-    const TYPE_SLIDE         = 1;
-    const TYPE_PARTNER  = 2;
-    const TYPE_POPUP         = 3;
-    const TYPE_ADVERTISEMENT = 4;
-
-    public static function getTypeOptions(): array
-    {
-        return [
-            self::TYPE_SLIDE         => 'Slide',
-            self::TYPE_PARTNER  => 'Đối tác',
-            self::TYPE_POPUP         => 'Popup',
-            self::TYPE_ADVERTISEMENT => 'Quảng cáo',
-        ];
-    }
-
-    public function getTypeNameAttribute(): string
-    {
-        return self::getTypeOptions()[$this->type] ?? 'Không xác định';
-    }
 
     /**
      * Lấy ảnh đầy đủ path (nếu dùng asset)

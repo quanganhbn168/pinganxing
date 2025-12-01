@@ -3,79 +3,111 @@
 namespace App\Services;
 
 use App\Models\PostCategory;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Traits\UploadImageTrait;
+use App\Contracts\MediaServiceContract;
+use Illuminate\Support\Arr;
 
 class PostCategoryService
 {
-    use UploadImageTrait;
+    protected MediaServiceContract $mediaService;
+
+    /**
+     * Cấu hình cho ảnh đại diện category.
+     */
+    private const CATEGORY_IMAGE_CONFIG = [
+        'main' => ['width' => 400],
+        'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
+        'quality' => 85,
+        'format' => 'webp'
+    ];
+
+    /**
+     * Cấu hình cho banner category.
+     */
+    private const BANNER_IMAGE_CONFIG = [
+        'main' => ['width' => 1920, 'height' => 500, 'fit' => true],
+        'variants' => ['thumbnail' => ['width' => 300, 'height' => 100, 'fit' => true]],
+        'quality' => 85,
+        'format' => 'webp'
+    ];
+
+    public function __construct(MediaServiceContract $mediaService)
+    {
+        $this->mediaService = $mediaService;
+    }
 
     public function getAll()
     {
-        return PostCategory::with('parent')->latest()->get();
+        return PostCategory::with('parent')->latest()->paginate(20);
     }
 
-    public function getParentOptions(?int $exceptId = null)
+    public function create(array $data): PostCategory
     {
-        return PostCategory::when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
-        ->pluck('name', 'id')
-        ->prepend('Danh mục gốc', 0)
-        ->toArray();
+        $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
+        $category = PostCategory::create($categoryData);
+
+        // Xử lý ảnh đại diện
+        $this->mediaService->updateMedia(
+            $category,
+            $data['image_original_path'] ?? null,
+            'post_categories', 
+            self::CATEGORY_IMAGE_CONFIG,
+            fn($imgData) => $category->setMainImage($imgData), 
+            null, 
+            'ảnh danh mục bài viết' 
+        );
+
+        // Xử lý banner
+        $this->mediaService->updateMedia(
+            $category,
+            $data['banner_original_path'] ?? null,
+            'post_categories/banner', 
+            self::BANNER_IMAGE_CONFIG,
+            fn($imgData) => $category->setBannerImage($imgData), 
+            null, 
+            'banner danh mục bài viết' 
+        );
+
+        return $category->load(['parent', 'images']);
     }
 
-
-    public function create(Request $request): PostCategory
+    public function update(PostCategory $postCategory, array $data): PostCategory
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:post_categories,slug',
-            'parent_id' => 'nullable|integer|min:0',
-            'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'status' => 'nullable|boolean',
-        ]);
+        $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
+        $postCategory->update($categoryData);
 
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
-        $data['image'] = $this->uploadImage($request->file('image'), 'uploads/post_categories');
-        if ($request->hasFile('banner')) {
-            $data['banner'] = $this->uploadImage($request->file('banner'), 'uploads/post_categories');
+        // Xử lý ảnh đại diện
+        $this->mediaService->updateMedia(
+            $postCategory,
+            $data['image_original_path'] ?? null,
+            'post_categories',
+            self::CATEGORY_IMAGE_CONFIG,
+            fn($imgData) => $postCategory->setMainImage($imgData),
+            fn() => $postCategory->mainImage(), 
+            'ảnh danh mục bài viết'
+        );
+
+        // Xử lý banner
+        $this->mediaService->updateMedia(
+            $postCategory,
+            $data['banner_original_path'] ?? null,
+            'post_categories/banner',
+            self::BANNER_IMAGE_CONFIG,
+            fn($imgData) => $postCategory->setBannerImage($imgData),
+            fn() => $postCategory->bannerImage(), 
+            'banner danh mục bài viết'
+        );
+
+        return $postCategory->load(['parent', 'images']);
+    }
+
+    public function delete(PostCategory $postCategory): void
+    {
+        $images = $postCategory->images()->get(); 
+        foreach ($images as $image) {
+            $this->mediaService->deleteProcessedImages($image);
+            $image->delete(); 
         }
 
-        return PostCategory::create($data);
-    }
-
-    public function update(PostCategory $postCategory, Request $request): PostCategory
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:post_categories,slug,' . $postCategory->id,
-            'parent_id' => 'nullable|integer|min:0',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-            'status' => 'nullable|boolean',
-        ]);
-
-        $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
-
-        if ($request->hasFile('image')) {
-            $this->deleteImage($postCategory->image);
-            $data['image'] = $this->uploadImage($request->file('image'), 'uploads/post_categories');
-        }
-
-        if ($request->hasFile('banner')) {
-            $this->deleteImage($postCategory->banner);
-            $data['banner'] = $this->uploadImage($request->file('banner'), 'uploads/post_categories');
-        }
-
-        $postCategory->update($data);
-        return $postCategory;
-    }
-
-    public function delete(PostCategory $postCategory): bool
-    {
-        $this->deleteImage($postCategory->image);
-        $this->deleteImage($postCategory->banner);
-        return $postCategory->delete();
+        $postCategory->delete();
     }
 }

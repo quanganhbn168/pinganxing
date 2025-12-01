@@ -23,7 +23,6 @@ return new class extends Migration
             $table->boolean('is_home')->default(1);
             $table->boolean('is_menu')->default(1);
             $table->boolean('is_footer')->default(1);
-            $table->enum('category_type', ['physical', 'service'])->default('physical');
             $table->unsignedInteger('position')->default(0)->index();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();   

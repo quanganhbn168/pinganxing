@@ -1,69 +1,61 @@
-@extends('layouts.admin') {{-- Thay đổi tùy theo layout của anh --}}
-
+@extends('layouts.admin')
 @section('title', 'Quản lý Vai trò')
+@section('content_header', 'Vai trò & Phân quyền')
 
 @section('content')
 <div class="card">
     <div class="card-header">
-        <h5 class="card-title mb-0">Danh sách Vai trò</h5>
+        <h3 class="card-title">Danh sách Vai trò</h3>
+        <div class="card-tools">
+            <a href="{{ route('admin.roles.create') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Thêm Vai trò
+            </a>
+        </div>
     </div>
-    <div class="card-body">
-        <a href="{{ route('admin.roles.create') }}" class="btn btn-primary mb-3">Thêm vai trò mới</a>
-
-        {{-- Hiển thị thông báo thành công hoặc lỗi --}}
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tên vai trò</th>
-                        <th>Các quyền</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($roles as $role)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $role->name }}</td>
-                            <td>
-                                @foreach ($role->permissions->take(5) as $permission)
-                                    <span class="badge bg-info me-1">{{ $permission->name }}</span>
-                                @endforeach
-                                @if ($role->permissions->count() > 5)
-                                    <span class="badge bg-secondary">...</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-sm btn-warning">Sửa</a>
-                                <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="d-inline"
-                                      onsubmit="return confirm('Anh có chắc chắn muốn xóa vai trò này không? Hành động này không thể hoàn tác.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center">Chưa có vai trò nào.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Phân trang --}}
-        <div class="mt-3">
-            {{ $roles->links() }}
-        </div>
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 50px">#</th>
+                    <th>Tên Vai trò</th>
+                    <th>Quyền hạn</th>
+                    <th style="width: 150px" class="text-right">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($roles as $role)
+                <tr>
+                    <td>{{ $role->id }}</td>
+                    <td>
+                        <strong>{{ $role->name }}</strong>
+                        @if($role->name === 'Super Admin')
+                            <span class="badge badge-danger ml-2">System</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($role->name === 'Super Admin')
+                            <span class="text-success"><i class="fas fa-check-circle"></i> Toàn quyền hệ thống</span>
+                        @else
+                            <span class="badge badge-info">{{ $role->permissions->count() }} quyền</span>
+                        @endif
+                    </td>
+                    <td class="text-right">
+                        @if($role->name !== 'Super Admin')
+                            <a href="{{ route('admin.roles.edit', $role->id) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xóa vai trò này?')">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        @else
+                            <button class="btn btn-sm btn-secondary" disabled><i class="fas fa-lock"></i></button>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
 @endsection

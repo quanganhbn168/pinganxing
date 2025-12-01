@@ -2,72 +2,270 @@
 
 namespace App\Services;
 
+use App\Contracts\MediaServiceContract;
 use App\Models\Project;
-use App\Traits\UploadImageTrait;
+use App\Models\ProjectCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ProjectService
 {
-    use UploadImageTrait;
+    /** Ảnh đại diện */
+    private const MAIN_IMAGE_CONFIG = [
+        'main'     => ['width' => 1024, 'height' => 768, 'fit' => true],
+        'variants' => [
+            'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
+        ],
+        'quality'  => 85,
+        'format'   => 'webp',
+    ];
 
-    public function create(Request $request): Project
+    /** Ảnh banner */
+    private const BANNER_IMAGE_CONFIG = [
+        'main'     => ['width' => 1920, 'height' => 700, 'fit' => true],
+        'variants' => [
+            'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
+        ],
+        'quality'  => 85,
+        'format'   => 'webp',
+    ];
+
+    /** Gallery */
+    private const GALLERY_IMAGE_CONFIG = [
+        'main'     => ['width' => 1024],
+        'variants' => [
+            'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
+        ],
+        'quality'  => 85,
+        'format'   => 'webp',
+    ];
+
+    public function __construct(
+        protected MediaServiceContract $mediaService
+    ) {}
+
+    /**
+     * Danh sách dự án + filter cơ bản cho trang index.
+     * Trả về [$projects, ['categories' => [id => name]]]
+     */
+    public function list(Request $request): array
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'required|string',
-            'content'     => 'nullable|string',
-            'parent_id'   => 'nullable|integer|min:0',
-            'status'      => 'nullable|boolean',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'banner'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
-        ]);
+        $perPage = (int) $request->integer('per_page', 20);
 
-        $data['parent_id'] = (int) ($data['parent_id'] ?? 0);
+        $projects = Project::with('category')
+            ->when($request->filled('keyword'), function ($q) use ($request) {
+                $kw = trim($request->get('keyword'));
+                $q->where(function ($qq) use ($kw) {
+                    $qq->where('name', 'LIKE', "%{$kw}%")
+                       ->orWhere('slug', 'LIKE', "%{$kw}%");
+                });
+            })
+            ->when($request->filled('project_category_id'), fn ($q) =>
+                $q->where('project_category_id', $request->integer('project_category_id')))
+            ->when($request->filled('status') || $request->get('status') === '0', fn ($q) =>
+                $q->where('status', (int) $request->get('status')))
+            ->when($request->filled('is_home') || $request->get('is_home') === '0', fn ($q) =>
+                $q->where('is_home', (int) $request->get('is_home')))
+            ->latest('id')
+            ->paginate($perPage);
 
-        if ($request->hasFile('image')) {
-            $data['image'] = $this->uploadImage($request->file('image'), 'uploads/projects', 1200, true);
-        }
+        $filterCategories = $this->getFilterCategories();
 
-        if ($request->hasFile('banner')) {
-            $data['banner'] = $this->uploadImage($request->file('banner'), 'uploads/projects', 1920, true);
-        }
-
-        return Project::create($data);
+        return [$projects, $filterCategories];
     }
 
-    public function update(Request $request, Project $project): Project
+    /** Dùng cho select filter phẳng (id => name) */
+    public function getFilterCategories(): array
     {
-        $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'required|string',
-            'content'     => 'nullable|string',
-            'parent_id'   => 'nullable|integer|min:0',
-            'status'      => 'nullable|boolean',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'banner'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+        return ProjectCategory::orderBy('name')->pluck('name', 'id')->toArray();
+    }
+
+    /** Dùng cho <x-form.category-tree> (cây danh mục) */
+    public function getCategoryTree()
+    {
+        return ProjectCategory::with('childrenRecursive')
+            ->where('parent_id', 0)
+            ->get();
+    }
+
+    /**
+     * Tạo mới Project + media (image/banner/gallery).
+     * Nhận các field media:
+     * - image_original_path
+     * - banner_original_path
+     * - gallery_original_paths (JSON array)
+     */
+    public function create(array $data): Project
+    {
+        $projectData = Arr::except($data, [
+            'image_original_path',
+            'banner_original_path',
+            'gallery_original_paths',
         ]);
 
-        $data['parent_id'] = (int) ($data['parent_id'] ?? 0);
-
-        if ($request->hasFile('image')) {
-            $this->deleteImage($project->image);
-            $data['image'] = $this->uploadImage($request->file('image'), 'uploads/projects', 1200, true);
+        // Tự tạo slug nếu để trống
+        if (empty($projectData['slug']) && !empty($projectData['name'])) {
+            $projectData['slug'] = Str::slug($projectData['name']);
         }
 
-        if ($request->hasFile('banner')) {
-            $this->deleteImage($project->banner);
-            $data['banner'] = $this->uploadImage($request->file('banner'), 'uploads/projects', 1920, true);
-        }
+        $project = Project::create($projectData);
 
-        $project->update($data);
+        // Ảnh đại diện
+        $this->mediaService->updateMedia(
+            $project,
+            $data['image_original_path'] ?? null,
+            'projects',
+            self::MAIN_IMAGE_CONFIG,
+            fn ($img) => $project->setMainImage($img),
+            null,
+            'Ảnh đại diện'
+        );
+
+        // Banner
+        $this->mediaService->updateMedia(
+            $project,
+            $data['banner_original_path'] ?? null,
+            'projects/banner',
+            self::BANNER_IMAGE_CONFIG,
+            fn ($img) => $project->setBannerImage($img),
+            null,
+            'Ảnh banner'
+        );
+
+        // Gallery
+        $this->updateGallery($project, $data['gallery_original_paths'] ?? null);
+
         return $project;
     }
 
+    /**
+     * Cập nhật Project + media (giữ nguyên nếu không truyền path mới)
+     */
+    public function update(Project $project, array $data): Project
+    {
+        $projectData = Arr::except($data, [
+            'image_original_path',
+            'banner_original_path',
+            'gallery_original_paths',
+        ]);
+
+        // Nếu slug trống nhưng có name → tự tạo
+        if (empty($projectData['slug']) && !empty($projectData['name'])) {
+            $projectData['slug'] = Str::slug($projectData['name']);
+        }
+
+        $project->update($projectData);
+
+        // Ảnh đại diện
+        $this->mediaService->updateMedia(
+            $project,
+            $data['image_original_path'] ?? null,
+            'projects',
+            self::MAIN_IMAGE_CONFIG,
+            fn ($img) => $project->setMainImage($img),
+            fn () => $project->mainImage(),
+            'Ảnh đại diện'
+        );
+
+        // Banner
+        $this->mediaService->updateMedia(
+            $project,
+            $data['banner_original_path'] ?? null,
+            'projects/banner',
+            self::BANNER_IMAGE_CONFIG,
+            fn ($img) => $project->setBannerImage($img),
+            fn () => $project->bannerImage(),
+            'Ảnh banner'
+        );
+
+        // Gallery (nếu truyền JSON mới thì sync thay thế)
+        $this->updateGallery($project, $data['gallery_original_paths'] ?? null);
+
+        return $project;
+    }
+
+    /**
+ * Đồng bộ gallery theo danh sách path (array hoặc JSON string).
+ * - Nếu null/empty: giữ nguyên gallery hiện có.
+ * - Nếu là JSON string: parse -> array.
+ * - Nếu là Collection: toArray().
+ * - Chỉ lấy các phần tử kiểu string, bỏ trống/invalid.
+ */
+private function updateGallery(Project $project, $pathsInput): void
+{
+    // Không truyền gì -> bỏ qua
+    if ($pathsInput === null || $pathsInput === '') {
+        return;
+    }
+
+    // Chuẩn hoá thành mảng $paths
+    if (is_string($pathsInput)) {
+        // Có thể là chuỗi JSON hoặc một path đơn lẻ
+        $decoded = json_decode($pathsInput, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $paths = $decoded;
+        } else {
+            // Không phải JSON -> coi như 1 path
+            $paths = [$pathsInput];
+        }
+    } elseif ($pathsInput instanceof \Illuminate\Support\Collection) {
+        $paths = $pathsInput->toArray();
+    } elseif (is_array($pathsInput)) {
+        $paths = $pathsInput;
+    } else {
+        // Kiểu lạ -> bỏ qua
+        return;
+    }
+
+    // Làm phẳng mảng & chỉ giữ string (phòng khi là mảng {original_path: ...})
+    $flat = [];
+    foreach ($paths as $item) {
+        if (is_string($item) && $item !== '') {
+            $flat[] = $item;
+        } elseif (is_array($item)) {
+            // thử các khoá hay dùng
+            foreach (['original_path','path','url','main_path'] as $k) {
+                if (!empty($item[$k]) && is_string($item[$k])) {
+                    $flat[] = $item[$k];
+                    break;
+                }
+            }
+        }
+    }
+
+    // Nếu sau khi lọc không có gì -> xoá sạch gallery (tuỳ yêu cầu)
+    // Ở đây: nếu danh sách trống => xoá toàn bộ cũ để "sync" đúng ý đồ
+    // Nếu muốn giữ nguyên khi trống, hãy return thay vì xoá.
+    foreach ($project->gallery as $img) {
+        $this->mediaService->deleteProcessedImages($img);
+        $img->delete();
+    }
+
+    foreach (array_values($flat) as $index => $path) {
+        $imageData = $this->mediaService->processAndPrepareData(
+            $path,
+            'projects/gallery',
+            self::GALLERY_IMAGE_CONFIG
+        );
+
+        if ($imageData) {
+            $project->addGalleryImage($imageData, $index);
+        }
+    }
+}
+
+
+    /**
+     * Xoá Project + toàn bộ media liên quan
+     */
     public function delete(Project $project): void
     {
-        $this->deleteImage($project->image);
-        $this->deleteImage($project->banner);
+        foreach ($project->images as $img) {
+            $this->mediaService->deleteProcessedImages($img);
+        }
+
+        $project->images()->delete();
         $project->delete();
     }
 }

@@ -1,81 +1,73 @@
-<footer class="footer">
+<footer class="footer-new">
     <div class="main-footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="footer__info">
-                        <div class="logo-footer">
-                            <a href="/" title="{{asset($setting->name)}}">
-                                <img width="300" height="51" src="{{asset($setting->logo)}}" alt="{{asset($setting->name)}}">
+        <div class="container">
+            <div class="row gy-4"> {{-- gy-4 để tạo khoảng cách giữa các cột trên mobile --}}
+
+                {{-- Cột 1: Thông tin công ty --}}
+                <div class="col-12 col-lg-4">
+                    <div class="footer-widget">
+                        <div class="logo-footer mb-3">
+                            <a href="/" title="{{ $setting->name }}">
+                                <img src="{{ asset($setting->logo) }}" alt="{{ $setting->name }}">
                             </a>
                         </div>
+                        <p class="footer-description">
+                            CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.
+                        </p>
                         <div class="info-address">
-                            <strong>{{$setting->name}}</strong><br>
-                            Mã số ĐKHKD: 01M8034928<br>
-                            Đăng ký lần đầu ngày 04/06/2024<br>
-                            Địa chỉ: {{$setting->address}}<br>
-                            Điện thoại: <a href="tel:{{$setting->phone}}">{{$setting->phone}}</a><br>
-                            Email: <a href="mailto:{{$setting->mail}}">{{$setting->mail}}</a>
-                        </div>
-                        <div class="social-list">
-                            <a href="https://facebook.com/ando.bhld" target="_blank" aria-label="Facebook"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/facebook_2.svg?1734490427077" alt="Facebook"></a>
-                            <a href="https://facebook.com/ando.bhld" target="_blank" aria-label="Instagram"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/instagram_1.svg?1734490427077" alt="Instagram"></a>
-                            <a href="https://shopee.vn/ando_bhld" target="_blank" aria-label="Shopee"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/shopee.svg?1734490427077" alt="Shopee"></a>
-                            <a href="https://www.lazada.vn/shop/ando-safety" target="_blank" aria-label="Lazada"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/lazada.svg?1734490427077" alt="Lazada"></a>
-                            <a href="https://www.tiktok.com/@bhld_ando" target="_blank" aria-label="Tiktok"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/tiktok.svg?1734490427077" alt="Tiktok"></a>
-                        </div>
-                        <div class="bct-logo">
-                            <a href="http://online.gov.vn/Home/WebDetails/120462" target="_blank"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/logo_bct.png?1734490427077" alt="Bộ Công Thương"></a>
+                            <p><i class="fas fa-map-marker-alt me-2"></i> {{ $setting->address }}</p>
+                            <p><i class="fas fa-phone-alt me-2"></i> <a href="tel:{{ $setting->phone }}">{{ $setting->phone }}</a></p>
+                            <p><i class="fas fa-envelope me-2"></i> <a href="mailto:{{ $setting->email }}">{{ $setting->email }}</a></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-12 col-sm-6 col-lg-2">
-                    <div class="footer__menu">
-                        <h4 class="menu-title">Chính sách</h4>
+                {{-- Lặp qua các cột menu được định nghĩa trong config/menu_footer.php --}}
+                @foreach(get_menu_footer() as $menuColumn)
+                <div class="col-12 col-md-6 col-lg-2">
+                    <div class="footer-widget">
+                        @if(!empty($menuColumn['items']))
                         <ul class="menu-list">
-                            <li><a href="/chinh-sach">Chính sách bảo mật</a></li>
-                            <li><a href="/chinh-sach">Chính sách vận chuyển</a></li>
-                            <li><a href="/chinh-sach">Chính sách đổi trả</a></li>
-                            <li><a href="/dieu-khoan">Quy định sử dụng</a></li>
+                            @foreach($menuColumn['items'] as $item)
+                            <li><a href="{{ $item['url'] }}">{{ $item['title'] }}</a></li>
+                            @endforeach
                         </ul>
+                        @endif
                     </div>
                 </div>
+                @endforeach
 
-                <div class="col-12 col-sm-6 col-lg-3">
-                    <div class="footer__menu">
-                        <h4 class="menu-title">Hướng dẫn</h4>
-                        <ul class="menu-list">
-                            <li><a href="/huong-dan">Hướng dẫn mua hàng</a></li>
-                            <li><a href="/huong-dan">Hướng dẫn thanh toán</a></li>
-                            <li><a href="/huong-dan">Hướng dẫn giao nhận</a></li>
-                            <li><a href="/dieu-khoan">Điều khoản dịch vụ</a></li>
-                        </ul>
-                    </div>
-                </div>
+                {{-- Cột 4: Đăng ký nhận tin & Mạng xã hội --}}
+                <div class="col-12 col-lg-4">
+                    <div class="footer-widget">
+                        <h4 class="widget-title">Đăng ký nhận tin</h4>
+                        <p>Nhận thông tin mới nhất về sản phẩm và các chương trình khuyến mãi của chúng tôi.</p>
+                        
+                        {{-- Sửa lại form theo cấu trúc input-group của Bootstrap --}}
+                        <form class="subscribe-form mt-4">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Nhập email của bạn..." aria-label="Nhập email của bạn">
+                                <button type="submit" class="btn btn-primary" id="button-subscribe">
+                                    <i class="fas fa-paper-plane"></i> {{-- Icon gửi thư --}}
+                                </button>
+                            </div>
+                        </form>
 
-                <div class="col-12 col-lg-3">
-                    <div class="footer__payment">
-                        <h4 class="menu-title">Hỗ trợ thanh toán</h4>
-                        <div class="payment-list">
-                            <div class="payment-item"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/payment_1.png?1734490427077" alt="MoMo"></div>
-                            <div class="payment-item"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/payment_2.png?1734490427077" alt="Techcombank"></div>
-                            <div class="payment-item"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/payment_3.png?1734490427077" alt="Vietcombank"></div>
-                            <div class="payment-item"><img src="//bizweb.dktcdn.net/100/504/717/themes/933859/assets/payment_4.png?1734490427077" alt="Moca"></div>
+                        <div class="social-list mt-4">
+                            <a href="{{ $setting->youtube ?? '#' }}" target="_blank" title="Youtube"><i class="fab fa-youtube"></i></a>
+                            <a href="{{ $setting->facebook ?? '#' }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            {{-- Đổi icon Zalo cho hiện đại hơn --}}
+                            <a href="{{ $setting->zalo ?? '#' }}" target="_blank" title="Zalo"><i class="fas fa-paper-plane"></i></a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
     <div class="copyright">
         <div class="container">
-            <span>© Bản quyền thuộc về <b>{{$setting->name}}</b> | Cung cấp bởi <a href="https://www.thtmedia.com/" rel="nofollow" target="_blank">THT Media</a></span>
+            <span>© Bản quyền thuộc về <b>{{$setting->name}}</b> | Cung cấp bởi <a href="https://webappbacninh.vn/" rel="nofollow" target="_blank">Web App Bắc Ninh</a></span>
         </div>
     </div>
 </footer>
-
-<div class="footer-widget">
-    </div>
-<a href="#" class="backtop" title="Lên đầu trang">
-    </a>

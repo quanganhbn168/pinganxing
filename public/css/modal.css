@@ -1,0 +1,232 @@
+/* ===== Media Library Modal - Refactored for AdminLTE 3 ===== */
+
+/* 1. MODAL LAYOUT & SCROLLING */
+#mediaModal .modal-dialog {
+    max-width: 95%; /* Rộng hơn modal-xl mặc định một chút */
+    height: 90vh;   /* Chiếm 90% chiều cao màn hình */
+    margin: 1.75rem auto;
+}
+#mediaModal .modal-content {
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+#mediaModal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+#mediaModal .modal-body {
+    padding: 0; /* Reset padding để layout con tràn viền */
+    overflow: hidden; /* Quan trọng để con scroll */
+    display: flex;
+}
+
+/* 2. MAIN LAYOUT (Split View) */
+.media-layout-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* --- Left Side: Main Content --- */
+.media-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Fix flex overflow */
+    background-color: #fff;
+}
+.media-toolbar {
+    flex: 0 0 auto;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.media-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background-color: #f4f6f9; /* Màu nền AdminLTE nhẹ */
+}
+
+/* --- Right Side: Sidebar --- */
+.media-sidebar {
+    flex: 0 0 300px; /* Cố định 300px */
+    width: 300px;
+    background-color: #f8f9fa;
+    border-left: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+}
+.sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+.sidebar-footer {
+    flex: 0 0 auto;
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    background: #fff;
+}
+
+/* 3. MEDIA GRID (CSS Grid - The Magic Part) */
+.media-grid {
+    display: grid;
+    /* Tự động chia cột, tối thiểu 130px, tối đa full */
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+    gap: 1rem;
+}
+
+.media-item-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.media-item-card:hover {
+    border-color: #adb5bd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Square Aspect Ratio for Image */
+.media-thumbnail {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* Tạo hình vuông tỷ lệ 1:1 */
+    overflow: hidden;
+    background-color: #e9ecef;
+    border-radius: 4px 4px 0 0;
+    /* Checkered background cho ảnh trong suốt */
+    background-image: 
+      linear-gradient(45deg, #ccc 25%, transparent 25%), 
+      linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, #ccc 75%), 
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.media-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ảnh luôn đầy khung */
+    transition: transform 0.3s;
+}
+
+.media-item-name {
+    padding: 8px;
+    font-size: 0.85rem;
+    color: #495057;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 1px solid #f1f3f5;
+    text-align: center;
+}
+
+/* 4. SELECTED STATE (WordPress Style) */
+.media-item-card.selected {
+    border-color: #007bff; /* Primary Blue */
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+}
+.media-item-card.selected .media-thumbnail::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 4px solid #007bff;
+    /* Lớp phủ xanh mờ */
+    background-color: rgba(0, 123, 255, 0.1); 
+}
+/* Checkmark Icon */
+.media-item-card.selected::before {
+    content: "\f00c"; /* FontAwesome Check */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #007bff;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    z-index: 10;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 5. SIDEBAR DETAILS */
+.detail-preview-box {
+    width: 100%;
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+.detail-preview-box img {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.detail-info-group {
+    margin-bottom: 1rem;
+}
+.detail-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+.detail-value {
+    font-size: 0.9rem;
+    color: #343a40;
+    word-break: break-word;
+}
+
+/* 6. DROPZONE OVERLAY */
+.media-drag-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    display: none; /* Mặc định ẩn */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 4px dashed #007bff;
+    margin: 1rem;
+    border-radius: 1rem;
+}
+.media-drag-overlay.active { display: flex; }
+
+/* 7. RESPONSIVE */
+@media (max-width: 768px) {
+    .media-layout-container { flex-direction: column; }
+    .media-sidebar { width: 100%; border-left: none; border-top: 1px solid #dee2e6; height: auto; max-height: 40%; }
+    .media-main-content { height: 60%; }
+}

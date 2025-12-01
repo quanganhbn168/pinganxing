@@ -11,10 +11,10 @@
             <x-form.input name="name" label="Tên danh mục" :value="old('name')" />
             <x-form.textarea name="description" label="Mô tả" :value="old('description')" />
             <x-form.ckeditor name="content" label="Nội dung" :value="old('content')" />
-            <x-form.category-select
+            <x-form.select-best
                 name="parent_id"
                 label="Danh mục"
-                :options="$categories"
+                :collection="$categories"
                 :selected="old('parent_id', 0)"
             />
 

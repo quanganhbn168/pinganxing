@@ -1,0 +1,91 @@
+/* --- Counter (Updated to match image) --- */
+
+.wa-counter {
+
+    text-align: center;
+
+}
+
+
+
+/* KHỐI TRÊN: Chứa Icon và Số */
+
+.wa-counter__top {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 10px; /* Khoảng cách giữa icon và số */
+
+    margin-bottom: 0.5rem;
+
+}
+
+
+
+.wa-counter__icon {
+
+    font-size: 2.5rem; /* Kích thước icon nhỏ hơn số một chút */
+
+    line-height: 1;
+
+    color: var(--cnet-blue-primary); /* ĐÃ SỬA: Đổi sang màu Xanh */
+
+}
+
+
+
+.wa-counter__number {
+
+    font-weight: 700; /* ĐÃ SỬA: Giảm độ đậm một chút cho hợp ảnh */
+
+    font-size: 3rem;  /* ĐÃ SỬA: Tăng kích thước số */
+
+    line-height: 1;
+
+    color: var(--cnet-blue-primary); /* ĐÃ SỬA: Đổi sang màu Xanh */
+
+}
+
+
+
+/* KHỐI DƯỚI: Chữ mô tả */
+
+.wa-counter__label {
+
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+
+    text-transform: uppercase; /* ĐÃ THÊM: In hoa chữ */
+
+    color: var(--cnet-gray-secondary); /* ĐÃ SỬA: Đổi sang màu Xám */
+
+    font-size: 0.9rem; /* Chỉnh lại cỡ chữ cho phù hợp */
+
+}
+
+
+
+/* Responsive giữ nguyên */
+
+@media (max-width: 768px) {
+
+    .wa-counter__number {
+
+        font-size: 2.25rem;
+
+    }
+
+    .wa-counter__icon {
+
+        font-size: 2.75rem;
+
+    }
+    .wa-counter__label{
+        font-size: 0.7rem;
+    }
+}

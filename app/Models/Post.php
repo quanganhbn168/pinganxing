@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Traits\HasImages;
+use App\Traits\HasSlug;
+
 class Post extends Model
 {
     /** @use HasFactory<\Database\Factories\PostFactory> */
-    use HasFactory;
+    use HasFactory, HasImages, HasSlug;
     protected $fillable = [
         'post_category_id',
         'title',
@@ -40,14 +43,5 @@ class Post extends Model
     public function category()
     {
         return $this->belongsTo(PostCategory::class, 'post_category_id');
-    }
-    public function slug()
-    {
-        return $this->morphOne(Slug::class, 'sluggable');
-    }
-
-    public function getSlugUrlAttribute()
-    {
-        return url($this->slug->slug ?? '#');
     }
 }

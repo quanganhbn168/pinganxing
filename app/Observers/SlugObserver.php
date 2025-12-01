@@ -4,88 +4,116 @@ namespace App\Observers;
 
 use Illuminate\Support\Str;
 use App\Models\Slug;
+use Illuminate\Support\Facades\Schema;
 
 class SlugObserver
 {
     /**
-     * Xử lý khi model được tạo mới (created)
+     * Xử lý sau khi bản ghi đã được Lưu (cả Create và Update)
      */
-    public function created($model)
+    public function saved($model)
     {
-        if ($this->shouldHandleSlug($model)) {
-            $this->generateUniqueSlug($model);
+        // 1. Xác định nguồn để tạo slug
+        $sourceString = null;
+
+        // Nếu Controller gán thủ công: $model->custom_slug = 'abc';
+        // (Anh cần gán biến này trong controller nếu muốn custom)
+        if (!empty($model->custom_slug)) {
+            $sourceString = $model->custom_slug;
+        } 
+        // Nếu tên/tiêu đề thay đổi hoặc chưa có slug trong bảng relation
+        elseif ($model->isDirty('name') || $model->isDirty('title')) {
+            $sourceString = $model->name ?? $model->title;
+        }
+        // Trường hợp tạo mới mà chưa có slug
+        elseif ($model->wasRecentlyCreated) {
+            $sourceString = $model->name ?? $model->title;
+        }
+
+        // 2. Nếu cần tạo/update slug
+        if ($sourceString) {
+            $this->processSlug($model, $sourceString);
         }
     }
 
-    /**
-     * Xử lý khi model được cập nhật (updated)
-     */
-    public function updated($model)
-    {
-        if ($this->shouldHandleSlug($model)) {
-            $this->handleSlugUpdate($model);
-        }
-    }
-
-    /**
-     * Xử lý xóa slug khi model bị xóa
-     */
     public function deleting($model)
     {
-        if ($model->slug()->exists()) {
-            $model->slug()->delete();
+        // Xóa slug trong bảng slugs khi model bị xóa
+        // Dùng relation slugData() như đã fix ở Model Category
+        if (method_exists($model, 'slugData') && $model->slugData()->exists()) {
+            $model->slugData()->delete();
         }
     }
 
-    /**
-     * Kiểm tra model có cần xử lý slug không
-     */
-    protected function shouldHandleSlug($model): bool
-    {
-        // Chỉ xử lý nếu model có trường name hoặc title
-        return isset($model->name) || isset($model->title);
-    }
+    /** ====================== CORE ====================== **/
 
-    /**
-     * Xử lý cập nhật slug khi model thay đổi
-     */
-    protected function handleSlugUpdate($model)
+    protected function processSlug($model, $string)
     {
-        $currentName = $model->name ?? $model->title;
-        $originalName = $model->getOriginal('name') ?? $model->getOriginal('title');
+        // 1. Tạo slug base
+        $slugBase = Str::slug($string);
+        
+        // 2. Đảm bảo unique toàn cục
+        $finalSlug = $this->uniqueSlug($slugBase, $model);
 
-        // Nếu name thay đổi hoặc chưa có slug
-        if ($currentName !== $originalName || !$model->slug()->exists()) {
-            $this->generateUniqueSlug($model);
+        // 3. Lưu vào bảng `slugs` (Bảng polymorphic)
+        // [QUAN TRỌNG] Dùng slugData() thay vì slug() để tránh trùng tên cột
+        if (method_exists($model, 'slugData')) {
+            $model->slugData()->updateOrCreate(
+                [], // Điều kiện tìm (rỗng vì quan hệ 1-1 sẽ tự fill ID)
+                ['slug' => $finalSlug]
+            );
+        }
+
+        // 4. [Optional] Nếu bảng chính (vd: categories) cũng có cột slug
+        // Ta update luôn cột đó để đồng bộ dữ liệu (fallback)
+        if (Schema::hasColumn($model->getTable(), 'slug')) {
+            // Kiểm tra để tránh loop vô tận và tránh query thừa
+            if ($model->slug !== $finalSlug) {
+                $model->slug = $finalSlug;
+                $model->saveQuietly(); // Lưu mà không kích hoạt lại Observer
+            }
         }
     }
 
-    /**
-     * Tạo slug duy nhất
-     */
-    protected function generateUniqueSlug($model)
+    protected function uniqueSlug(string $base, $model): string
     {
-        $slugBase = Str::slug($model->name ?? $model->title);
-        $slug = $slugBase;
+        $slug = $base ?: 'no-name';
+        $originalSlug = $slug;
         $i = 1;
 
-        while ($this->slugExists($slug, $model)) {
-            $slug = $slugBase . '-' . $i++;
+        // Loop check trùng: Check cả bảng slugs VÀ bảng chính của model
+        while ($this->checkExists($slug, $model)) {
+            $slug = $originalSlug . '-' . $i++;
         }
 
-        $model->slug()->updateOrCreate([], ['slug' => $slug]);
+        return $slug;
     }
 
-    /**
-     * Kiểm tra slug đã tồn tại
-     */
-    protected function slugExists($slug, $model): bool
+    protected function checkExists($slug, $model): bool
     {
-        return Slug::where('slug', $slug)
-            ->where(function ($query) use ($model) {
-                $query->where('sluggable_type', '!=', get_class($model))
-                    ->orWhere('sluggable_id', '!=', $model->id);
-            })
-            ->exists();
+        $id = $model->id;
+        $type = get_class($model);
+
+        // 1. Check trong bảng 'slugs' (trừ chính nó)
+        $existsInSlugs = Slug::where('slug', $slug)
+            ->where(function ($q) use ($id, $type) {
+                $q->where('sluggable_type', '!=', $type)
+                  ->orWhere('sluggable_id', '!=', $id);
+            })->exists();
+
+        if ($existsInSlugs) return true;
+
+        // 2. Check trong bảng chính của model (nếu có cột slug)
+        // Để tránh trùng với các record cũ chưa migrate sang bảng slugs
+        if (Schema::hasColumn($model->getTable(), 'slug')) {
+            $existsInOwnTable = \DB::table($model->getTable())
+                ->where('slug', $slug)
+                ->where('id', '!=', $id)
+                ->exists();
+            
+            if ($existsInOwnTable) return true;
+        }
+
+        return false;
     }
 }

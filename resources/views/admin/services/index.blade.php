@@ -48,6 +48,8 @@
                             @csrf @method('DELETE')
                             <button class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></button>
                         </form>
+                        <x-admin.duplicate-button model="services" :id="$service->id"
+                            label="Clone" icon="bi bi-copy" confirm="Clone dịch vụ này?" class="ms-1" />
                     </td>
                 </tr>
                 @endforeach

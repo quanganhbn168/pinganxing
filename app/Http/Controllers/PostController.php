@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Services\PostService;
 use App\Models\PostCategory;
+use App\Http\Requests\PostRequest;
 
 class PostController extends Controller
 {
@@ -36,11 +37,11 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        $categories = $this->postService->getParentOptions();
+        $categories = PostCategory::pluck("name","id");
         return view('admin.posts.edit', compact('post', 'categories'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post)
     {
         $this->postService->update($request, $post);
         return redirect()->route('admin.posts.index')->with('success', 'Cập nhật bài viết thành công.');

@@ -1,162 +1,187 @@
 <?php
 
 return [
+    // DASHBOARD
     [
         'title' => 'Dashboard',
-        'icon' => 'bi bi-speedometer',
+        'icon' => 'bi bi-speedometer2',
         'route' => 'admin.dashboard',
         'permission' => 'view-dashboard',
     ],
+
+    // ===== NHÓM 0: MEDIA (QUẢN LÝ TẬP TRUNG) =====
+    ['type' => 'header', 'title' => 'TÀI NGUYÊN & MEDIA'],
+    [
+        'title' => 'Quản lý Media',
+        'icon' => 'bi bi-folder2-open', // Icon folder mở
+        'route' => 'admin.media.index', // Route mới cho Media Manager
+        'active_pattern' => 'admin.media.*',
+        'permission' => 'manage-media',
+    ],
+    [
+        'title' => 'Quản lý menu',
+        'icon' => 'fas fa-bars', // Icon folder mở
+        'route' => 'admin.menus.index', // Route mới cho Media Manager
+        'active_pattern' => 'admin.menus.*',
+        'permission' => 'manage-menu',
+    ],
+    
+    // ===== NHÓM 1: SẢN PHẨM & DỊCH VỤ =====
+    ['type' => 'header', 'title' => 'SẢN PHẨM'],
+
     [
         'title' => 'Quản lý sản phẩm',
         'icon' => 'bi bi-box-seam',
         'permission' => 'manage-products',
         'active_pattern' => ['admin.products.*', 'admin.categories.*', 'admin.attributes.*'],
         'submenu' => [
-            [
-                'title' => 'Danh mục sản phẩm',
-                'route' => 'admin.categories.index',
-                'active_pattern' => 'admin.categories.*',
-                'icon' => 'bi bi-folder2-open',
-            ],
-            [
-                'title' => 'Thuộc tính',
-                'route' => 'admin.attributes.index',
-                'active_pattern' => 'admin.attributes.*',
-                'icon' => 'bi bi-tags',
-            ],
-            [
-                'title' => 'Sản phẩm',
-                'route' => 'admin.products.index',
-                'active_pattern' => 'admin.products.*',
-                'icon' => 'bi bi-bag',
-            ],
+            ['title' => 'Danh mục sản phẩm', 'route' => 'admin.categories.index', 'active_pattern' => 'admin.categories.*'],
+            ['title' => 'Sản phẩm',            'route' => 'admin.products.index',  'active_pattern' => 'admin.products.*'],
+            ['title' => 'Thuộc tính',         'route' => 'admin.attributes.index','active_pattern' => 'admin.attributes.*'],
         ],
     ],
-    [
-        'title' => 'Quản lý Đơn hàng',
-        'icon' => 'bi bi-receipt',
-        'permission' => 'manage-orders',
-        'active_pattern' => 'admin.orders.*',
-        'submenu' => [
-            [
-                'title' => 'Danh sách Đơn hàng',
-                'route' => 'admin.orders.index',
-                'active_pattern' => 'admin.orders.*',
-                'icon' => 'bi bi-list-ul',
-            ],
-            [
-                'title' => 'Tạo Đơn hàng mới',
-                'route' => 'admin.orders.create',
-                'active_pattern' => 'admin.orders.create',
-                'icon' => 'bi bi-cart-plus',
-            ],
-        ],
-    ],
-    [
-        'title' => 'Quản lý dịch vụ',
-        'icon' => 'bi bi-journal-bookmark-fill',
-        'active_pattern' => ['admin.service_categories.*', 'admin.services.*'],
-        'submenu' => [
-            [
-                'title' => 'Danh mục dịch vụ',
-                'route' => 'admin.service_categories.index',
-                'active_pattern' => 'admin.service_categories.*',
-                'icon' => 'bi bi-journal',
-            ],
-            [
-                'title' => 'Dịch vụ',
-                'route' => 'admin.services.index',
-                'active_pattern' => 'admin.services.*',
-                'icon' => 'bi bi-journal-medical',
-            ],
-        ],
-    ],
+
+    // ===== NHÓM 2: NỘI DUNG WEBSITE =====
+    ['type' => 'header', 'title' => 'NỘI DUNG WEBSITE'],
+
     [
         'title' => 'Quản lý bài viết',
-        'icon' => 'bi bi-file-text',
+        'icon' => 'bi bi-pencil-square',
         'permission' => 'manage-posts',
         'active_pattern' => ['admin.post-categories.*', 'admin.posts.*'],
         'submenu' => [
+            ['title' => 'Danh mục bài viết', 'route' => 'admin.post-categories.index', 'active_pattern' => 'admin.post-categories.*'],
+            ['title' => 'Bài viết',          'route' => 'admin.posts.index',            'active_pattern' => 'admin.posts.*'],
+        ],
+    ],
+    [
+        'title' => 'Thư viện & Hiển thị',
+        'icon' => 'bi bi-collection',
+        'active_pattern' => ['admin.slides.*', 'admin.testimonials.*', 'admin.intros.*', 'admin.brands.*'],
+        'submenu' => [
+            ['title' => 'Slide trang chủ',  'route' => 'admin.slides.index',        'active_pattern' => 'admin.slides.*'],
+            ['title' => 'Feedback (Testimonial)', 'route' => 'admin.testimonials.index', 'active_pattern' => 'admin.testimonials.*'],
+            ['title' => 'Giới thiệu (Pages)',      'route' => 'admin.intros.index',       'active_pattern' => 'admin.intros.*'],
+            ['title' => 'Thương hiệu (Brand)',     'route' => 'admin.brands.index',       'active_pattern' => 'admin.brands.*'],
+        ],
+    ],
+
+    // ===== NHÓM 3: DỰ ÁN & LĨNH VỰC =====
+    ['type' => 'header', 'title' => 'DỰ ÁN & LĨNH VỰC'],
+
+    [
+        'title' => 'Quản lý Dự án',
+        'icon' => 'bi bi-building', // Đổi icon building cho hợp dự án
+        'active_pattern' => ['admin.project-categories.*', 'admin.projects.*'],
+        'submenu' => [
+            ['title' => 'Danh mục Dự án', 'route' => 'admin.project-categories.index', 'active_pattern' => 'admin.project-categories.*'],
+            ['title' => 'Dự án',          'route' => 'admin.projects.index',            'active_pattern' => 'admin.projects.*'],
+        ],
+    ],
+    [
+        'title' => 'Quản lý Lĩnh vực',
+        'icon' => 'bi bi-diagram-3', // Đổi icon diagram cho hợp lĩnh vực hoạt động
+        'permission' => 'manage-fields',
+        'active_pattern' => ['admin.field-categories.*', 'admin.fields.*'],
+        'submenu' => [
+            ['title' => 'Danh mục Lĩnh vực', 'route' => 'admin.field-categories.index', 'active_pattern' => 'admin.field-categories.*'],
+            ['title' => 'Lĩnh vực',          'route' => 'admin.fields.index',            'active_pattern' => 'admin.fields.*'],
+        ],
+    ],
+
+    // ===== NHÓM 4: ĐỐI TÁC & TUYỂN DỤNG =====
+    ['type' => 'header', 'title' => 'ĐỐI TÁC & TUYỂN DỤNG'],
+
+    [
+        'title' => 'Quản lý Đại lý',
+        'icon' => 'bi bi-shop-window', // Icon cửa hàng/đại lý
+        'route' => 'admin.agents.index',
+        'active_pattern' => 'admin.agents.*',
+        'permission' => 'manage-agents',
+    ],
+    [
+        'title' => 'Quản lý Tuyển dụng',
+        'icon' => 'bi bi-briefcase',
+        'permission' => 'manage-careers',
+        // Active pattern cho cả tin tuyển dụng và hồ sơ ứng tuyển
+        'active_pattern' => ['admin.careers.*', 'admin.career_applications.*'],
+        'submenu' => [
+            // Quản lý bài đăng tuyển dụng
+            ['title' => 'Tin tuyển dụng',      'route' => 'admin.careers.index',             'active_pattern' => 'admin.careers.*'],
+            
+            // Quản lý CV/Form ứng tuyển gửi về
             [
-                'title' => 'Danh mục bài viết',
-                'route' => 'admin.post-categories.index',
-                'active_pattern' => 'admin.post-categories.*',
-                'icon' => 'bi bi-folder2',
+                'title' => 'Hồ sơ ứng tuyển',
+                'route' => 'admin.career-applications.index',
+                'active_pattern' => 'admin.career-applications.*'
+            ],
+        ],
+    ],
+    // ===== NHÓM MỚI: QUẢN LÝ CÔNG VIỆC (JOB) =====
+    ['type' => 'header', 'title' => 'QUẢN LÝ CÔNG VIỆC'],
+
+    [
+        'title' => 'Phiếu việc (Job)',
+        'icon' => 'bi bi-tools', // Icon công cụ
+        // Pattern này để giữ menu mở khi đang ở trang tạo hoặc xem việc của tôi
+        'active_pattern' => ['admin.work-orders.*', 'admin.my-work-orders.*'],
+        'submenu' => [
+            [
+                'title' => 'Danh sách phiếu việc',
+                'route' => 'admin.work-orders.index',
+                'active_pattern' => 'admin.work-orders.index'
             ],
             [
-                'title' => 'Bài viết',
-                'route' => 'admin.posts.index',
-                'active_pattern' => 'admin.posts.*',
-                'icon' => 'bi bi-file-earmark',
+                'title' => 'Tạo phiếu việc',     
+                'route' => 'admin.work-orders.create',   
+                'active_pattern' => 'admin.work-orders.create'
+            ],
+            // Dành cho Nhân viên xem việc
+            [
+                'title' => 'Việc của tôi',       
+                'route' => 'admin.my-work-orders.index', 
+                'active_pattern' => 'admin.my-work-orders.*' // Bao gồm cả trang chi tiết
             ],
         ],
     ],
     [
-        'title' => 'Quản lý slide',
-        'icon' => 'bi bi-images',
-        'route' => 'admin.slides.index',
-        'active_pattern' => 'admin.slides.*',
-        'permission' => 'manage-settings',
+        'title' => 'Duyệt & Doanh thu',
+        'icon' => 'bi bi-cash-stack', // Icon tiền
+        'route' => 'admin.task-audit.index',
+        'active_pattern' => 'admin.task-audit.*',
+        // 'permission' => 'audit-tasks', // Sau này có thể thêm quyền vào đây
     ],
-    [
-        'title' => 'Quản lý feedback',
-        'icon' => 'bi bi-images',
-        'route' => 'admin.testimonials.index',
-        'active_pattern' => 'admin.testimonials.*',
-        'permission' => 'manage-settings',
-    ],
-    [
-        'title' => 'Quản lý giới thiệu',
-        'icon' => 'bi bi-images',
-        'route' => 'admin.intros.index',
-        'active_pattern' => 'admin.intros.*',
-        'permission' => 'manage-settings',
-    ],
-    [
-        'title' => 'Quản lý thương hiệu',
-        'icon' => 'bi bi-images',
-        'route' => 'admin.brands.index',
-        'active_pattern' => 'admin.brands.*',
-        'permission' => 'manage-settings',
-    ],
+    // ===== NHÓM 5: HỆ THỐNG =====
+    ['type' => 'header', 'title' => 'HỆ THỐNG'],
+
     [
         'title' => 'Quản lý người dùng',
-        'icon' => 'bi bi-person',
+        'icon' => 'bi bi-person-gear',
         'permission' => 'manage-users',
         'active_pattern' => 'admin.users.*',
         'submenu' => [
-            [
-                'title' => 'Danh sách người dùng',
-                'route' => 'admin.users.index',
-                'active_pattern' => 'admin.users.*',
-                'icon' => 'bi bi-circle',
-            ],
-            
-            [
-                'title' => 'Thêm người dùng',
-                'route' => 'admin.users.create',
-                'active_pattern' => 'admin.users.create',
-                'icon' => 'bi bi-circle',
-            ],
+            ['title' => 'Danh sách người dùng', 'route' => 'admin.users.index',  'active_pattern' => 'admin.users.*'],
+            ['title' => 'Thêm người dùng',       'route' => 'admin.users.create', 'active_pattern' => 'admin.users.create'],
         ],
+    ],
+    [
+        'title' => 'Page Settings',
+        'icon' => 'bi bi-file-earmark-richtext',
+        'route' => 'admin.pages.index',
+        'active_pattern' => 'admin.pages.*',
+        'permission' => 'manage-pages',
     ],
     [
         'title' => 'Phân quyền',
-        'icon' => 'bi bi-shield-lock',
+        'icon' => 'bi bi-shield-check',
         'permission' => 'manage-roles',
         'active_pattern' => 'admin.roles.*',
         'submenu' => [
-            [
-                'title' => 'Vai trò & Quyền',
-                'route' => 'admin.roles.index',
-                'active_pattern' => 'admin.roles.*',
-                'icon' => 'bi bi-person-check-fill',
-            ],
+            ['title' => 'Vai trò & Quyền', 'route' => 'admin.roles.index', 'active_pattern' => 'admin.roles.*'],
         ],
     ],
     [
-        'title' => 'Cấu hình',
+        'title' => 'Cấu hình chung',
         'icon' => 'bi bi-gear',
         'route' => 'admin.settings.index',
         'active_pattern' => 'admin.settings.*',

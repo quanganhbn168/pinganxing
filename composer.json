@@ -7,17 +7,13 @@
     "require": {
         "php": "^8.2",
         "almasaeed2010/adminlte": "~3.1",
-        "intervention/image": "^2.7",
-        "kreait/laravel-firebase": "^6.1",
+        "ckfinder/ckfinder-laravel-package": "^5.0",
+        "intervention/image-laravel": "^1.5",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "livewire/livewire": "^3.6",
-        "simplesoftwareio/simple-qrcode": "4.2",
+        "livewire/livewire": "^3.7",
         "spatie/laravel-permission": "^6.21",
-        "spatie/laravel-sitemap": "^7.3",
-        "unisharp/laravel-filemanager": "^2.10",
-        "yajra/laravel-datatables": "^11.0",
-        "yajra/laravel-datatables-oracle": "^11.0"
+        "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -36,7 +32,8 @@
         },
         "files": [
             "app/helpers.php",
-            "app/Helpers/MenuHelper.php"
+            "app/Helpers/MenuHelper.php",
+            "app/Helpers/ContentHelper.php"
         ]
     },
     "autoload-dev": {

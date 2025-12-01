@@ -14,13 +14,15 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('parent_id')->nullable()->default(0);
+            $table->string('slug')->unique();
+            $table->unsignedBigInteger('project_category_id');
             $table->text('description');
             $table->text('content')->nullable();
             $table->boolean('status')->default(0);
             $table->boolean('is_home')->default(0);
             $table->string('image')->nullable();
             $table->string('banner')->nullable();
+            $table->foreign('project_category_id')->references('id')->on('project_categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

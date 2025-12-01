@@ -6,19 +6,17 @@
 @endpush
 
 @section('content')
-<div id="category-wrapper">
+<div id="service-wrapper">
     <!-- Banner -->
-    <div class="category-banner">
-        <img src="{{ asset($category->banner) }}" alt="{{ $service->name }}" width="1920" height="300">
-        <div class="category-banner_overlay"></div>
-        <div class="category-banner_info">
-            <h1 class="category-banner_title">{{ $service->name }}</h1>
-            <div class="category-banner_meta">
-                <i class="fas fa-user"></i> Admin
-                <span class="dot">•</span>
-                <i class="fas fa-clock"></i> {{ $service->updated_at->format('d/m/Y') }}
-            </div>
-        </div>
+    <div class="service-banner mb-4">
+        <img src="{{ !empty($service->banner) 
+    ? $service->banner 
+    : (!empty($setting->banner) 
+        ? $setting->banner 
+        : asset('images/setting/no-banner.png')) }}"
+            width="1920" height="300"
+            loading="eager">
+        <div class="service-banner_overlay"></div>
     </div>
 
     <!-- Breadcrumb -->
@@ -26,7 +24,7 @@
         <div class="container">
             <ul class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url('/') }}">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('slug.resolve', $category->slug) }}">{{ $category->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('frontend.slug.handle', $service->slug) }}">{{ $service->category->name }}</a></li>
                 <li class="breadcrumb-item active">{{ $service->name }}</li>
             </ul>
         </div>
@@ -35,10 +33,10 @@
     <!-- Nội dung -->
     <div class="container">
         <div class="row">
-            <!-- Content -->
+            @include("partials.frontend.aside")
             <div class="col-md-9">
                 <div class="service-detail">
-                    <h1 class="service-title text-primary">{{ $service->name }}</h1>
+                    <h1 class="service-title">{{ $service->name }}</h1>
                     <div class="service-content">
                         {!! $service->content !!}
                     </div>
@@ -60,7 +58,7 @@
                         @foreach($relatedServices as $related)
                         <div class="col-md-4 col-sm-6 mb-4">
                             <div class="services-list_item">
-                                <a href="{{ route('slug.resolve', $related->slug) }}">
+                                <a href="{{ route('frontend.slug.handle', $related->slug) }}">
                                     <div class="item-image">
                                         <img src="{{ asset($related->image) }}" alt="{{ $related->name }}">
                                     </div>
@@ -77,7 +75,7 @@
             </div>
 
             <!-- Sidebar -->
-            @include("partials.frontend.aside")
+            
         </div>
     </div>
 </div>

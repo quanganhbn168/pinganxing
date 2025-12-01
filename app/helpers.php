@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 
 if (!function_exists('is_active_menu')) {
     function is_active_menu($route)
@@ -28,29 +29,43 @@ if (!function_exists('is_open_menu')) {
     }
 }
 
-if (!function_exists('buildTreeOptions')) {
+if (!function_exists('get_category_options_flatten')) {
     /**
-     * Build select options dạng phân cấp (cho danh mục)
+     * Hàm lấy danh sách danh mục dạng phẳng (Flat) để hiển thị trong Select Box.
+     * Tự động Disable các danh mục Cha.
      *
-     * @param iterable $items
-     * @param \Illuminate\Support\Collection $grouped (grouped by parent_id)
-     * @param int|null $selected
-     * @param int $depth
+     * @param \Illuminate\Support\Collection $categories (Lấy từ Category::all())
+     * @param int|null $parentId (Đệ quy, không cần truyền)
+     * @param string $prefix (Tiền tố hiển thị cấp độ)
      * @return array
      */
-    function buildTreeOptions($items, $grouped, $selected = null, $depth = 0): array
+    function get_category_options_flatten($categories, $parentId = null, $prefix = '')
     {
-        $result = [];
+        $options = [];
+        
+        // Lọc lấy các con của parentId hiện tại
+        // Dùng where của Collection (trên RAM) nên rất nhanh, ko query lại DB
+        $children = $categories->where('parent_id', $parentId);
 
-        foreach ($items as $item) {
-            $prefix = str_repeat('— ', $depth);
-            $result[$item['id']] = $prefix . $item['name'];
+        foreach ($children as $category) {
+            // Kiểm tra xem thằng này có con không? (để biết là Cha hay Lá)
+            // Nếu có con -> $hasChild = true -> Sẽ bị Disable
+            $hasChild = $categories->where('parent_id', $category->id)->isNotEmpty();
 
-            if ($grouped->has($item['id'])) {
-                $result += buildTreeOptions($grouped[$item['id']], $grouped, $selected, $depth + 1);
+            $options[] = (object) [
+                'id' => $category->id,
+                'name' => $prefix . $category->name,
+                'disabled' => $hasChild, // TRUE nếu là cha
+                'style' => $hasChild ? 'font-weight: bold; background-color: #eee; color: #333;' : '' // Style nhẹ cho dễ nhìn
+            ];
+
+            // Nếu nó là cha (có con), thì tiếp tục đào sâu (đệ quy)
+            if ($hasChild) {
+                $subOptions = get_category_options_flatten($categories, $category->id, $prefix . '-- ');
+                $options = array_merge($options, $subOptions);
             }
         }
 
-        return $result;
+        return $options;
     }
 }

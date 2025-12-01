@@ -53,6 +53,8 @@
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger delete"><i class="far fa-trash-alt"></i></button>
                                 </form>
+                                <x-admin.duplicate-button model="service_categories" :id="$item->id"
+                            label="Clone" icon="bi bi-copy" confirm="Clone dịch vụ này?" class="ms-1" />
                             </td>
                         </tr>
                         @endforeach

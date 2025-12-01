@@ -18,7 +18,6 @@ class BrandRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:brands,name,' . $id,
             'slug' => 'nullable|string|max:255|unique:brands,slug,' . $id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'boolean',
         ];
     }
@@ -28,9 +27,6 @@ class BrandRequest extends FormRequest
         return [
             'name.required' => 'Tên thương hiệu không được để trống.',
             'name.unique'   => 'Tên thương hiệu này đã tồn tại.',
-            'image.image'   => 'Tệp tải lên phải là một hình ảnh.',
-            'image.mimes'   => 'Hình ảnh phải có định dạng là: :values.',
-            'image.max'     => 'Hình ảnh có dung lượng không quá :max KB.',
         ];
     }
 }

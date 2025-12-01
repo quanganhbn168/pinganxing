@@ -12,10 +12,15 @@ class GenerateSlugs extends Command
     protected $description = 'Generate missing slugs for existing models';
 
     protected $models = [
+        \App\Models\Intro::class,
         \App\Models\Product::class,
         \App\Models\Service::class,
         \App\Models\Project::class,
+        \App\Models\ProjectCategory::class,
         \App\Models\Post::class,
+        \App\Models\Category::class,
+        \App\Models\FieldCategory::class,
+        \App\Models\Field::class,
         \App\Models\Category::class,
         \App\Models\ServiceCategory::class,
         \App\Models\PostCategory::class,
@@ -39,7 +44,7 @@ class GenerateSlugs extends Command
                     $slug = $base . '-' . $i++;
                 }
 
-                $item->slug()->create(['slug' => $slug]);
+                $item->slugData()->create(['slug' => $slug]);
                 $this->line("{$slug}");
             }
         }

@@ -15,11 +15,15 @@ class SlugServiceProvider extends ServiceProvider
         \App\Models\Product::class,
         \App\Models\Category::class,
         \App\Models\Service::class,
+        \App\Models\ProjectCategory::class,
         \App\Models\Project::class,
         \App\Models\ServiceCategory::class,
         \App\Models\PostCategory::class,
         \App\Models\Post::class,
-        // Thêm các model khác tại đây
+        \App\Models\Intro::class,
+        \App\Models\Field::class,
+        \App\Models\FieldCategory::class,
+        \App\Models\Career::class,
     ];
 
     /**
@@ -36,7 +40,10 @@ class SlugServiceProvider extends ServiceProvider
     public function boot(): void
     {
         foreach ($this->observableModels as $model) {
-            $model::observe(SlugObserver::class);
+            // Kiểm tra class tồn tại để tránh lỗi crash app nếu lỡ xóa file model
+            if (class_exists($model)) {
+                $model::observe(SlugObserver::class);
+            }
         }
     }
 }

@@ -5,80 +5,117 @@ namespace App\Traits;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 trait UploadImageTrait
 {
     /**
-     * Upload ảnh với resize (có thể set chiều rộng và chiều cao), WebP và watermark.
+     * Upload ảnh (hỗ trợ raster & SVG) với resize, WebP, watermark — tương thích Intervention Image v3.
+     *
+     * @param UploadedFile $file
+     * @param string       $folder         Thư mục lưu (trong disk 'public')
+     * @param int|null     $resizeWidth    Chiều rộng max/đích
+     * @param int|null     $resizeHeight   Chiều cao max/đích
+     * @param bool         $convertToWebp  Convert sang WebP
+     * @param string       $watermarkPath  Đường dẫn public_path() tới watermark (tùy chọn)
+     * @param bool         $keepRatio      true: scaleDown giữ tỉ lệ, false: resize ép khuôn (khi có đủ w,h)
+     *
+     * @return string      Public path dạng 'storage/...'
      */
     public function uploadImage(
         UploadedFile $file,
         string $folder = 'uploads/images',
-        int $resizeWidth = 1920,
-        int $resizeHeight = 0,
+        ?int $resizeWidth = 1920,
+        ?int $resizeHeight = null,
         bool $convertToWebp = true,
         string $watermarkPath = '',
-        bool $keepRatio = true // Mới thêm
+        bool $keepRatio = true
     ): string {
-        // Tạo tên file mới
-        $ext = strtolower($file->getClientOriginalExtension());
+        $disk = 'public';
+        $ext  = strtolower($file->getClientOriginalExtension() ?: '');
+        $mime = strtolower($file->getClientMimeType() ?: '');
         $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $slug = Str::slug($name);
-        $filename = uniqid() . '-' . $slug;
+        $slug = Str::slug($name) ?: 'image';
+        $uniq = uniqid();
 
-        // Tạo image từ file và auto xoay đúng chiều
-        $image = Image::make($file->getRealPath())->orientate();
+        // ===== SVG: lưu nguyên file, không xử lý =====
+        if ($ext === 'svg' || str_contains($mime, 'svg')) {
+            $filename = "{$uniq}-{$slug}.svg";
+            $path     = "{$folder}/{$filename}";
+            $file->storeAs($folder, $filename, $disk);
+            return "storage/{$path}";
+        }
 
-        // Resize nếu cần
-        if ($resizeWidth > 0 || $resizeHeight > 0) {
+        // ===== Raster: xử lý v3 =====
+        $manager = new ImageManager(new Driver());
+        $image   = $manager->read($file->getPathname())->orient();
+
+        // Resize
+        if ($resizeWidth || $resizeHeight) {
             if ($keepRatio) {
-                $image->resize(
-                    $resizeWidth > 0 ? $resizeWidth : null,
-                    $resizeHeight > 0 ? $resizeHeight : null,
-                    function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    }
+                // scaleDown giữ tỉ lệ, không phóng vượt kích thước đưa vào
+                $image->scaleDown(
+                    width:  $resizeWidth  ?? null,
+                    height: $resizeHeight ?? null
                 );
             } else {
-                $image->resize($resizeWidth, $resizeHeight);
+                // Ép đúng kích thước khi có đủ 2 chiều
+                if ($resizeWidth && $resizeHeight) {
+                    $image->resize($resizeWidth, $resizeHeight);
+                }
             }
         }
 
-        // Thêm watermark nếu có
-        if ($watermarkPath && file_exists(public_path($watermarkPath))) {
-            $watermark = Image::make(public_path($watermarkPath));
-            $image->insert($watermark, 'bottom-right', 10, 10);
+        // Watermark (tuỳ chọn)
+        if ($watermarkPath && is_file(public_path($watermarkPath))) {
+            $wm = $manager->read(public_path($watermarkPath));
+            // bottom-right, offset (10,10)
+            $image->place($wm, 'bottom-right', 10, 10);
         }
 
-        // Encode và lưu ảnh
+        // Encode & tên file cuối
         if ($convertToWebp) {
-            $filename .= '.webp';
-            $image->encode('webp', 85);
+            $filename = "{$uniq}-{$slug}.webp";
+            $binary   = $image->toWebp(85);
         } else {
-            $filename .= '.' . $ext;
-            $image->encode($ext, 85);
+            // Giữ/ext hợp lệ khi không convert
+            $finalExt = in_array($ext, ['jpg','jpeg','png','webp']) ? ($ext === 'jpeg' ? 'jpg' : $ext) : 'jpg';
+            $filename = "{$uniq}-{$slug}.{$finalExt}";
+            switch ($finalExt) {
+    case 'png':
+        // PNG không có quality, chỉ interlace (bool)
+        $binary = $image->toPng(); // hoặc ->toPng(interlaced: true)
+        break;
+
+    case 'webp':
+        $binary = $image->toWebp(quality: 85);
+        break;
+
+    default: // jpg
+        $binary = $image->toJpeg(quality: 85);
+        break;
+}
+
         }
 
-        // Lưu vào storage
-        $path = $folder . '/' . $filename;
-        Storage::disk('public')->put($path, $image);
+        $path = "{$folder}/{$filename}";
+        Storage::disk($disk)->put($path, (string) $binary);
 
-        return 'storage/' . $path;
+        return "storage/{$path}";
     }
 
-
     /**
-     * Xóa ảnh đã lưu.
+     * Xóa ảnh đã lưu (public path).
      */
-    public function deleteImage(?string $path): void
+    public function deleteImage(?string $publicPath): void
     {
-        if ($path && Str::startsWith($path, 'storage/')) {
-            $path = Str::replaceFirst('storage/', '', $path);
-            if (Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->delete($path);
-            }
+        if (!$publicPath || !Str::startsWith($publicPath, 'storage/')) {
+            return;
+        }
+        $rel = Str::replaceFirst('storage/', '', $publicPath);
+        if (Storage::disk('public')->exists($rel)) {
+            Storage::disk('public')->delete($rel);
         }
     }
 }

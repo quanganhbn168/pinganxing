@@ -8,29 +8,17 @@
         @csrf
         <div class="card-body">
             <x-form.input type="text" name="name" label="Tên dịch vụ" :value="old('name')" required />
-            <x-form.category-select name="service_category_id" label="Danh mục" :options="$categories" :selected="old('parent_id', 0)" placeholder="-- Danh mục gốc --" required />
+            <x-form.select-best
+                name="service_category_id"
+                label="Danh mục sản phẩm"
+                :collection="$categories"
+                :options="$categories"
+                valueField="id"
+                textField="name"
+                placeholder="-- Danh mục gốc --"
+                required
+            />
             <x-form.image-input name="image" label="Ảnh dịch vụ" />
-            <x-form.money-input
-                name="price"
-                label="Giá"
-                :value="old('price')"
-                required
-            />
-
-            <x-form.select
-                name="unit_id"
-                label="Đơn vị tính"
-                :options="$units->pluck('name', 'id')"
-                :selected="old('unit_id', $service->unit_id ?? '')"
-                placeholder="-- Chọn đơn vị --"
-                required
-            />
-
-            {{-- <x-form.image-multi-input
-                name="gallery"
-                label="Thư viện ảnh chi tiết"
-            /> --}}
-
             <x-form.image-input name="banner" label="Banner (tuỳ chọn)" />
             <x-form.textarea name="description" label="Mô tả ngắn" :value="old('description')" />
             <x-form.ckeditor name="content" label="Nội dung chi tiết" :value="old('content')" />

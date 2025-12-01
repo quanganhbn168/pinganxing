@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             // UserSeeder::class,
             // AdminSeeder::class,
-            CategoryProductSeeder::class
+            // CategoryProductSeeder::class
         ]);
     }
 }

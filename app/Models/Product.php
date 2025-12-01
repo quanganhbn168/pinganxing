@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasImages;
+use App\Traits\HasSlug;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasImages, HasSlug;
 
     protected $fillable = [
         'type',
@@ -22,6 +24,7 @@ class Product extends Model
         'image',
         'description',
         'content',
+        'specifications',
         'price',
         'price_discount',
         'stock',
@@ -70,20 +73,6 @@ class Product extends Model
     public function specifications(): BelongsToMany
     {
         return $this->belongsToMany(AttributeValue::class, 'attribute_value_product');
-    }
-
-    public function slug()
-    {
-        return $this->morphOne(\App\Models\Slug::class, 'sluggable');
-    }
-    public function images()
-    {
-        return $this->morphMany(Image::class, 'item');
-    }
-    
-    public function getSlugUrlAttribute()
-    {
-        return url($this->slug->slug ?? '#');
     }
 
     /**

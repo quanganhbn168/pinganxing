@@ -4,87 +4,103 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Attribute;
 use App\Http\Requests\CategoryRequest;
 use App\Services\CategoryService;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * @var CategoryService
-     */
-    protected $categoryService;
+    public function __construct(
+        protected CategoryService $categoryService
+    ) {}
 
-    // Sử dụng Dependency Injection để inject CategoryService vào controller
-    public function __construct(CategoryService $categoryService)
-    {
-        $this->categoryService = $categoryService;
-    }
-    /**
-     * Hiển thị danh sách các danh mục.
-     */
     public function index()
     {
-        // Lấy danh sách danh mục có phân trang
-        $categories = Category::with('parent')->latest()->paginate(10);
+        $categories = $this->categoryService->getAll();
         return view('admin.categories.index', compact('categories'));
     }
-    /**
-     * Hiển thị form để tạo mới category.
-     */
+
     public function create()
     {
-        $category = new Category();
-        $categories = Category::all();
-        $attributes = Attribute::all();
+        $categories = Category::select("id","name",'parent_id')->get();
 
-        return view('admin.categories.create', compact('category', 'categories', 'attributes'));
+        return view('admin.categories.create', compact('categories'));
     }
 
-    /**
-     * Lưu category mới vào database.
-     */
     public function store(CategoryRequest $request)
     {
-        $this->categoryService->store($request);
-
-        // Giả sử bạn có route index để quay về danh sách
-        return redirect()->route('admin.categories.index')
-                         ->with('success', 'Tạo danh mục thành công.');
+        $validatedData = $request->validated();
+        $validatedData['image_original_path'] = $request->input('image_original_path');
+        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        $this->categoryService->create($validatedData);
+        
+        return $request->has('save_new')
+            ? redirect()->route('admin.categories.create')->with('success', 'Thêm danh mục thành công.')
+            : redirect()->route('admin.categories.index')->with('success', 'Thêm danh mục thành công.');
     }
 
-    /**
-     * Hiển thị form để chỉnh sửa category.
-     */
     public function edit(Category $category)
     {
-        $categories = Category::where('id', '!=', $category->id)->get();
-        $selectedAttributes = $category->attributes()->pluck('id')->toArray();
-        $attributes = Attribute::all();
+        $category->load(['parent', 'images', 'children.childrenRecursive']);
 
-        return view('admin.categories.edit', compact('category', 'categories', 'attributes', 'selectedAttributes'));
+        $excludeIds = array_merge([$category->id], $category->descendantIds());
+
+        $categories = Category::select("id","name","parent_id")->get();
+        
+        return view('admin.categories.edit', compact('category', 'categories'));
     }
 
-    /**
-     * Cập nhật category trong database.
-     */
     public function update(CategoryRequest $request, Category $category)
     {
-        $this->categoryService->update($request, $category);
-
-        return redirect()->route('admin.categories.index')
-                         ->with('success', 'Cập nhật danh mục thành công.');
+        $validatedData = $request->validated();
+        $validatedData['image_original_path'] = $request->input('image_original_path');
+        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        $this->categoryService->update($category, $validatedData);
+        
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công.');
     }
-    
+    /**
+     * Xử lý thao tác hàng loạt (Delete, Active, Inactive...)
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids'    => 'required|array',
+            'ids.*'  => 'exists:categories,id', // Đảm bảo ID tồn tại
+            'action' => 'required|string|in:delete,active,inactive', // Các hành động cho phép
+        ]);
+
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+        $count = count($ids);
+
+        switch ($action) {
+            case 'delete':
+                // Cách 1: Xóa nhanh bằng 1 lệnh SQL (Tối ưu nhất)
+                // Lưu ý: Cách này sẽ KHÔNG kích hoạt Observer (nếu bạn có logic xóa ảnh trong Observer)
+                // Nếu muốn xóa ảnh vật lý qua Observer, hãy dùng vòng lặp hoặc Event.
+                Category::whereIn('id', $ids)->delete();
+                
+                $message = "Đã xóa thành công $count danh mục.";
+                break;
+
+            // Ví dụ mở rộng sau này:
+            // case 'active':
+            //     Category::whereIn('id', $ids)->update(['status' => 1]);
+            //     $message = "Đã hiển thị $count danh mục.";
+            //     break;
+            
+            default:
+                return back()->withErrors(['message' => 'Hành động không hợp lệ.']);
+        }
+
+        return back()->with('success', $message);
+    }
     public function destroy(Category $category)
     {
-        try {
-            $this->categoryService->destroy($category);
-            return redirect()->route('admin.categories.index')
-                             ->with('success', 'Xóa danh mục thành công.');
-        } catch (\Exception $e) {
-            // Nếu có lỗi (ví dụ: còn danh mục con), quay lại và báo lỗi
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+        $this->categoryService->delete($category);
+        return redirect()->route('admin.categories.index')->with('success', 'Xóa danh mục thành công.');
     }
 }

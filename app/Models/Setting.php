@@ -11,7 +11,7 @@ class Setting extends Model
 
     protected $table = 'settings';
 
-    // Nếu chỉ có 1 dòng, không cần khóa chính
+    // Cấu hình khóa chính (giữ nguyên theo code cũ của bạn)
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -19,19 +19,30 @@ class Setting extends Model
     protected $fillable = [
         'name',
         'logo',
+        'banner',
         'favicon',
         'email',
         'phone',
         'address',
         'map',
-        'schema_script',
-        'meta_description',
-        'meta_keywords',
-        'meta_image',
+        
+        // --- Mạng xã hội ---
         'zalo',
         'mess',
         'tiktok',
         'youtube',
+
+        // --- [MỚI] Profile & Video ---
+        'profile',          // Đường dẫn file PDF hồ sơ năng lực
+        'video_type',       // Loại video: 'youtube' hoặc 'upload'
+        'intro_video',      // Đường dẫn file Video (nếu upload)
+        'intro_video_url',  // Link Youtube (nếu chọn youtube)
+
+        // --- SEO & Scripts ---
+        'meta_description',
+        'meta_keywords',
+        'meta_image',
+        'schema_script',
         'head_script',
         'body_script',
     ];

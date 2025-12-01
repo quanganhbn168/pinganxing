@@ -2,291 +2,461 @@
 @section('title','Trang chủ - '.$setting->name)
 @section('meta_description',$setting->meta_description)
 @section('meta_keywords',$setting->meta_keywords)
+@push('css')
+<link rel="stylesheet" href="{{ asset('css/counter.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+@endpush
 @push('jsonld')
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Store",
-  "name": "{{$setting->name}}",
-  "alternateName": "{{$setting->name}}",
-  "url": "{{ url()->current() }}",
-  "logo": "{{asset($setting->logo)}}",
-  "description": "{{$setting->meta_description}}",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "{{$setting->address}}",
-    "addressLocality": "Thành phố Bắc Ninh",
-    "addressRegion": "Bắc Ninh",
-    "postalCode": "220000",
-    "addressCountry": "VN"
-  },
-  "telephone": "{{$setting->phone}}",
-  "email": "{{$setting->email}}",
-  "openingHoursSpecification": [
     {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "opens": "08:00",
-      "closes": "17:30"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Saturday",
-      "opens": "08:00",
-      "closes": "12:00"
+        "@context": "https://schema.org",
+        "@type": "Store",
+        "name": "{{$setting->name}}",
+        "alternateName": "{{$setting->name}}",
+        "url": "{{ url()->current() }}",
+        "logo": "{{asset($setting->logo)}}",
+        "description": "{{$setting->meta_description}}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{$setting->address}}",
+            "addressLocality": "Thành phố Bắc Ninh",
+            "addressRegion": "Bắc Ninh",
+            "postalCode": "220000",
+            "addressCountry": "VN"
+        },
+        "telephone": "{{$setting->phone}}",
+        "email": "{{$setting->email}}",
+        "openingHoursSpecification": [{
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday"
+                ],
+                "opens": "08:00",
+                "closes": "17:30"
+            },
+            {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": "Saturday",
+                "opens": "08:00",
+                "closes": "12:00"
+            }
+        ],
+        "sameAs": [
+            "{{$setting->facebook}}",
+            "{{$setting->youtube}}",
+            "{{$setting->zalo}}"
+        ]
     }
-  ],
-  "sameAs": [
-    "{{$setting->facebook}}",
-    "{{$setting->youtube}}",
-    "{{$setting->zalo}}"
-  ]
-}
 </script>
-@endpush
-@push('css')
-<link rel="stylesheet" href="{{asset('vendor/glightbox/css/glightbox.min.css')}}?{{time()}}">
 @endpush
 @section("content")
 <section id="slider">
     @include("partials.frontend.slide")
 </section>
-<section class="section-index section_category">
+<section class="section section-intro">
     <div class="container">
-        <div class="section-title side-left has-control">
-            <h2>Sản phẩm bạn đang tìm kiếm</h2>
-            <div class="slider-controls">
-                <div class="swiper-button-prev"></div>
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6">
+                <a href="{{route('frontend.slug.handle',$introMain->slug)}}">
+                    <img src="{{ optional($introMain->mainImage())->url() }}" alt="{{$introMain->name}}">
+                </a>
+            </div>
+            <div class="col-12 col-md-6">
+                <h2 class="">{{$setting->name}}</h2>
+                {!! $introMain->description !!}
+                <div class="intro-action">
+                    <a href="{{ asset('storage/' . $setting->profile) }}" target="_blank" class="btn btn-primary rounded-pill btn-crossover">
+                        <span class="btn-crossover-text">Download Profile</span>
+                        <span class="btn-crossover-icon">
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                        </span>
+                    </a>
+                    <a href="/gioi-thieu" class="btn btn-outline-primary rounded-pill btn-crossover">
+                        <span class="btn-crossover-text">Xem chi tiết</span>
+                        <span class="btn-crossover-icon">
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+    @foreach($sodem as $item)
+        <div class="col-md-3 col-6">
+            <x-counter 
+                :icon="$item['icon']" 
+                :to="$item['value']" 
+                suffix="+" 
+                :label="$item['title']" 
+            />
+        </div>
+    @endforeach
+</div>
+    </div>
+</section>
+<section class="section section-fields">
+    <h2 class="section-title">
+        <a href="{{ route('frontend.fields.index') }}">Lĩnh vực hoạt động</a>
+    </h2>
+    <div class="container">
+        <div class="row">
+            @foreach($homeFields as $key => $field)
+            <div class="col-6 col-md-4 mb-4">
+                <div class="field-category-item">
+                    <div class="field-category-item__image">
+                        <a href="{{ route('frontend.slug.handle', $field->slugValue) }}">
+                            <img src="{{ optional($field->mainImage())->url() }}" alt="{{ $field->name }}">
+                        </a>
+                    </div>
+                    <div class="field-category-item__name">
+                        <a href="{{ route('frontend.slug.handle', $field->slugValue) }}">
+                            {{ $field->name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+<section class="section section-project">
+    <h2 class="section-title"><a href="">Dự án nổi bật</a></h2>
+    @if($homeProjectCategories->isNotEmpty())
+    <ul class="nav nav-pills justify-content-center mb-4" id="projectTabs" role="tablist">
+        @if($homeProjects->isNotEmpty())
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-all-projects" data-toggle="pill" data-target="#pane-all-projects" type="button" role="tab" aria-controls="pane-all-projects" aria-selected="true">Tất cả</button>
+        </li>
+        @endif
+        @foreach($homeProjectCategories as $projectCategory)
+        @if($projectCategory->projects->isNotEmpty())
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-{{ $projectCategory->slug }}" data-toggle="pill" data-target="#pane-{{ $projectCategory->slug }}" type="button" role="tab" aria-controls="pane-{{ $projectCategory->slug }}" aria-selected="false">{{ $projectCategory->name }}</button>
+        </li>
+        @endif
+        @endforeach
+    </ul>
+    @endif
+    <div class="tab-content" id="projectTabsContent">
+        @if($homeProjects->isNotEmpty())
+        <div class="tab-pane fade show active" id="pane-all-projects" role="tabpanel" aria-labelledby="tab-all-projects">
+            <div class="project-slider-wrapper">
+                <div class="swiper project-swiper">
+                    <div class="swiper-wrapper">
+                        @foreach($homeProjects as $project)
+                        @include('partials.frontend.project_item', ['project' => $project])
+                        @endforeach
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
                 <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
         </div>
-        <div class="swiper_category swiper">
-            <div class="swiper-wrapper">
-                @foreach($allCategoriesHome as $key => $allCategoyHome)
-                <div class="swiper-slide">
-                    <a href="{{route('products.by_category',$allCategoyHome->slug)}}" title="{{$allCategoyHome->name}}" class="cate-item">
-                        <div class="bg-thumb">
-                            <div class="thumb">
-                                <img src="{{ $allCategoyHome->icon ? asset($allCategoyHome->icon) : asset('images/setting/no-image.png') }}" alt="{{ $allCategoyHome->name }}" loading="lazy">
-                            </div>
-                        </div>
-                        <div class="cate-content">
-                            <h3 class="line-clamp-2-new">{{$allCategoyHome->name}}</h3>
-                            <div class="status">
-                                <span class="total-product">{{$allCategoyHome->products()->count()}} sản phẩm</span>
-                                <span class="view-more">Xem chi tiết</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                @endforeach                
-            </div>
-        </div>
-    </div>
-</section>
-@foreach ($categoriesWithProducts as $category)
-<section class="section-index section_product">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="block-title col-lg-3 col-xl-2">
-                <div class="section-title side-left has-control">
-                    <h2>
-                        <a href="{{route('products.by_category',$category->slug)}}">{{ $category->name }}</a>
-                    </h2>
-                    <div class="slider-controls">
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    </div>
-                </div>
-                <a href="{{route('products.by_category',$category->slug)}}" title="Xem tất cả" class="btn btn-primary d-none d-sm-block">
-                    <span>Xem tất cả</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                    </svg>
-                </a>
-            </div>
-            <div class="block-product-list col-lg-9 col-xl-10">
-                <div class="product-slider swiper">
+        @endif
+        @foreach($homeProjectCategories as $projectCategory)
+        @if($projectCategory->projects->isNotEmpty())
+        <div class="tab-pane fade" id="pane-{{ $projectCategory->slug }}" role="tabpanel" aria-labelledby="tab-{{ $projectCategory->slug }}">
+            <div class="project-slider-wrapper">
+                <div class="swiper project-swiper">
                     <div class="swiper-wrapper">
-                        @foreach($category->products as $product)
-                            <div class="swiper-slide">
-                                @include('partials.frontend.product_item', ['product' => $product])
-                            </div>
+                        @foreach($projectCategory->projects as $project)
+                        @include('partials.frontend.project_item', ['project' => $project])
                         @endforeach
                     </div>
                 </div>
-                <div class="block-see-more text-center d-block d-md-none mt-3">
-                    <a href="{{route('products.by_category',$category->slug)}}" title="Xem tất cả" class="btn btn-primary">
-                        <span>Xem tất cả</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                        </svg>
-                    </a>
-                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
         </div>
+        @endif
+        @endforeach
     </div>
 </section>
-@endforeach
-@php
-    // Chỉ hiển thị section này khi có đủ 4 danh mục nổi bật
-    // Vì layout này được thiết kế cứng cho 4 mục
-@endphp
-@if(isset($featuredCategories) && $featuredCategories->count() >= 4)
-<section class="section-index section_group_banner">
-    <div class="container-fluid"> 
-        <div class="grid">
-            <div class="col-left">
-                <div class="banner_1 banner-box">
-                    @php $cat = $featuredCategories[0]; @endphp
-                    <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
-                        <img src="{{ asset($cat->image ?? 'images/setting/no-image.png') }}" alt="{{ $cat->name }}" loading="lazy" class="lazyload duration-300">
-                        <div class="box-title">
-                            <h3>{{ $cat->name }}</h3>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-right">
-                <div class="grid-sub">
-                    <div class="banner_2 banner-box">
-                        @php $cat = $featuredCategories[1]; @endphp
-                        <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
-                            <img src="{{ asset($cat->image ?? 'images/setting/no-image.png') }}" alt="{{ $cat->name }}" loading="lazy" class="lazyload duration-300">
-                            <div class="box-title">
-                                <h3>{{ $cat->name }}</h3>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="banner_3 banner-box">
-                        @php $cat = $featuredCategories[2]; @endphp
-                        <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
-                            <img src="{{ asset($cat->image ?? 'images/setting/no-image.png') }}" alt="{{ $cat->name }}" loading="lazy" class="lazyload duration-300">
-                            <div class="box-title">
-                                <h3>{{ $cat->name }}</h3>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="banner_4 banner-box">
-                        @php $cat = $featuredCategories[3]; @endphp
-                        <a href="{{ route('products.by_category', $cat->slug) }}" title="{{ $cat->name }}">
-                            <img src="{{ asset($cat->image ?? 'images/setting/no-image.png') }}" alt="{{ $cat->name }}" loading="lazy" class="lazyload duration-300">
-                            <div class="box-title">
-                                <h3>{{ $cat->name }}</h3>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-@endif
-@if(isset($saleProducts) && $saleProducts->count() > 0)
-<section class="section-index section_product sale_product">
-    <div class="container-fluid">
+<section class="section section-partner">
+    <div class="container">
+        <h2 class="section-title"><a href="">Đối tác & khách hàng</a></h2>
         <div class="row">
-            <div class="block-title col-lg-3 col-xl-2">
-                <div class="section-title side-left has-control">
-                    <h2>
-                        <a href="{{route('products.by_category',$category->slug)}}">{{ $category->name }}</a>
-                    </h2>
-                    <div class="slider-controls">
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-button-next"></div>
-                    </div>
-                </div>
-                <a href="#" title="Xem tất cả" class="btn btn-primary d-none d-sm-block">
-                    <span>Xem tất cả</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                    </svg>
-                </a>
-            </div>
-            <div class="block-product-list col-lg-9 col-xl-10">
-                <div class="product-slider swiper">
-                    <div class="swiper-wrapper">
-                        @foreach($saleProducts as $product)
-                            <div class="swiper-slide">
-                                @include('partials.frontend.product_item', ['product' => $product])
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="block-see-more text-center d-block d-md-none mt-3">
-                    <a href="#" title="Xem tất cả" class="btn btn-primary">
-                        <span>Xem tất cả</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-@endif
-<section class="section-index section_feedback">
-    <div class="bg-section">
-        <div class="container">
-            <div class="section-title side-left has-control">
-                <h2>
-                    Khách hàng nói về chúng tôi
-                    <div class="desc">
-                        Hơn +50,000 khách hàng đang sử dụng cảm nhận như thế nào về chúng tôi
-                    </div>
-                </h2>
-                <div class="slider-controls">
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div>
-                </div>
-            </div>
-            <div class="swiper_feedback swiper-container control-top">
-                <div class="swiper-wrapper">
-                    @foreach($testimonials as $testimonial)
-                        <div class="swiper-slide">
-                            @include('partials.frontend.feedback_item', ['feedback' => $testimonial])
+            <div class="col-12 col-lg-6">
+                <div class="partner-testimonial">
+                    <div class="quote-box">
+                        <div class="quote-icon">
+                            <i class="fas fa-quote-left"></i>
                         </div>
+                        <p class="quote-text">
+                            Chúng tôi cam kết đem đến cho khách hàng những sản phẩm chất lượng cao và dịch vụ tốt nhất!
+                        </p>
+                        <div class="quote-author">
+                            <strong class="author-name">Lê Sỹ Ngà</strong>
+                            <span class="author-title">Giám đốc</span>
+                        </div>
+                    </div>
+                    <img src="{{asset('images/setting/bat-tay.png')}}" alt="Ths. Ngô Anh Tuấn" class="director-image">
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="partner-list">
+                    @foreach($brands as $brand)
+                    <a href="{{ $brand->link ?? '#' }}" class="brand-logo-item" target="_blank">
+                        <img src="{{ optional($brand->mainImage())->url() }}" alt="{{ $brand->name }}">
+                    </a>
                     @endforeach
                 </div>
+                <a href="/khach-hang" class="view-all-partners">Xem tất cả <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
     </div>
 </section>
-<section class="section-index section-blog">
-    <div class="container">
-        <div class="section-title side-left has-control">
-            <h2>
-                <a href="">Tin tức mới nhất</a>
-            </h2>
-            <div class="slider-controls">
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            </div>
-            <div class="swiper_blog swiper">
-            </div>
-        </div>
+<section class="section section-core-values">
+    @foreach ($slide_banners as $slide_banner)
+    <div class="coreValueItem">
+        <img src="{{ optional($slide_banner->mainImage())->url() }}" alt="{{ $slide_banner->title }}">
     </div>
+    @endforeach
 </section>
-<section class="section-index section-brand">
+<section class="section section-news">
     <div class="container">
-        <div class="section-title side-left has-control">
-            <h2>
-                <a href="">Thương hiệu nổi bật</a>
-            </h2>
-            <div class="slider-controls">
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            </div>
-            <div class="swiper_brand swiper">
-                <div class="swiper-wrapper">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <h4 class="section-title text-left mb-2">
+                    <a href="">Tin tức - sự kiện</a>
+                </h4>
+                @if($homePostCategories->isNotEmpty())
+                <ul class="nav nav-pills mb-3" id="newsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-news-all" data-toggle="pill" data-target="#pane-news-all" type="button" role="tab" aria-controls="pane-news-all" aria-selected="true">Tất cả</button>
+                    </li>
+                    @foreach($homePostCategories as $postCategory)
+                    @if($postCategory->posts->isNotEmpty())
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-news-{{ $postCategory->slug }}" data-toggle="pill" data-target="#pane-news-{{ $postCategory->slug }}" type="button" role="tab" aria-controls="pane-news-{{ $postCategory->slug }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}">{{ $postCategory->name }}</button>
+                    </li>
+                    @endif
+                    @endforeach
+                </ul>
+                <div class="tab-content" id="newsTabsContent">
+                    <div class="tab-pane fade show active" id="pane-news-all" role="tabpanel" aria-labelledby="tab-news-all">
+                        @php
+                        $firstAllPost = $allPosts->first();
+                        $otherAllPosts = $allPosts->skip(1);
+                        @endphp
+                        <div class="news-grid">
+                            <div class="news-grid-large">
+                                <a href="{{ route('frontend.slug.handle', $firstAllPost->slug) }}" class="news-item">
+                                    <img src="{{ optional($firstAllPost->mainImage())->url() }}" alt="{{ $firstAllPost->title }}">
+                                    <div class="news-item-title">
+                                        <h3>{{ $firstAllPost->title }}</h3>
+                                    </div>
+                                </a>
+                            </div>
+                            @if($otherAllPosts->isNotEmpty())
+                            <div class="news-grid-small">
+                                @foreach($otherAllPosts as $post)
+                                <a href="{{ route('frontend.slug.handle', $post->slug) }}" class="news-item">
+                                    <img src="{{ optional($post->mainImage())->url() }}" alt="{{ $post->title }}">
+                                    <div class="news-item-title">
+                                        <h4>{{ $post->title }}</h4>
+                                    </div>
+                                </a>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @foreach($homePostCategories as $postCategory)
+                    @if($postCategory->posts->isNotEmpty())
+                    <div class="tab-pane fade" id="pane-news-{{ $postCategory->slug }}" role="tabpanel" aria-labelledby="tab-news-{{ $postCategory->slug }}">
+                        @php
+                        $firstPost = $postCategory->posts->first();
+                        $otherPosts = $postCategory->posts->skip(1)->take(2);
+                        @endphp
+                        <div class="news-grid">
+                            <div class="news-grid-large">
+                                <a href="{{ route('frontend.slug.handle', $firstPost->slugValue) }}" class="news-item">
+                                    <img src="{{ optional($firstPost->mainImage())->url() }}" alt="{{ $firstPost->title }}">
+                                    <div class="news-item-title">
+                                        <h3>{{ $firstPost->title }}</h3>
+                                    </div>
+                                </a>
+                            </div>
+                            @if($otherPosts->isNotEmpty())
+                            <div class="news-grid-small">
+                                @foreach($otherPosts as $post)
+                                <a href="{{ route('frontend.slug.handle', $post->slugValue) }}" class="news-item">
+                                    <img src="{{ optional($post->mainImage())->url() }}" alt="{{ $post->title }}">
+                                    <div class="news-item-title">
+                                        <h4>{{ $post->title }}</h4>
+                                    </div>
+                                </a>
+                                @endforeach
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+                    @endforeach
                 </div>
+                @endif
+            </div>
+            <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+    <h4 class="section-title">
+        <a href="javascript:void(0)">Video giới thiệu</a>
+    </h4>
+    <div class="video-list">
+        <div class="position-relative rounded overflow-hidden" style="background: #000; min-height: 200px;">
+            
+            {{-- LOGIC YOUTUBE --}}
+            @if(($setting->video_type ?? 'youtube') === 'youtube' && !empty($setting->intro_video_url))
+                @php
+                    // Lấy ID Youtube để tạo thumbnail và link embed
+                    $videoID = '';
+                    $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
+                    if (preg_match($pattern, $setting->intro_video_url, $match)) {
+                        $videoID = $match[1];
+                    }
+                @endphp
+                
+                @if($videoID)
+                    <a href="https://www.youtube.com/watch?v={{ $videoID }}" class="glightbox position-relative d-block w-100 h-100">
+                        {{-- Lấy ảnh thumbnail chất lượng cao từ Youtube --}}
+                        <img src="https://img.youtube.com/vi/{{ $videoID}}/hqdefault.jpg" class="w-100 h-100" style="object-fit: cover; opacity: 0.8;" alt="Video Thumbnail">
+                        
+                        {{-- Nút Play Icon --}}
+                        <div class="position-absolute top-50 start-50 translate-middle text-white" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                            <i class="fas fa-play-circle fa-4x"></i>
+                        </div>
+                    </a>
+                @endif
+
+            {{-- LOGIC UPLOAD VIDEO --}}
+            @elseif(($setting->video_type ?? '') === 'upload' && !empty($setting->intro_video))
+                @php
+                    $videoPath = asset('storage/' . $setting->intro_video);
+                @endphp
+                {{-- Với video upload, ta dùng thẻ video luôn hoặc Glightbox (nhưng cần ảnh thumb riêng). 
+                     Để đơn giản và đẹp, ta dùng Glightbox gọi file video --}}
+                <a href="{{ $videoPath }}" class="glightbox position-relative d-block w-100 h-100">
+                    {{-- Vì không có ảnh thumb, ta dùng ảnh banner mặc định hoặc nền đen --}}
+                    <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-dark text-white" style="min-height: 215px;">
+                        <span class="text-center">
+                             <i class="fas fa-play-circle fa-4x mb-2"></i><br>
+                             Xem Video Giới Thiệu
+                        </span>
+                    </div>
+                </a>
+            @endif
+
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+</section>
+<section class="section section-careers">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-md-4">
+                <div class="career-item">
+                    <h4 class="career-item-title">{{ $tuyendung->name }}</h4>
+                    <div class="career-item-img card-has-overlay">
+                        <a href="/tuyen-dung">
+                            <img src="{{ optional($tuyendung->mainImage())->url() }}" alt="{{ $tuyendung->description }}">
+                        </a>
+                        <p class="text-overlay">{{$tuyendung->description}}</p>
+                    </div>
+                    <div class="career-item-link">
+                        <a href="/tuyen-dung">Ứng tuyển</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="career-item">
+                    <h4 class="career-item-title">{{ $daily->name }}</h4>
+                    <div class="career-item-img card-has-overlay">
+                        <a href="/tuyen-dung">
+                            <img src="{{ optional($daily->mainImage())->url() }}" alt="{{ $daily->description }}">
+                        </a>
+                        <p class="text-overlay">{{$daily->description}}</p>
+                    </div>
+                    <div class="career-item-link">
+                        <a href="/tuyen-dung">Tham gia ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section section-testimonial">
+    <div class="container">
+        <h2 class="section-title"><a href="">Đánh giá từ khách hàng</a></h2>
+        <div class="swiper testimonial-swiper">
+            <div class="swiper-wrapper">
+                @foreach($testimonials as $testimonial)
+                <div class="swiper-slide">
+                    <div class="testimonial-item">
+                        <div class="testimonial-author">
+                            <div class="testimonial-logo">
+                                <img src="{{ optional($testimonial->mainImage())->url() }}" alt="{{ $testimonial->name }}">
+                            </div>
+                            <div class="testimonial-info">
+                                <span class="author-name">{{ $testimonial->name }}</span>
+                                {{-- <span class="author-position">{{ $testimonial->position }}</span> --}}
+                            </div>
+                        </div>
+                        <div class="testimonial-content">
+                            <p>{!! $testimonial->content !!}</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+<section class="section-contact-visual" style="background-image: url('{{ asset('images/setting/lien-he-bg.jpg') }}');">
+    <div class="contact-overlay"></div>
+    <div class="container position-relative">
+        <div class="section-decorator">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="contact-visual-info">
+                    <h2 class="contact-visual-title">
+                        Vui lòng để lại thông tin, Cnet sẽ liên hệ trong thời gian sớm nhất!
+                    </h2>
+                    <ul class="contact-visual-features">
+                        <li><i class="fa-solid fa-gears"></i> Quy trình nhanh chóng</li>
+                        <li><i class="fa-solid fa-headset"></i> Đội ngũ tư vấn nhiệt tình</li>
+                        <li><i class="fa-solid fa-tags"></i> Giá cả phù hợp nhất</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <form action="{{ route('contact.store') }}" method="POST" id="contact-form" class="contact-visual-form">
+                    @csrf
+                    <div class="form-group">
+                        <input type="text" name="name" class="form-control" placeholder="Tên của bạn" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="phone" class="form-control" placeholder="Số điện thoại" required>
+                    </div>
+                    <div class="form-group form-group-message">
+                        <input name="message" class="form-control" placeholder="Nội dung bạn quan tâm">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-submit">Gửi thông tin</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -295,189 +465,144 @@
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
 <script>
-        $.validator.addMethod("phoneVN", function (value, element) {
-            return this.optional(element) || /^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/.test(value);
-        }, "Số điện thoại không hợp lệ");
-        $(document).ready(function () {
-            $('#contact-form').validate({
-                rules: {
-                    name: {
-                        required: true,
-                        minlength: 2
-                    },
-                    phone: {
-                        required: true,
-                        phoneVN: true
-                    },
-                    email: {
-                        email: true
-                    },
-                    message: {
-                        maxlength: 1000
-                    }
+    $.validator.addMethod("phoneVN", function(value, element) {
+        return this.optional(element) || /^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/.test(value);
+    }, "Số điện thoại không hợp lệ");
+    $(document).ready(function() {
+        $('#contact-form').validate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
                 },
-                messages: {
-                    name: {
-                        required: "Vui lòng nhập họ và tên",
-                        minlength: "Tên quá ngắn"
-                    },
-                    phone: {
-                        required: "Vui lòng nhập số điện thoại",
-                        phoneVN: "Số điện thoại không hợp lệ (ví dụ: 098xxxxxxx)"
-                    },
-                    email: {
-                        email: "Email không hợp lệ"
-                    },
-                    message: {
-                        maxlength: "Ý kiến không vượt quá 1000 ký tự"
-                    }
+                phone: {
+                    required: true,
+                    phoneVN: true
                 },
-                errorElement: 'small',
-                errorClass: 'text-danger',
-                highlight: function (element) {
-                    $(element).addClass('is-invalid');
+                email: {
+                    email: true
                 },
-                unhighlight: function (element) {
-                    $(element).removeClass('is-invalid');
+                message: {
+                    maxlength: 1000
                 }
-            });
+            },
+            messages: {
+                name: {
+                    required: "Vui lòng nhập họ và tên",
+                    minlength: "Tên quá ngắn"
+                },
+                phone: {
+                    required: "Vui lòng nhập số điện thoại",
+                    phoneVN: "Số điện thoại không hợp lệ (ví dụ: 098xxxxxxx)"
+                },
+                email: {
+                    email: "Email không hợp lệ"
+                },
+                message: {
+                    maxlength: "Ý kiến không vượt quá 1000 ký tự"
+                }
+            },
+            errorElement: 'small',
+            errorClass: 'text-danger',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            }
         });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    const lightbox = GLightbox({
+        selector: '.glightbox', // Áp dụng cho class .glightbox
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: true
+    });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // --- 1. KHỞI TẠO SLIDER CHÍNH (LUÔN CHẠY) ---
-    const mainSliderEl = document.querySelector('.main-slider');
-    if (mainSliderEl) {
-        const mainSlider = new Swiper(mainSliderEl, {
+    $(document).ready(function() {
+        // --- 1. Cấu hình chung cho tất cả các slider ---
+        const swiperOptions = {
+            // Bỏ 'effect: coverflow'
+            loop: false,
+            rewind: true,
+            grabCursor: true,
+            centeredSlides: false, // Slide active sẽ luôn ở giữa
+            slidesPerView: 1.2, // Số slide hiển thị trên mobile, cho phép thấy 1 phần slide kế tiếp
+            spaceBetween: 15, // Khoảng cách trên mobile
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            // Breakpoints để thay đổi cấu hình trên màn hình lớn hơn
+            breakpoints: {
+                // Khi màn hình >= 768px (tablet)
+                768: {
+                    slidesPerView: 2.5, // Hiển thị 2.5 slide
+                    spaceBetween: 30,
+                },
+                // Khi màn hình >= 1024px (desktop)
+                1024: {
+                    slidesPerView: 3.5, // Hiển thị 3.5 slide, tạo hiệu ứng lấp ló 2 bên
+                    spaceBetween: 40,
+                }
+            }
+        };
+        // --- 2. Hàm để khởi tạo Swiper (đã được tối ưu) ---
+        function initSwiper(paneSelector) {
+            // Tìm đến thẻ swiper bên trong pane được chọn
+            const swiperEl = $(paneSelector).find('.project-swiper')[0];
+            // Chỉ khởi tạo nếu thẻ tồn tại và chưa được khởi tạo swiper trước đó
+            if (swiperEl && !swiperEl.swiper) {
+                new Swiper(swiperEl, swiperOptions);
+            }
+        }
+        // --- 3. Khởi tạo slider cho tab đầu tiên khi tải trang ---
+        initSwiper('#pane-all-projects');
+        // --- 4. Lắng nghe sự kiện khi một tab mới được hiển thị ---
+        $('button[data-toggle="pill"]').on('shown.bs.tab', function(e) {
+            const targetPaneId = $(e.target).data('target');
+            if (targetPaneId) {
+                initSwiper(targetPaneId);
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const testimonialSwiper = new Swiper('.testimonial-swiper', {
+            // Kích hoạt lặp vô tận
             loop: true,
+            // Tự động chạy
             autoplay: {
                 delay: 5000,
                 disableOnInteraction: false,
             },
-            lazy: {
-                loadPrevNext: true,
+            // Số lượng slide hiển thị trên các màn hình khác nhau (responsive)
+            slidesPerView: 1,
+            spaceBetween: 30,
+            breakpoints: {
+                768: {
+                    slidesPerView: 2,
+                },
+                992: {
+                    slidesPerView: 3,
+                }
             },
-            // QUAN TRỌNG: Chỉ tìm nút điều hướng bên trong chính slider này
+            // Dấu chấm phân trang
             pagination: {
-                el: mainSliderEl.querySelector('.swiper-pagination'),
+                el: '.swiper-pagination',
                 clickable: true,
             },
-            navigation: {
-                nextEl: mainSliderEl.querySelector('.swiper-button-next'),
-                prevEl: mainSliderEl.querySelector('.swiper-button-prev'),
-            },
         });
-    }
-    // Tìm đến section cha chứa cả slider và các nút điều khiển
-    const feedbackSection = document.querySelector('.section_feedback');
-    if (feedbackSection) {
-        // Tìm đến element của slider bên trong section đó
-        const swiperFeedbackEl = feedbackSection.querySelector('.swiper_feedback');
-        if (swiperFeedbackEl) {
-            const swiperFeedback = new Swiper(swiperFeedbackEl, {
-                // Hiển thị 3 slide trên màn hình lớn (desktop) làm mặc định
-                slidesPerView: 3,
-                // Khoảng cách giữa các slide là 20px
-                spaceBetween: 20,
-                loop: true,
-                autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false,
-                },
-                lazy: {
-                    loadPrevNext: true,
-                },
-                // Sửa lỗi: Tìm pagination và navigation bên trong section hiện tại
-                pagination: {
-                    el: feedbackSection.querySelector('.swiper-pagination'),
-                    clickable: true,
-                },
-                navigation: {
-                    nextEl: feedbackSection.querySelector('.swiper-button-next'),
-                    prevEl: feedbackSection.querySelector('.swiper-button-prev'),
-                },
-                // Responsive: Tùy chỉnh số lượng slide theo kích thước màn hình
-                breakpoints: {
-                    // Dưới 768px (Mobile)
-                    0: {
-                        slidesPerView: 1,
-                        spaceBetween: 10,
-                    },
-                    // Từ 768px đến 1199px (Tablet)
-                    768: {
-                        slidesPerView: 2,
-                        spaceBetween: 20,
-                    },
-                    // Từ 1200px trở lên (Desktop)
-                    1200: {
-                        slidesPerView: 3,
-                        spaceBetween: 20,
-                    },
-                },
-            });
-        }
-    }
-    // --- 2. HÀM KHỞI TẠO CÁC SLIDER RESPONSIVE (chỉ chạy trên màn hình lớn) ---
-    // Hàm này đã được viết tốt, giữ nguyên
-    const setupResponsiveSwiper = (sectionElement, swiperSelector, options, breakpointWidth = 992) => {
-        if (!sectionElement) return;
-        let swiperInstance = null;
-        const breakpoint = window.matchMedia(`(min-width: ${breakpointWidth}px)`);
-        const initializeSwiper = () => {
-            if (breakpoint.matches === true && swiperInstance === null) {
-                const swiperEl = sectionElement.querySelector(swiperSelector);
-                const nextEl = sectionElement.querySelector('.swiper-button-next');
-                const prevEl = sectionElement.querySelector('.swiper-button-prev');
-                const paginationEl = sectionElement.querySelector('.swiper-pagination');
-                const finalOptions = {
-                    ...options,
-                    navigation: { nextEl, prevEl },
-                    pagination: { el: paginationEl, clickable: true },
-                };
-                if (swiperEl) {
-                    swiperInstance = new Swiper(swiperEl, finalOptions);
-                }
-            } else if (breakpoint.matches === false && swiperInstance !== null) {
-                swiperInstance.destroy(true, true);
-                swiperInstance = null;
-            }
-        };
-        initializeSwiper();
-        window.addEventListener('resize', initializeSwiper);
-    };
-    // --- 3. ÁP DỤNG HÀM RESPONSIVE CHO CÁC SECTION TƯƠNG ỨNG ---
-    const categorySection = document.querySelector('.section_category');
-    if (categorySection) {
-        setupResponsiveSwiper(
-            categorySection,
-            '.swiper_category',
-            {
-                spaceBetween: 20,
-                slidesPerView: 2,
-                breakpoints: {
-                    1200: { slidesPerView: 8 },
-                    992: { slidesPerView: 5 },
-                    768: { slidesPerView: 4 }
-                }
-            },
-            768
-        );
-    }
-    const productSections = document.querySelectorAll('.section_product');
-    productSections.forEach(section => {
-        setupResponsiveSwiper(
-            section, 
-            '.product-slider',
-            {
-                spaceBetween: 20,
-                breakpoints: {
-                    992: { slidesPerView: 3 },
-                    1200: { slidesPerView: 4 }
-                }
-            },
-            992
-        );
     });
-});
 </script>
+<script src="{{ asset('js/counter.js') }}"></script>
 @endpush

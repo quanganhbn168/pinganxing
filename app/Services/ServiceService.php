@@ -27,7 +27,6 @@ class ServiceService
             'status' => 'nullable|boolean',
             'gallery' => 'nullable|array',
             'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-            'unit_id' => 'nullable|exists:units,id',
         ]);
 
         $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
@@ -39,7 +38,6 @@ class ServiceService
 
         $service = Service::create($data);
 
-        $this->imageGallery->sync($service, $request, 'gallery', 'uploads/services/gallery');
 
         return $service;
     }
@@ -55,11 +53,6 @@ class ServiceService
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'status' => 'nullable|boolean',
-            'gallery_old' => 'nullable|array',
-            'gallery_old.*' => 'string',
-            'gallery' => 'nullable|array',
-            'gallery.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
-            'unit_id' => 'nullable|exists:units,id',
         ]);
 
         // Slug tự sinh nếu không có
@@ -80,7 +73,6 @@ class ServiceService
         // Cập nhật thông tin cơ bản
         $service->update($data);
 
-        $this->imageGallery->sync($service, $request, 'gallery', 'uploads/services/gallery');
 
         return $service;
     }
@@ -90,10 +82,6 @@ class ServiceService
         $this->deleteImage($service->image);
         $this->deleteImage($service->banner);
 
-        foreach ($service->images as $img) {
-            $this->deleteImage($img->image);
-            $img->delete();
-        }
 
         $service->delete();
     }

@@ -15,14 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('logo')->nullable();
+            $table->string('banner')->nullable();
             $table->string('favicon')->nullable();
 
             $table->string('email')->nullable();
             $table->string('phone')->nullable();      
-            $table->json('phone_json')->nullable();   
 
             $table->string('address')->nullable();    
-            $table->json('address_json')->nullable(); 
             $table->string('zalo')->nullable();    
             $table->string('mess')->nullable();    
             $table->string('tiktok')->nullable();    

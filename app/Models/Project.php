@@ -4,38 +4,48 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use App\Traits\HasImages;
+use App\Traits\HasSlug;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, HasImages, HasSlug;
 
     protected $fillable = [
         'name',
-        'parent_id',
+        'image',
+        'slug',
+        'project_category_id',
         'description',
         'content',
         'status',
         'is_home',
-        'image',
         'banner',
+        'investor',
+        'address',
+        'year',
+        'value'
     ];
 
-    public function parent()
+    protected $casts = [
+        'project_category_id' => 'integer',
+        'status'             => 'boolean',
+        'is_home'            => 'boolean',
+    ];
+
+    protected static function booted(): void
     {
-        return $this->belongsTo(Project::class, 'parent_id');
+        static::creating(function ($project) {
+            if (empty($project->slug) && ! empty($project->name)) {
+                $project->slug = Str::slug($project->name) . '-' . Str::random(5);
+            }
+        });
     }
 
-    public function children()
+    public function category()
     {
-        return $this->hasMany(Project::class, 'parent_id');
-    }
-    public function slug()
-    {
-        return $this->morphOne(Slug::class, 'sluggable');
+        return $this->belongsTo(ProjectCategory::class, 'project_category_id');
     }
 
-    public function getSlugUrlAttribute()
-    {
-        return url($this->slug->slug ?? '#');
-    }
 }

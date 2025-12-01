@@ -1,89 +1,180 @@
 <?php
+
 namespace App\Http\Controllers\Frontend;
+
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Tag;
-use Illuminate\Http\Request;
+use App\Models\Page;
+
 class ProductController extends Controller
 {
     /**
-     * Hiển thị trang tất cả sản phẩm với nền tảng cho việc lọc.
+     * Hiển thị trang danh sách sản phẩm theo từng root category (Option A)
      */
     public function index(Request $request)
     {
-        $query = Product::query()->with('category');
-        if ($request->has('category')) {
-            $query->where('category_id', $request->category);
+        $page = Page::where('slug', 'san-pham')->first();
+        $perCategoryLimit = (int) $request->input('limit', 12);
+        $allCategories = Category::whereNull('parent_id')->where('status', 1)->orderBy('name')->get();
+        
+        $categories = Category::where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        
+        $childrenMap = [];
+        foreach ($categories as $c) {
+            $parent = $c->parent_id ?? 0;
+            $childrenMap[$parent][] = $c->id;
         }
-        if ($request->has('price_min') && $request->has('price_max')) {
-            $query->whereBetween('price', [$request->price_min, $request->price_max]);
-        }
-        if ($request->has('sort_by')) {
-            if ($request->sort_by == 'price_asc') {
-                $query->orderBy('price', 'asc');
-            } elseif ($request->sort_by == 'price_desc') {
-                $query->orderBy('price', 'desc');
+
+        
+        $collectDescendants = function ($startId) use (&$childrenMap, &$collectDescendants) {
+            $ids = [$startId];
+            $children = $childrenMap[$startId] ?? [];
+            foreach ($children as $childId) {
+                $ids = array_merge($ids, $collectDescendants($childId));
             }
-        } else {
-            $query->latest(); 
+            return $ids;
+        };
+
+        
+        $roots = $categories->whereNull('parent_id')->values();
+
+        
+        $allProducts = Product::where('status', 1)
+            ->with(['category'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        
+        $productsByCategory = [];
+        foreach ($allProducts as $p) {
+            $productsByCategory[$p->category_id ?? 0][] = $p;
         }
-        $products = $query->paginate(12);
-        $categories = Category::where('status', true)->get();
-        $tags = Tag::all();
-        return view('frontend.products.allProduct', compact('products', 'categories', 'tags'));
+
+        
+        $allCategoryAndProduct = collect();
+        foreach ($roots as $root) {
+            $descIds = $collectDescendants($root->id);
+
+            $col = collect();
+            foreach ($descIds as $id) {
+                if (!empty($productsByCategory[$id])) {
+                    $col = $col->merge($productsByCategory[$id]);
+                }
+            }
+
+            
+            $col = $col->slice(0, $perCategoryLimit);
+
+            
+            $obj = (object) [
+                'category' => $root,
+                'products' => $col,
+            ];
+
+            $allCategoryAndProduct->push($obj);
+        }
+
+        return view('frontend.products.index', compact('allCategoryAndProduct', 'page', 'allCategories'));
     }
     /**
-     * Hiển thị sản phẩm theo một danh mục cụ thể.
+     * Route cho trang danh mục, sẽ chuyển hướng logic về hàm index.
      */
-    public function byCategory(Category $category)
+    public function byCategory(Category $category, Request $request)
     {
-        $descendantIds = $category->getAllDescendantIds();
-        $categoryIds = collect($descendantIds)->push($category->id);
-        $products = Product::whereIn('category_id', $categoryIds)
-                            ->with('category')
-                            ->where("status",1)
-                            ->orderByDesc('id')
-                            ->paginate(12);
-        $categories = Category::where('status', true)->whereNull('parent_id')->get();
-        $tags = Tag::all();
-        return view('frontend.products.productByCate', compact('products', 'categories', 'tags', 'category'));
+        
+        $collectIds = function ($rootId) {
+            $ids = [$rootId];
+            $stack = [$rootId];
+
+            while (!empty($stack)) {
+                $parent = array_pop($stack);
+                $children = Category::where('parent_id', $parent)
+                    ->where('status', 1)
+                    ->pluck('id')
+                    ->toArray();
+
+                foreach ($children as $c) {
+                    if (!in_array($c, $ids, true)) {
+                        $ids[] = $c;
+                        $stack[] = $c;
+                    }
+                }
+            }
+
+            return $ids;
+        };
+
+        
+        $categoryIds = $collectIds($category->id);
+        
+        $childCategories = Category::where('parent_id', $category->id)
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        
+        $otherCategories = Category::where('status', 1)
+            ->whereNotIn('id', $categoryIds)
+            ->orderBy('name')
+            ->get();
+
+        
+        $products = Product::where('status', 1)
+            ->whereIn('category_id', $categoryIds)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->appends($request->except('page')); 
+        
+        $featuredProducts = Product::where('status', 1)
+            ->whereIn('category_id', $categoryIds)
+            ->where('is_featured', 1)
+            ->inRandomOrder()
+            ->get();
+
+        return view('frontend.products.productByCate', compact(
+            'category',
+            'products',
+            'otherCategories',
+            'featuredProducts',
+            'childCategories'
+        ));
     }
+
     /**
      * Hiển thị chi tiết sản phẩm.
      */
     public function show(Product $product)
     {
-        $product->load('category', 'images', 'variants.attributeValues.attribute');
-        $variantAttributes = [];
-            foreach ($product->variants as $variant) {
-                foreach ($variant->attributeValues as $attributeValue) {
-                    $attributeName = $attributeValue->attribute->name;
-                    $valueId = $attributeValue->id;
-                    $value = $attributeValue->value;
-                    if (!isset($variantAttributes[$attributeName])) {
-                        $variantAttributes[$attributeName] = [];
-                    }
-                    $variantAttributes[$attributeName][$valueId] = $value;
-                }
-            }
-        $variantMap = $product->variants
-        ->filter(fn($variant) => $variant->attributeValues->isNotEmpty()) 
-        ->mapWithKeys(function ($variant) {
-            $key = $variant->attributeValues->pluck('id')->sort()->implode('-');
-            return [$key => [
-                'id' => $variant->id,
-                'price' => $variant->price_discount ?? $variant->price, 
-                'compare_at_price' => $variant->price, 
-                'sku' => $variant->code, 
-                'stock' => $variant->stock,
-            ]];
-        });
         $relatedProducts = Product::where('id', '!=', $product->id)
             ->where('category_id', $product->category_id)
             ->inRandomOrder()
             ->take(4)
             ->get();
-        return view('frontend.products.detail', compact('product', 'relatedProducts','variantAttributes','variantMap'));
+        return view('frontend.products.detail', compact('product', 'relatedProducts'));
     }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->input('q');
+
+    
+    
+        $products = Product::where('name', 'like', "%{$keyword}%")
+                ->orWhere('description', 'like', "%{$keyword}%") 
+                ->where('status',1) 
+                ->paginate(12); 
+
+    
+    
+                return view('frontend.products.search_results', [
+                    'products' => $products,
+                    'keyword' => $keyword,
+                    'pageTitle' => 'Kết quả tìm kiếm: ' . $keyword
+                ]);
+            }
 }

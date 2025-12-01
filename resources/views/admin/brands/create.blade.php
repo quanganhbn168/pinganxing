@@ -9,8 +9,22 @@
     <div class="card">
         <div class="card-body">
             <x-form.input name="name" label="Tên thương hiệu" required />
-            <x-form.input name="slug" label="Slug (nếu không nhập sẽ tự tạo)" />
-            <x-form.image-input name="image" label="Logo" />
+            <x-form.slug
+                name="slug"
+                label="Đường dẫn (slug)"
+                :value="old('slug')"
+                source="#name"
+                table="brands"
+                field="slug"
+                :current-id="null"
+            />
+
+            <x-admin.form.media-input
+                name="image_original_path"
+                label="Logo thương hiệu"
+                :multiple="false"
+                :value="old('image_original_path')"
+            />
             <x-form.switch name="status" label="Hiển thị" :checked="true" />
         </div>
     </div>
