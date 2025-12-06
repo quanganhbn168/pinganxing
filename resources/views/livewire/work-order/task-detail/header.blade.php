@@ -4,7 +4,6 @@
             <i class="fas fa-arrow-left fa-lg"></i>
         </a>
         <div style="flex: 1; min-width: 0;">
-            <small class="text-muted d-block text-xs text-uppercase font-weight-bold">Nhiệm vụ</small>
             <h6 class="m-0 font-weight-bold text-dark text-truncate">{{ $task->report_content }}</h6>
         </div>
     </div>

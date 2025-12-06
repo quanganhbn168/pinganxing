@@ -28,6 +28,7 @@ class WorkOrder extends Model
 
     protected $casts = [
         'status' => \App\Enums\WorkOrderStatus::class,
+        'priority' => \App\Enums\WorkOrderPriority::class, // Auto cast to Enum
     ];
 
     public function customer(): BelongsTo

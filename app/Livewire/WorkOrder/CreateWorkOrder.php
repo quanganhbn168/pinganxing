@@ -30,7 +30,7 @@ class CreateWorkOrder extends Component
     ];
 
     // --- Biến cho Khách hàng ---
-    public $is_new_customer = false;
+    public $is_new_customer = true; // Mặc định là khách lẻ
     public $search_customer = '';
     public $selected_customer_id = null;
     public $selected_customer_name = ''; 
@@ -73,6 +73,8 @@ class CreateWorkOrder extends Component
         $this->task_list = array_values($this->task_list); // Đánh lại index
     }
 
+    public $suggestedSites = []; // Danh sách địa điểm cũ để gợi ý
+
     public function selectCustomer($id, $name)
     {
         $this->selected_customer_id = $id;
@@ -80,16 +82,47 @@ class CreateWorkOrder extends Component
         $this->search_customer = '';
 
         // --- MỚI: Tự động điền thông tin thi công lấy từ khách ---
-        // Tìm sđt và địa chỉ chính của khách để gợi ý vào ô thi công
+        // 1. Lấy thông tin chính trước
         $customer = Customer::with('contacts')->find($id);
         if ($customer) {
-            $this->contact_person = $customer->name; // Mặc định là tên khách
+            $this->contact_person = $customer->name; 
             
-            $phone = $customer->contacts->where('type', 'phone')->where('is_primary', true)->first();
+            $phone = $customer->contacts->where('type', 'phone')->sortByDesc('is_primary')->first();
             $this->contact_phone = $phone ? $phone->value : '';
 
-            $address = $customer->contacts->where('type', 'address')->where('is_primary', true)->first();
+            $address = $customer->contacts->where('type', 'address')->sortByDesc('is_primary')->first();
             $this->site_address = $address ? $address->value : '';
+        }
+
+        // 2. Load các địa điểm thi công cũ (History)
+        // 2. Load các địa điểm thi công cũ (History)
+        // Fix lỗi SQL 3065: Fetch latest -> Unique in PHP
+        $this->suggestedSites = WorkOrder::where('customer_id', $id)
+            ->latest()
+            ->take(30) // Lấy 30 đơn gần nhất để lọc
+            ->get()
+            ->unique(function ($item) {
+                return $item->site_address . '|' . $item->contact_person . '|' . $item->contact_phone;
+            })
+            ->take(5)
+            ->map(function ($item) {
+                return [
+                    'site_address' => $item->site_address,
+                    'contact_person' => $item->contact_person,
+                    'contact_phone' => $item->contact_phone
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+    
+    public function fillSiteInfo($index)
+    {
+        if (isset($this->suggestedSites[$index])) {
+            $site = $this->suggestedSites[$index];
+            $this->site_address = $site['site_address'];
+            $this->contact_person = $site['contact_person'];
+            $this->contact_phone = $site['contact_phone'];
         }
     }
 
@@ -97,6 +130,7 @@ class CreateWorkOrder extends Component
     {
         $this->selected_customer_id = null;
         $this->selected_customer_name = '';
+        $this->suggestedSites = []; // Clear suggestions
         // Clear cả thông tin thi công để nhập lại
         $this->reset(['site_address', 'contact_person', 'contact_phone']);
     }
@@ -106,12 +140,36 @@ class CreateWorkOrder extends Component
         $this->is_new_customer = !$this->is_new_customer;
         $this->reset(['selected_customer_id', 'selected_customer_name', 'search_customer', 
                       'new_customer_name', 'new_customer_phone', 'new_customer_address',
-                      'site_address', 'contact_person', 'contact_phone']); 
+                      'site_address', 'contact_person', 'contact_phone', 'suggestedSites']); 
     }
 
     // Khi gõ thông tin khách mới, tự động fill xuống thông tin thi công cho tiện
     public function updatedNewCustomerName($value) { $this->contact_person = $value; }
-    public function updatedNewCustomerPhone($value) { $this->contact_phone = $value; }
+    
+    public function updatedNewCustomerPhone($value) 
+    { 
+        $this->contact_phone = $value; 
+        
+        // KIỂM TRA TRÙNG SỐ ĐIỆN THOẠI (Prevent Duplicate)
+        // Nếu nhập SĐT mà trùng với khách đã có -> Tự động chuyển sang chế độ Chọn Khách Cũ
+        if ($this->is_new_customer && strlen($value) > 3) {
+            $existingContact = CustomerContact::where('type', 'phone')
+                                ->where('value', $value) // Có thể like %...% nếu muốn mềm hơn
+                                ->first();
+            
+            if ($existingContact) {
+                $customer = Customer::find($existingContact->customer_id);
+                if ($customer) {
+                    // Switch mode
+                    $this->is_new_customer = false;
+                    $this->selectCustomer($customer->id, $customer->name);
+                    
+                    // Thông báo cho user biết (Dùng JS alert hoặc Toast)
+                    $this->dispatch('alert', ['type' => 'info', 'message' => 'Số điện thoại này đã tồn tại! Hệ thống đã chọn khách hàng cũ tương ứng: ' . $customer->name]);
+                }
+            }
+        }
+    }
     public function updatedNewCustomerAddress($value) { $this->site_address = $value; }
 
     public function save()
@@ -148,10 +206,37 @@ class CreateWorkOrder extends Component
 
             // 1. Tạo Khách mới (nếu có)
             if ($this->is_new_customer) {
-                $customer = Customer::create(['name' => $this->new_customer_name]);
-                CustomerContact::create(['customer_id' => $customer->id, 'type' => 'phone', 'value' => $this->new_customer_phone, 'is_primary' => true]);
-                if ($this->new_customer_address) {
-                    CustomerContact::create(['customer_id' => $customer->id, 'type' => 'address', 'value' => $this->new_customer_address, 'is_primary' => true]);
+                // Tự động sync lại lần nữa để chắc chắn
+                // Nếu khách lẻ, lấy địa chỉ thi công làm địa chỉ khách
+                $finalAddress = $this->site_address; 
+                
+                // XỬ LÝ TÊN "KHÁCH LẺ" CHUNG CHUNG
+                // Nếu tên quá chung chung, tự động nối thêm SĐT để dễ phân biệt
+                $nameToCheck = \Illuminate\Support\Str::lower(trim($this->new_customer_name));
+                $genericNames = ['khách lẻ', 'khach le', 'khách hàng', 'khach hang', 'khách', 'khach', 'guest', 'unknown', 'người lạ'];
+                
+                $finalName = $this->new_customer_name;
+                if (in_array($nameToCheck, $genericNames)) {
+                    $finalName .= ' - ' . $this->new_customer_phone;
+                }
+
+                $customer = Customer::create(['name' => $finalName]);
+                CustomerContact::create([
+                    'customer_id' => $customer->id, 
+                    'type' => 'phone', 
+                    'value' => $this->new_customer_phone, 
+                    'is_primary' => true,
+                    'label' => 'Di động'
+                ]);
+                
+                if ($finalAddress) {
+                    CustomerContact::create([
+                        'customer_id' => $customer->id, 
+                        'type' => 'address', 
+                        'value' => $finalAddress, 
+                        'is_primary' => true,
+                        'label' => 'Địa chỉ chính'
+                    ]);
                 }
                 $customerId = $customer->id;
             }
@@ -203,6 +288,15 @@ class CreateWorkOrder extends Component
             $this->task_list = [['content' => '', 'note' => '']]; // Reset task list
             $this->dispatch('clear-select2'); 
             $this->reset(['priority']);
+            
+            // SweetAlert2 Toast
+            $this->dispatch('swal', [
+                'title' => 'Thành công!',
+                'text' => 'Đã tạo phiếu việc thành công!',
+                'icon' => 'success',
+                'timer' => 3000
+            ]);
+
             session()->flash('success', 'Đã tạo phiếu việc thành công!');
 
         } catch (\Exception $e) {

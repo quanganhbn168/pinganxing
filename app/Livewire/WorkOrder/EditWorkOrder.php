@@ -40,7 +40,7 @@ class EditWorkOrder extends Component
 
         $this->title = $order->title;
         $this->description = $order->description;
-        $this->priority = $order->priority;
+        $this->priority = $order->priority->value ?? $order->priority;
         $this->site_address = $order->site_address;
         $this->contact_person = $order->contact_person;
         $this->contact_phone = $order->contact_phone;

@@ -1,13 +1,38 @@
 <div>
     <section class="content-header">
-        <div class="container-fluid">
-            <h1>
-                @if($filter == 'all')
-                    Tất cả công việc
-                @else
-                    Việc hiện tại (Chưa xong)
-                @endif
-            </h1>
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Quản lý công việc</h1>
+            </div>
+            
+        </div>
+        
+        {{-- Status Counters (Mobile Friendly - Horizontal Scroll) --}}
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex flex-nowrap overflow-auto pb-2" style="gap: 10px;">
+                    <a href="?filter=all" class="btn btn-app {{ $filter == 'all' ? 'bg-info' : 'bg-light' }} m-0">
+                        <span class="badge bg-purple">{{ $statusCounts['all'] }}</span>
+                        <i class="fas fa-list"></i> Các loại
+                    </a>
+                    <a href="?filter=active" class="btn btn-app {{ $filter == 'active' ? 'bg-primary' : 'bg-light' }} m-0">
+                        <span class="badge bg-warning">{{ $statusCounts['active'] }}</span>
+                        <i class="fas fa-bolt"></i> Cần làm
+                    </a>
+                    <a href="#" class="btn btn-app bg-light m-0 disabled">
+                        <span class="badge bg-warning">{{ $statusCounts['pending'] }}</span>
+                        <i class="fas fa-clock"></i> Chờ xử lý
+                    </a>
+                    <a href="#" class="btn btn-app bg-light m-0 disabled">
+                        <span class="badge bg-primary">{{ $statusCounts['processing'] }}</span>
+                        <i class="fas fa-spinner"></i> Đang làm
+                    </a>
+                    <a href="#" class="btn btn-app bg-light m-0 disabled">
+                        <span class="badge bg-success">{{ $statusCounts['completed'] }}</span>
+                        <i class="fas fa-check"></i> Xong
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -35,15 +60,9 @@
                                         @endif
 
                                         {{-- Badge trạng thái --}}
-                                        @if($order->status === \App\Enums\WorkOrderStatus::PENDING)
-                                            <span class="badge badge-warning">Chờ xử lý</span>
-                                        @elseif($order->status === \App\Enums\WorkOrderStatus::PROCESSING)
-                                            <span class="badge badge-primary">Đang làm</span>
-                                        @elseif($order->status === \App\Enums\WorkOrderStatus::COMPLETED)
-                                            <span class="badge badge-success">Hoàn thành</span>
-                                        @else
-                                            <span class="badge badge-secondary">Đã hủy</span>
-                                        @endif
+                                        <span class="badge badge-{{ $order->status->color() }}">
+                                            {{ $order->status->label() }}
+                                        </span>
                                     </div>
                                 </div>
                             <div class="card-body">
@@ -51,10 +70,10 @@
                                 <p class="text-muted small mb-2"><i class="far fa-clock"></i> {{ $order->created_at->format('d/m/Y H:i') }}</p>
                                 
                                 <ul class="list-unstyled">
-                                    <li><strong>Khách:</strong> {{ $order->customer->name }}</li>
+                                    <li><strong>Người phụ trách:</strong> {{ $order->contact_person }}</li>
                                     {{-- Lấy SĐT chính --}}
-                                    @php $phone = $order->customer->contacts->where('type', 'phone')->first(); @endphp
-                                    <li><strong>SĐT:</strong> <a href="tel:{{ $phone->value ?? '' }}">{{ $phone->value ?? '---' }}</a></li>
+                                    <li><strong>SĐT:</strong> <a href="tel:{{ $order->contact_phone ?? '' }}">{{ $order->contact_phone ?? '---' }}</a></li>
+                                    <li><strong>Địa chỉ:</strong> <a href="tel:{{ $order->site_address ?? '' }}">{{ $order->site_address ?? '---' }}</a></li>
                                 </ul>
                                 
                                 <a href="{{ route('admin.work-orders.show', $order->id) }}" class="btn btn-block btn-info">

@@ -66,7 +66,7 @@ class AuthController extends Controller
 
                 // Check Role
                 if ($user->hasRole('staff')) {
-                    return redirect()->route('admin.my-work-orders.index');
+                    return redirect()->route('worker.jobs');
                 }
                 return redirect()->route('admin.dashboard');
             }

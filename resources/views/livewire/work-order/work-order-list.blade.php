@@ -73,12 +73,18 @@
                                     </td>
                                     
                                     <td>
-                                        @switch($order->priority)
-                                            @case('urgent') <span class="badge badge-danger"><i class="fas fa-fire"></i> GẤP</span> @break
-                                            @case('high') <span class="badge badge-warning text-white">Cao</span> @break
-                                            @case('low') <span class="badge badge-secondary">Thấp</span> @break
-                                            @default <span class="badge badge-info">Trung bình</span>
-                                        @endswitch
+                                        @php
+                                            $priorityEnum = $order->priority instanceof \App\Enums\WorkOrderPriority 
+                                                ? $order->priority 
+                                                : \App\Enums\WorkOrderPriority::tryFrom($order->priority);
+                                        @endphp
+                                        @if($priorityEnum)
+                                            <span class="badge badge-{{ $priorityEnum->color() }}">
+                                                {{ $priorityEnum->label() }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">{{ $order->priority }}</span>
+                                        @endif
                                     </td>
 
                                     <td>
@@ -115,11 +121,12 @@
                                         <small class="text-muted">{{ $completedTasks }}/{{ $totalTasks }} việc ({{ $percent }}%)</small>
                                     </td>
                                     <td class="text-center">
-                                        @if($order->status === \App\Enums\WorkOrderStatus::PENDING) <span class="badge badge-warning">Chờ xử lý</span>
-                                        @elseif($order->status === \App\Enums\WorkOrderStatus::PROCESSING) <span class="badge badge-primary">Đang làm</span>
-                                        @elseif($order->status === \App\Enums\WorkOrderStatus::COMPLETED) <span class="badge badge-success">Hoàn thành</span>
-                                        @elseif($order->status === \App\Enums\WorkOrderStatus::PENDING_APPROVAL) <span class="badge badge-info">Chờ duyệt</span>
-                                        @else <span class="badge badge-secondary">Đã hủy</span>
+                                        @if($order->status instanceof \App\Enums\WorkOrderStatus)
+                                            <span class="badge badge-{{ $order->status->color() }}">
+                                                {{ $order->status->label() }}
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary">{{ $order->status }}</span>
                                         @endif
                                     </td>
                                     <td class="text-right">

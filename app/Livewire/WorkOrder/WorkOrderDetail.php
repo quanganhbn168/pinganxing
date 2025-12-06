@@ -23,6 +23,7 @@ class WorkOrderDetail extends Component
     public $totalCollected = 0;
     public $allItems = [];
     public $allPayments = [];
+    public $allReports = []; // Added missing property
 
     // Material Management
     public $showMaterialModal = false;
@@ -44,6 +45,12 @@ class WorkOrderDetail extends Component
     public function refreshTasks()
     {
         $this->tasks = $this->workOrder->tasks()->with(['reports.items', 'performer'])->orderBy('id', 'asc')->get();
+        
+        // Aggregate all reports for History tab
+        $this->allReports = $this->workOrder->tasks
+            ->flatMap(function($task) { return $task->reports; })
+            ->sortByDesc('created_at');
+
         $this->calculateFinancials();
     }
 
@@ -151,7 +158,46 @@ class WorkOrderDetail extends Component
         }
     }
 
-    // --- HÀM MỞ LẠI TASK (ADMIN ONLY) ---
+    // --- HÀM HOÀN THÀNH NHANH TASK (ADMIN) ---
+    public function quickFinishTask($taskId)
+    {
+        $task = Task::find($taskId);
+        
+        // Chỉ cho phép nếu task chưa xong
+        if ($task && $task->status !== \App\Enums\TaskStatus::COMPLETED) {
+            
+            // 1. Cập nhật trạng thái Task
+            $task->update(['status' => \App\Enums\TaskStatus::COMPLETED]);
+
+            // 2. Kiểm tra xem có báo cáo nào chưa?
+            if ($task->reports()->count() == 0) {
+                 $this->dispatch('alert', ['type' => 'error', 'message' => 'Nhiệm vụ chưa có báo cáo nào, không thể hoàn thành!']);
+                 return;
+            }
+
+            // 3. Tạo báo cáo tự động (System Log)
+            TaskReport::create([
+                'task_id' => $task->id,
+                'reporter_id' => auth('admin')->id(),
+                'content' => 'Hoàn thành bởi Admin',
+                'is_completed' => true,
+            ]);
+
+            // 3. Kiểm tra xem tất cả task đã xong chưa?
+            $allTasksCompleted = $this->workOrder->tasks()->where('status', '!=', \App\Enums\TaskStatus::COMPLETED)->count() == 0;
+            
+            if ($allTasksCompleted) {
+                // Nếu xong hết rồi thì không tự động đóng WorkOrder like Worker, 
+                // mà để Admin tự quyết định nút "Duyệt". 
+                // Hoặc có thể tự chuyển sang Pending Approval.
+                // Tạm thời giữ nguyên trạng thái WorkOrder để Admin review.
+            }
+
+            session()->flash('message', 'Đã đánh dấu hoàn thành nhiệm vụ.');
+            $this->refreshTasks();
+        }
+    }
+
     public function reopenTask($taskId)
     {
         $task = Task::find($taskId);
@@ -165,6 +211,15 @@ class WorkOrderDetail extends Component
 
             session()->flash('message', 'Đã mở lại công việc thành công.');
             $this->refreshTasks(); // Load lại danh sách để cập nhật giao diện
+        }
+    }
+
+    public function updateWorkOrderStatus($status)
+    {
+        $statusEnum = \App\Enums\WorkOrderStatus::tryFrom($status);
+        if ($statusEnum) {
+            $this->workOrder->update(['status' => $statusEnum]);
+            session()->flash('message', 'Đã cập nhật trạng thái đơn hàng.');
         }
     }
 

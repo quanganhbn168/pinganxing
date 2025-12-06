@@ -11,7 +11,7 @@
         {{-- Tabs --}}
         <ul class="nav nav-pills nav-justified mb-3 mx-1 p-1 bg-white rounded border shadow-sm">
             <li class="nav-item">
-                <a class="nav-link py-2 {{ $activeTab == 'new_report' ? 'active shadow-sm font-weight-bold text-primary' : 'text-muted' }}" 
+                <a class="nav-link py-2 {{ $activeTab == 'new_report' ? 'active shadow-sm font-weight-bold' : 'text-muted' }}" 
                    href="javascript:void(0)" wire:click="switchTab('new_report')">BÁO CÁO</a>
             </li>
             <li class="nav-item">
@@ -32,8 +32,8 @@
                 @include('livewire.work-order.task-detail.tab-report')
             </div>
 
-            {{-- 4. FOOTER BUTTON (Chỉ hiện khi ở tab báo cáo) --}}
-            @if($task->status != 'completed')
+            {{-- 4. FOOTER BUTTON (Chỉ hiện khi ở tab báo cáo và chưa xong) --}}
+            @if($task->status != \App\Enums\TaskStatus::COMPLETED)
                 <div class="mt-3 mb-4">
                     <button class="btn btn-success btn-lg btn-block shadow-sm font-weight-bold" onclick="submitReport()">
                         <i class="fas fa-paper-plane mr-2"></i> GỬI BÁO CÁO

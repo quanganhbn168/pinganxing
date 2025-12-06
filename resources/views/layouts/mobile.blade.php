@@ -95,7 +95,7 @@
 
     {{-- HEADER --}}
     <div class="app-header">
-        <h5>CNET TECH</h5>
+        <h5>{{ $title ?? 'CNET TECH' }}</h5>
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="btn-logout">
             <i class="fas fa-sign-out-alt"></i>
         </a>
@@ -107,7 +107,11 @@
     </div>
 
     {{-- BOTTOM MENU --}}
-    @livewire('admin.mobile-bottom-nav')
+    @if(auth('admin')->check() && auth('admin')->user()->hasRole('staff'))
+        @livewire('worker.mobile-bottom-nav')
+    @else
+        @livewire('admin.mobile-bottom-nav')
+    @endif
 
     {{-- POPUP MỜI CÀI ĐẶT APP --}}
     <div id="install-prompt">

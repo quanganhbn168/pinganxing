@@ -96,10 +96,16 @@
                                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                         <td>{{ Str::limit($order->title, 50) }}</td>
                                         <td>
-                                            @if($order->status == 'completed') <span class="badge badge-success">Hoàn thành</span>
-                                            @elseif($order->status == 'processing') <span class="badge badge-primary">Đang làm</span>
-                                            @elseif($order->status == 'pending') <span class="badge badge-warning">Chờ xử lý</span>
-                                            @else <span class="badge badge-secondary">Đã hủy</span> @endif
+                                            @php
+                                                $statusEnum = $order->status instanceof \App\Enums\WorkOrderStatus 
+                                                    ? $order->status 
+                                                    : \App\Enums\WorkOrderStatus::tryFrom($order->status);
+                                            @endphp
+                                            @if($statusEnum)
+                                                <span class="badge badge-{{ $statusEnum->color() }}">{{ $statusEnum->label() }}</span>
+                                            @else
+                                                <span class="badge badge-secondary">{{ $order->status }}</span>
+                                            @endif
                                         </td>
                                         <td class="text-right">
                                             <a href="{{ route('admin.work-orders.show', $order->id) }}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i></a>

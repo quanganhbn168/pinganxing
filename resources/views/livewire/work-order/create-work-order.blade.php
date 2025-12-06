@@ -33,11 +33,11 @@
                         {{-- 1. Khách hàng --}}
                         <div class="card card-primary card-outline">
                             <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-user"></i> 1. Khách hàng (Hợp đồng)</h3>
+                                <h3 class="card-title"><i class="fas fa-user"></i> 1. Khách hàng</h3>
                                 <div class="card-tools">
-                                    <button type="button" class="btn btn-xs {{ $is_new_customer ? 'btn-default' : 'btn-success' }}" 
+                                <button type="button" class="btn btn-xs {{ $is_new_customer ? 'btn-outline-primary' : 'btn-info' }}" 
                                     wire:click="toggleNewCustomer">
-                                    {{ $is_new_customer ? 'Quay lại tìm' : 'Thêm mới' }}
+                                    {{ $is_new_customer ? '🔍 Đã có khách này?' : '✏️ Nhập khách mới' }}
                                 </button>
                             </div>
                         </div>
@@ -46,15 +46,15 @@
                             @if($is_new_customer)
                             <div class="form-group">
                                 <label>Tên khách <span class="text-danger">*</span></label>
-                                <input type="text" wire:model.live="new_customer_name" class="form-control">
+                                <input type="text" wire:model.live="new_customer_name" class="form-control" placeholder="Tên khách hàng...">
                             </div>
                             <div class="form-group">
                                 <label>Điện thoại <span class="text-danger">*</span></label>
-                                <input type="text" wire:model.live="new_customer_phone" class="form-control">
+                                <input type="text" wire:model.live="new_customer_phone" class="form-control" placeholder="Số điện thoại...">
                             </div>
                             <div class="form-group">
                                 <label>Địa chỉ</label>
-                                <textarea wire:model.live="new_customer_address" class="form-control" rows="2"></textarea>
+                                <textarea wire:model.live="new_customer_address" class="form-control" rows="2" placeholder="Địa chỉ..."></textarea>
                             </div>
                             @else
                             @if($selected_customer_id)
@@ -87,6 +87,23 @@
                             <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> 2. Địa điểm & Liên hệ thi công</h3>
                         </div>
                         <div class="card-body">
+                            {{-- GỢI Ý ĐỊA ĐIỂM CŨ --}}
+                            @if(!$is_new_customer && count($suggestedSites) > 0)
+                                <div class="mb-3">
+                                    <label class="text-muted small mb-1"><i class="fas fa-history"></i> Lịch sử gần đây (Chọn để điền nhanh):</label>
+                                    <div class="d-flex flex-wrap" style="gap: 5px;">
+                                        @foreach($suggestedSites as $index => $site)
+                                            <button type="button" wire:click="fillSiteInfo({{ $index }})" 
+                                                    class="btn btn-xs btn-outline-secondary text-left" 
+                                                    style="max-width: 100%; white-space: normal;">
+                                                <strong>{{ $site['contact_person'] }}</strong> - {{ $site['contact_phone'] }}<br>
+                                                <small>{{ \Illuminate\Support\Str::limit($site['site_address'], 30) }}</small>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                    <hr>
+                                </div>
+                            @endif
                             <div class="form-group">
                                 <label>Người phụ trách tại chỗ <span class="text-danger">*</span></label>
                                 <input type="text" wire:model="contact_person" class="form-control" placeholder="VD: Anh bảo vệ, Chị giúp việc...">
@@ -204,7 +221,12 @@
 </section>
 </div>
 
+@push('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+@endpush
+
 @push('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('livewire:initialized', () => {
         $('#staff-select').select2({ theme: 'bootstrap4' });
@@ -213,6 +235,21 @@
         });
         @this.on('clear-select2', () => {
             $('#staff-select').val(null).trigger('change');
+        });
+
+        // Listen for SweetAlert event
+        @this.on('swal', (event) => {
+            const data = event[0] || event; // Handle array wrapping if Livewire < 3.0 differs
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: data.icon || 'success',
+                title: data.title || 'Thông báo',
+                text: data.text || '',
+                showConfirmButton: false,
+                timer: data.timer || 3000,
+                timerProgressBar: true
+            });
         });
     });
 </script>

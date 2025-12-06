@@ -97,5 +97,6 @@ Route::post('/wishlist/add/{product}', [WishlistController::class, 'add'])->name
 Route::post('/wishlist/remove/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 
 require __DIR__.'/admin.php';
+require __DIR__.'/worker.php';
 require __DIR__.'/auth.php';
 Route::get('/{slug}', [SlugController::class, 'handle'])->where('slug', '.*')->name('frontend.slug.handle');

@@ -6,19 +6,18 @@
     {{-- ================================================= --}}
     {{-- TRƯỜNG HỢP 1: TASK ĐÃ HOÀN THÀNH => CHẶN BÁO CÁO --}}
     {{-- ================================================= --}}
-    @if($task->status == 'completed')
+    @if($task->status == \App\Enums\TaskStatus::COMPLETED)
         <div class="text-center py-5 mt-3">
             <div class="mb-3">
                 <i class="fas fa-check-circle text-success fa-5x"></i>
             </div>
             <h5 class="font-weight-bold text-dark">ĐÃ HOÀN THÀNH</h5>
-            <p class="text-muted px-4 small">Công việc này đã được chốt xong. Bạn không thể gửi thêm báo cáo.</p>
+            <p class="text-muted px-4 small">Công việc này đã được chốt xong.</p>
             
-            {{-- Nút Mở Lại (Gọi hàm reopenTask trong PHP) --}}
-            <button wire:confirm="Bạn có chắc muốn MỞ LẠI công việc này? (Trạng thái sẽ chuyển về Đang xử lý)" 
-                    wire:click="reopenTask" 
-                    class="btn btn-outline-danger mt-3 px-4 rounded-pill font-weight-bold shadow-sm">
-                <i class="fas fa-redo-alt mr-1"></i> MỞ LẠI CÔNG VIỆC
+            <button wire:click="reopenTask" 
+                    wire:confirm="Bạn có chắc chắn muốn mở lại công việc này để báo cáo tiếp không?"
+                    class="btn btn-outline-danger font-weight-bold mt-3 rounded-pill px-4 shadow-sm">
+                <i class="fas fa-undo mr-2"></i> MỞ LẠI CÔNG VIỆC
             </button>
         </div>
 
@@ -156,7 +155,7 @@
                     <div class="form-row mb-2 align-items-start no-gutters border-bottom pb-2">
                         
                         {{-- Cột 1: Tên (Có Search) & Serial --}}
-                        <div class="col-7 pr-1 position-relative"> {{-- position-relative để căn dropdown --}}
+                        <div class="col-7 pr-1 position-relative"> 
                             
                             {{-- Ô nhập tên (Có autocomplete) --}}
                             <input type="text" 
@@ -182,18 +181,20 @@
                                 </div>
                             @endif
 
-                            {{-- Ô nhập Serial --}}
-                            <div class="input-group input-group-sm">
-                                <input type="text" 
-                                       wire:model.live="items.{{ $index }}.serial" 
-                                       class="form-control" 
-                                       placeholder="Serial (nếu có)">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary px-2" onclick="openScanner({{ $index }})">
-                                        <i class="fas fa-qrcode text-dark"></i>
-                                    </button>
+                            {{-- Ô nhập Serial (Chỉ hiện khi SL <= 1) --}}
+                            @if(empty($items[$index]['qty']) || $items[$index]['qty'] <= 1)
+                                <div class="input-group input-group-sm">
+                                    <input type="text" 
+                                           wire:model.live="items.{{ $index }}.serial" 
+                                           class="form-control" 
+                                           placeholder="Serial (nếu có)">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary px-2" onclick="openScanner({{ $index }})">
+                                            <i class="fas fa-qrcode text-dark"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
                         {{-- Cột 2: Số lượng --}}

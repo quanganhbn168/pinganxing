@@ -51,20 +51,61 @@
     function openScanner(index) {
         currentScanningIndex = index;
         document.getElementById('scanner-overlay').style.display = 'flex';
-        if(html5QrcodeScanner) return;
-        html5QrcodeScanner = new Html5Qrcode("reader");
-        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
-            (decodedText) => {
-                @this.set('items.' + currentScanningIndex + '.serial', decodedText);
-                toastr.success('OK: ' + decodedText);
-                closeScanner();
-            }, (err) => {}
-        );
+        
+        // Ensure cleanup if previous instance was stuck
+        if(html5QrcodeScanner) {
+             html5QrcodeScanner.stop().then(() => {
+                 html5QrcodeScanner.clear();
+                 html5QrcodeScanner = null;
+                 startScannerInstance();
+             }).catch(err => {
+                 console.error("Failed to stop previous scanner", err);
+                 html5QrcodeScanner = null;
+                 startScannerInstance();
+             });
+        } else {
+             startScannerInstance();
+        }
     }
+
+    function startScannerInstance() {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        // Use higher resolution config
+        const config = { 
+            fps: 15, 
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+            showTorchButtonIfSupported: true
+        };
+        
+        html5QrcodeScanner.start({ facingMode: "environment" }, config, 
+            (decodedText) => {
+                // Success
+                console.log("Scanned:", decodedText);
+                @this.set('items.' + currentScanningIndex + '.serial', decodedText);
+                toastr.success('Đã quét: ' + decodedText);
+                closeScanner();
+            }, 
+            (errorMessage) => {
+                // Parse error, ignore common failures to keep console clean
+            }
+        ).catch(err => {
+            console.error("Error starting scanner", err);
+            toastr.error('Không thể khởi động camera. Vui lòng cấp quyền.');
+            closeScanner();
+        });
+    }
+
     function closeScanner() {
         document.getElementById('scanner-overlay').style.display = 'none';
         if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().then(() => { html5QrcodeScanner.clear(); html5QrcodeScanner = null; }).catch(err => {});
+            html5QrcodeScanner.stop().then(() => {
+                html5QrcodeScanner.clear();
+                html5QrcodeScanner = null;
+            }).catch(err => {
+                console.error("Failed to stop scanner", err);
+                html5QrcodeScanner = null;
+            });
         }
     }
 

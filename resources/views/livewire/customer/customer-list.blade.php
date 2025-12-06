@@ -18,7 +18,24 @@
             <div class="card">
                 <div class="card-header border-0">
                     <div class="d-flex justify-content-between align-items-center">
-                        
+                        {{-- KHU VỰC TOOLBAR --}}
+                        <div class="d-flex">
+                            <div class="btn-group mr-3">
+                                <button wire:click="downloadTemplate" class="btn btn-sm btn-default" title="Tải file mẫu"><i class="fas fa-file-download"></i> File mẫu</button>
+                                <button wire:click="export" class="btn btn-sm btn-success" title="Xuất dữ liệu"><i class="fas fa-file-excel"></i> Xuất Excel</button>
+                                <label class="btn btn-sm btn-info mb-0" style="cursor: pointer;" title="Nhập dữ liệu">
+                                    <i class="fas fa-file-import"></i> Nhập Excel
+                                    <input type="file" wire:model="file_import" class="d-none" accept=".csv, .xlsx">
+                                </label>
+                            </div>
+                            <div wire:loading wire:target="file_import">
+                                <span class="text-primary text-sm align-self-center"><i class="fas fa-spinner fa-spin"></i> Đang xử lý...</span>
+                            </div>
+                            <div wire:loading wire:target="export">
+                                <span class="text-success text-sm align-self-center"><i class="fas fa-spinner fa-spin"></i> Đang xuất...</span>
+                            </div>
+                        </div>
+
                         {{-- KHU VỰC HÀNH ĐỘNG HÀNG LOẠT (Chỉ hiện khi có chọn) --}}
                         <div class="d-flex align-items-center" style="min-height: 38px;">
                             @if(count($selected) > 0)

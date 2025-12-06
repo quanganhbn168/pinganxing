@@ -26,6 +26,7 @@ class GlobalBulkActionController extends Controller
         'media_file' => \App\Models\MediaFile::class,
         'career_application' => \App\Models\CareerApplication::class,
         'user' => \App\Models\User::class,
+        'material' => \App\Models\Material::class,
         // Thêm model mới vào đây là xong
     ];
 

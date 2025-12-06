@@ -16,7 +16,11 @@
                             </div>
                             <div class="text-muted text-xs">{{ $rpt->created_at->format('H:i - d/m/Y') }}</div>
                         </div>
-                        @if($rpt->is_completed) <span class="badge badge-success"><i class="fas fa-check"></i> Đã xong</span> @endif
+                        @if($rpt->is_completed) 
+                            <span class="badge badge-success"><i class="fas fa-check"></i> Đã xong</span> 
+                        @elseif(str_contains($rpt->content, 'Mở lại:'))
+                            <span class="badge badge-danger"><i class="fas fa-undo"></i> Mở lại</span>
+                        @endif
                     </div>
 
                     <div class="history-body">

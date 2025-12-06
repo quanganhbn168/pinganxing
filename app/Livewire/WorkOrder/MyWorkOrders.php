@@ -38,7 +38,28 @@ class MyWorkOrders extends Component
 
         return view('livewire.work-order.my-work-orders', [
             'orders' => $orders,
-            'filter' => $filter
+            'filter' => $filter,
+            'statusCounts' => $this->getStatusCounts($user)
         ])->layout(auth('admin')->user()->layout);
+    }
+
+    protected function getStatusCounts($user)
+    {
+        $baseQuery = $user->assignedWorkOrders();
+        
+        $counts = [
+            'all' => $baseQuery->count(), // Tổng số do user này phụ trách
+            'pending' => (clone $baseQuery)->where('status', \App\Enums\WorkOrderStatus::PENDING)->count(),
+            'processing' => (clone $baseQuery)->where('status', \App\Enums\WorkOrderStatus::PROCESSING)->count(),
+            'completed' => (clone $baseQuery)->where('status', \App\Enums\WorkOrderStatus::COMPLETED)->count(),
+            'cancelled' => (clone $baseQuery)->where('status', \App\Enums\WorkOrderStatus::CANCELLED)->count(),
+            // Việc hiện tại (active) = Chưa xong & Chưa hủy
+            'active' => (clone $baseQuery)->whereNotIn('status', [
+                \App\Enums\WorkOrderStatus::COMPLETED,
+                \App\Enums\WorkOrderStatus::CANCELLED
+            ])->count()
+        ];
+
+        return $counts;
     }
 }

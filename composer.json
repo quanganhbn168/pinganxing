@@ -14,7 +14,8 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.7",
         "spatie/laravel-permission": "^6.21",
-        "spatie/laravel-sitemap": "^7.3"
+        "spatie/laravel-sitemap": "^7.3",
+        "spatie/simple-excel": "^3.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
