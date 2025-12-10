@@ -70,22 +70,31 @@ class WorkOrderDiscussion extends Component
             });
 
         // Load spawned tasks (tasks that have parent_task_id set)
-        $spawnedTasks = $this->workOrder->tasks()
-            ->whereNotNull('parent_task_id')
-            ->with(['performer', 'parentTask', 'createdByWorker'])
-            ->get()
-            ->map(function ($task) {
-                return [
-                    'type' => 'task_spawn',
-                    'id' => 'spawn-' . $task->id,
-                    'data' => $task,
-                    'created_at' => $task->created_at,
-                    'author' => $task->createdByWorker,
-                ];
-            });
+        // Tương thích với database cũ: kiểm tra column tồn tại
+        $spawnedTasks = collect();
+        if (\Schema::hasColumn('tasks', 'parent_task_id')) {
+            $spawnedTasks = $this->workOrder->tasks()
+                ->whereNotNull('parent_task_id')
+                ->with(['performer', 'parentTask', 'createdByWorker'])
+                ->get()
+                ->map(function ($task) {
+                    return [
+                        'type' => 'task_spawn',
+                        'id' => 'spawn-' . $task->id,
+                        'data' => $task,
+                        'created_at' => $task->created_at,
+                        'author' => $task->createdByWorker ?? null,
+                    ];
+                });
+        }
 
         // Merge all and sort by created_at descending (newest first)
-        $this->feedItems = $comments->merge($reports)->merge($spawnedTasks)
+        $allItems = collect()
+            ->concat($comments)
+            ->concat($reports)
+            ->concat($spawnedTasks);
+            
+        $this->feedItems = $allItems
             ->sortByDesc('created_at')
             ->values()
             ->toArray();
