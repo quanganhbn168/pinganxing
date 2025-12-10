@@ -40,7 +40,7 @@ class WorkOrderDiscussion extends Component
 
     public function loadFeed()
     {
-        // Load comments
+        // Load comments (toBase để convert EloquentCollection -> Support\Collection)
         $comments = $this->workOrder->comments()
             ->with(['author', 'attachments', 'mentions.admin'])
             ->get()
@@ -52,7 +52,8 @@ class WorkOrderDiscussion extends Component
                     'created_at' => $comment->created_at,
                     'author' => $comment->author,
                 ];
-            });
+            })
+            ->toBase(); // FIX: Convert to Support\Collection
 
         // Load task reports from all tasks in this work order
         $taskIds = $this->workOrder->tasks()->pluck('id');
@@ -67,7 +68,8 @@ class WorkOrderDiscussion extends Component
                     'created_at' => $report->created_at,
                     'author' => $report->reporter,
                 ];
-            });
+            })
+            ->toBase(); // FIX: Convert to Support\Collection
 
         // Load spawned tasks (tasks that have parent_task_id set)
         $spawnedTasks = $this->workOrder->tasks()
@@ -82,7 +84,8 @@ class WorkOrderDiscussion extends Component
                     'created_at' => $task->created_at,
                     'author' => $task->createdByWorker,
                 ];
-            });
+            })
+            ->toBase(); // FIX: Convert to Support\Collection
 
         // Merge all and sort by created_at descending (newest first)
         $this->feedItems = $comments->merge($reports)->merge($spawnedTasks)
