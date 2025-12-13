@@ -55,25 +55,30 @@ return [
         ],
     ],
     [
-        'title' => 'Kho Vật tư',
-        'icon' => 'bi bi-box-seam', 
-        'route' => 'admin.materials.index',
-        'active_pattern' => 'admin.materials.*',
+        'title' => 'Quản lý Vật tư',
+        'icon' => 'bi bi-box-seam',
         'permission' => 'view_materials',
-    ],
-    [
-        'title' => 'Vật tư thu hồi',
-        'icon' => 'bi bi-arrow-return-left', 
-        'route' => 'admin.returned-materials.index',
-        'active_pattern' => 'admin.returned-materials.*',
-        'permission' => 'view_materials', // Dùng chung quyền với vật tư
-    ],
-    [
-        'title' => 'Nhà cung cấp',
-        'icon' => 'bi bi-truck', 
-        'route' => 'admin.suppliers.index',
-        'active_pattern' => 'admin.suppliers.*',
-        'permission' => 'view_materials', // Dùng chung quyền với vật tư
+        'active_pattern' => ['admin.materials.*', 'admin.returned-materials.*', 'admin.suppliers.*'],
+        'submenu' => [
+            [
+                'title' => 'Kho vật tư',
+                'route' => 'admin.materials.index',
+                'active_pattern' => 'admin.materials.*',
+                'permission' => 'view_materials',
+            ],
+            [
+                'title' => 'Vật tư thu hồi',
+                'route' => 'admin.returned-materials.index',
+                'active_pattern' => 'admin.returned-materials.*',
+                'permission' => 'view_materials',
+            ],
+            [
+                'title' => 'Nhà cung cấp',
+                'route' => 'admin.suppliers.index',
+                'active_pattern' => 'admin.suppliers.*',
+                'permission' => 'view_materials',
+            ],
+        ],
     ],
     [
         'title' => 'Bảo hành',

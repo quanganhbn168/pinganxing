@@ -76,6 +76,9 @@
                                         </div>
                                     </td>
                                     <td class="text-right">
+                                        <a href="{{ route('admin.staff.performance', $staff->id) }}" class="btn btn-sm btn-outline-success" title="Hiệu suất">
+                                            <i class="fas fa-chart-line"></i>
+                                        </a>
                                         <a href="{{ route('admin.staff.edit', $staff->id) }}" class="btn btn-sm btn-info" title="Sửa">
                                             <i class="fas fa-pen"></i>
                                         </a>

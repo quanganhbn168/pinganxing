@@ -213,7 +213,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->as('admin.')->group(function
      Route::get('/returned-materials', \App\Livewire\Material\ReturnedMaterialList::class)->name('returned-materials.index');
 
      // Staff Performance (Hiệu suất nhân viên)
-     Route::get('/staff/{id}/performance', [\App\Http\Controllers\Admin\StaffController::class, 'performance'])->name('staff.performance');
+     Route::get('/staff/{id}/performance', \App\Livewire\Admin\StaffPerformance::class)->name('staff.performance');
 
      Route::get('/profile', \App\Livewire\Admin\UserProfile::class)->name('profile');
      Route::get('/notifications', \App\Livewire\Admin\NotificationList::class)->name('notifications.index');
