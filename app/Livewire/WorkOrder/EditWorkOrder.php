@@ -65,8 +65,12 @@ class EditWorkOrder extends Component
         $this->contact_person = $order->contact_person;
         $this->contact_phone = $order->contact_phone;
 
+        // Tính days_count từ started_at và deadline
+        $this->calculateDaysCount();
+
         // Lấy danh sách ID nhân viên đã gán
         $this->assignee_ids = $order->assignees->pluck('id')->map(fn($id) => (string)$id)->toArray();
+
 
         // Lấy danh sách Task
         foreach ($order->tasks as $task) {

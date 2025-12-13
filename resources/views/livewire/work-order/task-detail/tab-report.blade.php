@@ -123,8 +123,11 @@
 
         {{-- 4. VẬT TƯ TIÊU HAO --}}
         <div class="app-card">
-            <div class="app-card-header">
+            <div class="app-card-header d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-box mr-1"></i> Vật tư tiêu hao</span>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="openContinuousScanner('items')">
+                    <i class="fas fa-barcode mr-1"></i> Quét liên tục
+                </button>
             </div>
             <div class="app-card-body p-2">
                 {{-- Header Cột --}}
@@ -265,6 +268,62 @@
                 <div wire:ignore class="signature-wrapper">
                     <canvas id="signature-pad"></canvas>
                 </div>
+            </div>
+        </div>
+
+        {{-- 7. ĐÁNH DẤU HOÀN THÀNH --}}
+        <div class="app-card border-success mt-3">
+            <div class="app-card-header bg-success text-white">
+                <span><i class="fas fa-check-circle mr-1"></i> Hoàn thành công việc</span>
+            </div>
+            <div class="app-card-body py-3">
+                <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="toggleComplete" 
+                           wire:model.live="is_task_completed">
+                    <label class="custom-control-label font-weight-bold" for="toggleComplete">
+                        Đánh dấu đã hoàn thành công việc này
+                    </label>
+                </div>
+                <small class="text-muted d-block mt-1">
+                    Bật toggle này nếu đây là báo cáo cuối cùng cho công việc.
+                </small>
+
+                {{-- FORM TẠO VIỆC TIẾP THEO (Chỉ hiện khi tick hoàn thành) --}}
+                @if($is_task_completed && $task->workOrder->allowsAdditionalTasks())
+                <div class="mt-4 pt-3 border-top" wire:transition>
+                    <h6 class="font-weight-bold text-primary mb-3">
+                        <i class="fas fa-forward mr-1"></i> Tạo công việc tiếp theo (nếu cần)
+                    </h6>
+                    
+                    <div class="form-group">
+                        <label class="text-sm font-weight-bold">Nội dung công việc</label>
+                        <input type="text" wire:model="newTaskTitle" class="form-control" 
+                               placeholder="VD: Triển khai lắp đặt camera...">
+                        @error('newTaskTitle') <span class="text-danger text-xs mt-1 d-block">{{ $message }}</span> @enderror
+                        <small class="text-muted">Để trống nếu không cần tạo việc mới</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="text-sm font-weight-bold"><i class="fas fa-calendar mr-1"></i> Hẹn ngày</label>
+                                <input type="datetime-local" wire:model="newTaskScheduledAt" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="text-sm font-weight-bold"><i class="fas fa-user mr-1"></i> Gán cho</label>
+                                <select wire:model="newTaskAssigneeId" class="form-control form-control-sm">
+                                    <option value="">-- Chưa gán --</option>
+                                    @foreach(\App\Models\Admin::all() as $admin)
+                                        <option value="{{ $admin->id }}">{{ $admin->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     @endif

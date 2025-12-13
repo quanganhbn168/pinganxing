@@ -73,4 +73,38 @@
     .money-value { font-size: 16px; font-weight: bold; color: #1b5e20; }
     .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-top: 10px; }
     .image-item { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; border: 1px solid #eee; cursor: zoom-in; }
+
+    /* FAB Button */
+    .fab-button {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    .fab-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+    }
+    .fab-button:active {
+        transform: scale(0.95);
+    }
+    .fab-button i {
+        transition: transform 0.3s ease;
+    }
+    .fab-button:hover i {
+        transform: rotate(90deg);
+    }
 </style>

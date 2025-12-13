@@ -46,7 +46,8 @@ class TaskDetail extends Component
     public function mount($id)
     {
         $this->task = Task::with([
-            'workOrder', 
+            'workOrder.customer', 
+            'workOrder.tags',
             'reports.images', 
             'reports.items', 
             'reports.returnedItems',
@@ -289,6 +290,28 @@ class TaskDetail extends Component
     {
         unset($this->returnedItems[$index]);
         $this->returnedItems = array_values($this->returnedItems);
+    }
+
+    // === CONTINUOUS SCAN METHODS ===
+    
+    /**
+     * Thêm vật tư từ scan liên tục
+     * @param string $serial Mã serial
+     * @param string $materialName Tên vật tư (đã chọn trước khi quét)
+     */
+    public function addScannedItem($serial, $materialName = '')
+    {
+        $this->items[] = ['name' => $materialName, 'serial' => $serial, 'qty' => 1];
+    }
+
+    /**
+     * Thêm thiết bị thu hồi từ scan liên tục
+     * @param string $serial Mã serial
+     * @param string $materialName Tên thiết bị (đã chọn trước khi quét)
+     */
+    public function addScannedReturnedItem($serial, $materialName = '')
+    {
+        $this->returnedItems[] = ['name' => $materialName, 'serial' => $serial, 'reason' => ''];
     }
 
     // --- TASK PHÁT SINH / SPAWN ---

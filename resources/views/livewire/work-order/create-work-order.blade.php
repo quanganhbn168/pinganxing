@@ -169,8 +169,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label><i class="fas fa-play-circle text-success mr-1"></i> Thời gian bắt đầu <span class="text-danger">*</span></label>
-                                            <input type="datetime-local" wire:model.live="started_at" class="form-control" 
-                                                   min="{{ $minDateTime }}">
+                                            <input type="datetime-local" wire:model.live="started_at" class="form-control">
                                             @error('started_at') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                                         </div>
                                     </div>

@@ -74,7 +74,6 @@ class CreateWorkOrder extends Component
         return view('livewire.work-order.create-work-order', [
             'customers' => $customers,
             'staffs' => $staffs,
-            'minDateTime' => now()->format('Y-m-d\TH:i'),
             'availableTags' => Tag::forWorkOrders()->ordered()->get(),
         ]);
     }
