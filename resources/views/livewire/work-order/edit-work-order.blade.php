@@ -259,6 +259,74 @@
                                     <label>Mô tả chi tiết</label>
                                     <textarea wire:model="description" class="form-control" rows="4"></textarea>
                                 </div>
+
+                                {{-- File đính kèm --}}
+                                <div class="form-group mt-3 border-top pt-3">
+                                    <label><i class="fas fa-paperclip text-secondary mr-1"></i> Tài liệu đính kèm</label>
+                                    
+                                    {{-- Hiển thị file cũ --}}
+                                    @if(count($existingAttachments) > 0)
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block mb-2">File hiện có:</small>
+                                            <div class="d-flex flex-wrap" style="gap: 8px;">
+                                                @foreach($existingAttachments as $attachment)
+                                                    <div class="position-relative border rounded p-2" style="min-width: 80px;">
+                                                        @if($attachment['type'] === 'image')
+                                                            <a href="{{ asset('storage/' . $attachment['file_path']) }}" target="_blank">
+                                                                <img src="{{ asset('storage/' . $attachment['file_path']) }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                            </a>
+                                                        @else
+                                                            <a href="{{ asset('storage/' . $attachment['file_path']) }}" target="_blank" class="text-center d-block">
+                                                                <i class="fas fa-file fa-2x text-muted"></i>
+                                                                <div class="text-xs text-truncate" style="max-width: 60px;">{{ $attachment['file_name'] }}</div>
+                                                            </a>
+                                                        @endif
+                                                        <button type="button" wire:click="removeExistingAttachment({{ $attachment['id'] }})" 
+                                                                wire:confirm="Bạn có chắc muốn xóa file này?"
+                                                                class="btn btn-xs btn-danger position-absolute" 
+                                                                style="top: -5px; right: -5px;">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- Upload file mới --}}
+                                    <input type="file" wire:model="attachments" multiple class="form-control-file" 
+                                           accept="image/*,.pdf,.doc,.docx,.dwg,.dxf">
+                                    <small class="text-muted">Ảnh, PDF, Word, CAD. Tối đa 10MB/file</small>
+                                    @error('attachments.*') <span class="text-danger text-sm d-block">{{ $message }}</span> @enderror
+                                    
+                                    {{-- Preview files mới --}}
+                                    @if(count($attachments) > 0)
+                                    <div class="mt-2 d-flex flex-wrap" style="gap: 8px;">
+                                        @foreach($attachments as $index => $file)
+                                            <div class="position-relative border rounded p-2 bg-light" style="min-width: 80px;">
+                                                @if(str_starts_with($file->getMimeType(), 'image/'))
+                                                    <img src="{{ $file->temporaryUrl() }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                @else
+                                                    <div class="text-center">
+                                                        <i class="fas fa-file fa-2x text-muted"></i>
+                                                        <div class="text-xs text-truncate" style="max-width: 60px;">{{ $file->getClientOriginalName() }}</div>
+                                                    </div>
+                                                @endif
+                                                <button type="button" wire:click="removeAttachment({{ $index }})" 
+                                                        class="btn btn-xs btn-warning position-absolute" 
+                                                        style="top: -5px; right: -5px;">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                                <span class="badge badge-info position-absolute" style="bottom: -5px; left: 50%; transform: translateX(-50%);">Mới</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @endif
+                                    
+                                    <div wire:loading wire:target="attachments" class="text-info mt-2">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải file...
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-footer text-right">
                                 <button type="submit" class="btn btn-primary px-4">

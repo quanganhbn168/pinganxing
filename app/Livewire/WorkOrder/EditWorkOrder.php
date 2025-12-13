@@ -3,13 +3,18 @@
 namespace App\Livewire\WorkOrder;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\WorkOrder;
-use App\Models\Admin; // Model nhân viên
+use App\Models\WorkOrderAttachment;
+use App\Models\Admin;
 use App\Models\Tag;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Facades\Storage;
 
 class EditWorkOrder extends Component
 {
+    use WithFileUploads;
+
     public $workOrderId;
     public $code;
     public $customer_name;
@@ -34,6 +39,10 @@ class EditWorkOrder extends Component
     public $assignee_ids = [];
     public $tasks = [];
     public $selectedTags = []; // Tags đã chọn
+
+    // Attachments
+    public $attachments = [];          // File mới upload
+    public $existingAttachments = [];  // File cũ đã có
 
     public function mount($id)
     {
@@ -85,6 +94,9 @@ class EditWorkOrder extends Component
                 'is_deleted' => false // Flag để đánh dấu xóa
             ];
         }
+
+        // Lấy attachments cũ
+        $this->existingAttachments = $order->attachments->toArray();
     }
 
     // Tính số ngày từ deadline
@@ -129,6 +141,33 @@ class EditWorkOrder extends Component
             $this->selectedTags = array_values(array_diff($this->selectedTags, [$tagId]));
         } else {
             $this->selectedTags[] = $tagId;
+        }
+    }
+
+    /**
+     * Xóa file đính kèm mới (chưa lưu)
+     */
+    public function removeAttachment($index)
+    {
+        array_splice($this->attachments, $index, 1);
+    }
+
+    /**
+     * Xóa file đính kèm cũ (đã lưu trong DB)
+     */
+    public function removeExistingAttachment($attachmentId)
+    {
+        $attachment = WorkOrderAttachment::find($attachmentId);
+        if ($attachment) {
+            // Xóa file vật lý
+            Storage::disk('public')->delete($attachment->file_path);
+            $attachment->delete();
+            
+            // Cập nhật danh sách hiển thị
+            $this->existingAttachments = array_filter(
+                $this->existingAttachments, 
+                fn($a) => $a['id'] !== $attachmentId
+            );
         }
     }
 
@@ -242,6 +281,20 @@ class EditWorkOrder extends Component
                     'is_paid' => false
                 ]);
             }
+        }
+
+        // Lưu file đính kèm mới
+        foreach ($this->attachments as $file) {
+            $path = $file->store('work-orders/' . $order->code, 'public');
+            $isImage = str_starts_with($file->getMimeType(), 'image/');
+            
+            WorkOrderAttachment::create([
+                'work_order_id' => $order->id,
+                'type' => $isImage ? 'image' : 'document',
+                'file_path' => $path,
+                'file_name' => $file->getClientOriginalName(),
+                'uploaded_by' => auth('admin')->id(),
+            ]);
         }
 
         session()->flash('success', "Đã cập nhật phiếu {$this->code} thành công!");
