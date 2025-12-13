@@ -72,22 +72,6 @@ class WorkOrderDiscussion extends Component
             ->toBase(); // FIX: Convert to Support\Collection
 
         // Load spawned tasks (tasks that have parent_task_id set)
-<<<<<<< HEAD
-        $spawnedTasks = $this->workOrder->tasks()
-            ->whereNotNull('parent_task_id')
-            ->with(['performer', 'parentTask', 'createdByWorker'])
-            ->get()
-            ->map(function ($task) {
-                return [
-                    'type' => 'task_spawn',
-                    'id' => 'spawn-' . $task->id,
-                    'data' => $task,
-                    'created_at' => $task->created_at,
-                    'author' => $task->createdByWorker,
-                ];
-            })
-            ->toBase(); // FIX: Convert to Support\Collection
-=======
         // Tương thích với database cũ: kiểm tra column tồn tại
         $spawnedTasks = collect();
         if (\Schema::hasColumn('tasks', 'parent_task_id')) {
@@ -105,7 +89,7 @@ class WorkOrderDiscussion extends Component
                     ];
                 });
         }
->>>>>>> dev
+
 
         // Merge all and sort by created_at descending (newest first)
         $allItems = collect()
