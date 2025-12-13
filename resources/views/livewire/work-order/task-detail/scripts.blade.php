@@ -183,12 +183,23 @@
         });
     }
     
+    let lastScanTime = 0;
+    const SCAN_COOLDOWN = 2000; // 2 giây cooldown giữa các lần quét
+    
     function handleContinuousScan(serial) {
-        if (scannedSerials.includes(serial)) {
-            toastr.warning('Serial đã quét: ' + serial);
-            return;
+        const now = Date.now();
+        
+        // Cooldown: bỏ qua nếu quét quá nhanh
+        if (now - lastScanTime < SCAN_COOLDOWN) {
+            return; // Im lặng bỏ qua, không spam
         }
         
+        // Check trùng lặp - im lặng bỏ qua
+        if (scannedSerials.includes(serial)) {
+            return; // Không show warning để tránh spam
+        }
+        
+        lastScanTime = now;
         scannedSerials.push(serial);
         scanCount++;
         updateScanCounter();
