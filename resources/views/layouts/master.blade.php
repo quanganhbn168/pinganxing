@@ -31,10 +31,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset($setting->favicon) }}" />
     {{-- CSS & JS --}}
     <link rel="stylesheet" href="{{asset('vendor/bootstrap/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('vendor/fontawesome/css/all.min.css')}}">
-    <link rel="stylesheet" href="{{asset('vendor/swiper/swiper-bundle.min.css')}}">
-    <link rel="stylesheet" href="{{asset('plugins/sweetalert2/bootstrap-4.min.css')}}">
-    <link rel="stylesheet" href="{{asset('plugins/sweetalert2/bootstrap-4.min.css')}}">
+    {{-- Non-critical CSS Defer --}}
+    <link rel="stylesheet" href="{{asset('vendor/fontawesome/css/all.min.css')}}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{asset('vendor/swiper/swiper-bundle.min.css')}}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{asset('plugins/sweetalert2/bootstrap-4.min.css')}}" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="{{asset('vendor/fontawesome/css/all.min.css')}}">
+        <link rel="stylesheet" href="{{asset('vendor/swiper/swiper-bundle.min.css')}}">
+        <link rel="stylesheet" href="{{asset('plugins/sweetalert2/bootstrap-4.min.css')}}">
+    </noscript>
     
     {{-- Bundle Frontend CSS via Vite --}}
     @vite(['resources/css/frontend.css'])
@@ -82,7 +87,6 @@
     <script src="{{asset('/vendor/bootstrap/popper.min.js')}}?{{time()}}"></script>
     <script src="{{asset('/vendor/bootstrap/js/bootstrap.min.js')}}?{{time()}}"></script>
     <script src="{{asset('/vendor/swiper/swiper-bundle.min.js')}}?{{time()}}"></script>
-    <script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
     <script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
     
     {{-- Bundle Frontend JS via Vite --}}
