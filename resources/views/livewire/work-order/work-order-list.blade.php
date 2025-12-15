@@ -4,9 +4,19 @@
             <div class="d-flex justify-content-between">
                 <h1><i class="fas fa-list-alt"></i> Quản lý Phiếu Việc</h1>
                 @if($this->canCreate)
-                    <a href="{{ route('admin.work-orders.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Tạo mới
-                    </a>
+                    <div class="btn-group">
+                        <button wire:click="syncAll" 
+                                wire:confirm="Bạn có chắc chắn muốn đồng bộ hóa lại TOÀN BỘ dữ liệu (Tiêu đề & Nội dung báo cáo) của tất cả Work Orders? Hành động này không thể hoàn tác."
+                                wire:loading.attr="disabled"
+                                class="btn btn-warning mr-2">
+                            <i class="fas fa-sync-alt" wire:loading.remove></i>
+                            <i class="fas fa-spinner fa-spin" wire:loading></i>
+                            Đồng bộ
+                        </button>
+                        <a href="{{ route('admin.work-orders.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Tạo mới
+                        </a>
+                    </div>
                 @endif
             </div>
         </div>

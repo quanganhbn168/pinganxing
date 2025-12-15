@@ -6,6 +6,11 @@
                     <h1><i class="fas fa-edit"></i> Cập nhật Phiếu: <b>{{ $code }}</b></h1>
                 </div>
                 <div class="col-sm-6 text-right">
+                    <button type="button" wire:click="syncData" 
+                            wire:confirm="Bạn có chắc muốn đồng bộ hóa lại dữ liệu cho phiếu này không? Hành động này sẽ cập nhật lại tiêu đề và nội dung báo cáo."
+                            class="btn btn-warning mr-2">
+                        <i class="fas fa-sync-alt"></i> Đồng bộ hóa
+                    </button>
                     <a href="{{ route('admin.work-orders.index') }}" class="btn btn-default">Hủy bỏ</a>
                 </div>
             </div>

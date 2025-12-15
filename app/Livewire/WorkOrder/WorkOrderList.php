@@ -156,4 +156,32 @@ class WorkOrderList extends Component
             session()->flash('success', "Đã mở lại Job {$order->code}.");
         }
     }
+
+    /**
+     * Đồng bộ hóa lại dữ liệu tiêu đề và nội dung báo cáo cho TOÀN BỘ task
+     */
+    public function syncAll()
+    {
+        if (!auth('admin')->user()->can('update_work_orders')) {
+            return;
+        }
+
+        // Chunking để tránh memory leak nếu dữ liệu lớn
+        \App\Models\Task::chunk(100, function ($tasks) {
+            foreach ($tasks as $task) {
+                // Logic: Nếu title rỗng thì lấy report_content, sau đó đồng bộ report_content theo title
+                $title = $task->title ?: $task->report_content;
+                
+                // Nếu cả 2 đều rỗng thì bỏ qua hoặc để mặc định (ở đây chỉ xử lý khi có dữ liệu)
+                if ($title) {
+                    $task->update([
+                        'title' => $title,
+                        'report_content' => $title
+                    ]);
+                }
+            }
+        });
+
+        session()->flash('success', "Đã đồng bộ hóa dữ liệu cho tất cả Work Orders thành công!");
+    }
 }

@@ -254,6 +254,16 @@ class EditWorkOrder extends Component
 
     public function update()
     {
+        return $this->performUpdate("Đã cập nhật phiếu {$this->code} thành công!");
+    }
+
+    public function syncData()
+    {
+        return $this->performUpdate("Đã đồng bộ dữ liệu phiếu {$this->code} thành công! Các lỗi hiển thị đã được sửa.");
+    }
+
+    protected function performUpdate($successMessage)
+    {
         $this->validate([
             'title' => 'required|min:5',
             'priority' => 'required|in:low,medium,high,urgent',
@@ -343,7 +353,7 @@ class EditWorkOrder extends Component
             ]);
         }
 
-        session()->flash('success', "Đã cập nhật phiếu {$this->code} thành công!");
+        session()->flash('success', $successMessage);
         return redirect()->route('admin.work-orders.index');
     }
 
