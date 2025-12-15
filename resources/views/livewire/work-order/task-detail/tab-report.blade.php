@@ -70,7 +70,7 @@
                         @if ($proof_images)
                             @foreach($proof_images as $index => $image)
                                 <div class="img-thumb-wrapper">
-                                    <img src="{{ $image->temporaryUrl() }}" class="img-thumb">
+                                    <img src="{{ asset('storage/livewire-tmp/' . $image->getFilename()) }}" class="img-thumb" onerror="this.src='{{ asset('images/placeholder.png') }}'">
                                     <button wire:click="removeProofImage({{ $index }})" class="btn btn-danger btn-remove-img shadow-sm">&times;</button>
                                 </div>
                             @endforeach
