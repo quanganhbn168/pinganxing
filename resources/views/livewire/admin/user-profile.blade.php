@@ -16,7 +16,7 @@
                 </div>
                 <div class="widget-user-image">
                     @if($avatar)
-                        <img class="img-circle elevation-2" src="{{ $avatar->temporaryUrl() }}" alt="User Avatar" style="width: 90px; height: 90px; object-fit: cover;">
+                        <img class="img-circle elevation-2" src="{{ asset('storage/livewire-tmp/' . $avatar->getFilename()) }}" alt="User Avatar" style="width: 90px; height: 90px; object-fit: cover;" onerror="this.src='{{ $currentAvatarUrl }}'">
                     @else
                         <img class="img-circle elevation-2" src="{{ $currentAvatarUrl }}" alt="User Avatar" style="width: 90px; height: 90px; object-fit: cover;">
                     @endif

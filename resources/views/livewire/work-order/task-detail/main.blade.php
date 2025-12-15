@@ -133,8 +133,8 @@
                         <div class="d-flex flex-wrap mt-2" style="gap: 8px;">
                             @foreach($newTaskImages as $index => $image)
                             <div class="position-relative">
-                                <img src="{{ $image->temporaryUrl() }}" class="img-thumbnail" 
-                                     style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="{{ asset('storage/livewire-tmp/' . $image->getFilename()) }}" class="img-thumbnail" 
+                                     style="width: 60px; height: 60px; object-fit: cover;" onerror="this.style.display='none'">
                                 <button type="button" wire:click="removeNewTaskImage({{ $index }})" 
                                         class="btn btn-xs btn-danger position-absolute" 
                                         style="top: -5px; right: -5px; padding: 2px 5px;">

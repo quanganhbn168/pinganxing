@@ -308,7 +308,7 @@
                                         @foreach($attachments as $index => $file)
                                             <div class="position-relative border rounded p-2" style="min-width: 80px;">
                                                 @if(str_starts_with($file->getMimeType(), 'image/'))
-                                                    <img src="{{ $file->temporaryUrl() }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                                    <img src="{{ asset('storage/livewire-tmp/' . $file->getFilename()) }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" onerror="this.style.display='none'">
                                                 @else
                                                     <div class="text-center">
                                                         <i class="fas fa-file fa-2x text-muted"></i>

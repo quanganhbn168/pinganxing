@@ -20,7 +20,7 @@
     <div class="mt-2">
         @if ($image)
             {{-- 1. Ưu tiên hiển thị preview ảnh MỚI --}}
-            <img src="{{ $image->temporaryUrl() }}" style="max-height: 150px; border: 1px solid #ddd; padding: 4px;">
+            <img src="{{ asset('storage/livewire-tmp/' . $image->getFilename()) }}" style="max-height: 150px; border: 1px solid #ddd; padding: 4px;" onerror="this.style.display='none'">
         @elseif ($value)
             {{-- 2. Nếu không có ảnh mới, hiển thị ảnh CŨ (khi edit) --}}
             <img src="{{ asset($value) }}" style="max-height: 150px; border: 1px solid #ddd; padding: 4px;">
