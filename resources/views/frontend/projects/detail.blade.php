@@ -356,7 +356,14 @@
         {{-- PHẦN NỘI DUNG CHI TIẾT --}}
         {{-- ====================================================== --}}
         <div class="project-content">
-            {!!$project->content!!}
+            @if(empty($project->content) || trim(strip_tags($project->content)) == '')
+                <div class="alert alert-light text-center py-5">
+                    <i class="fa-solid fa-file-pen fa-3x mb-3 text-muted"></i>
+                    <p class="text-muted">Nội dung đang được cập nhật...</p>
+                </div>
+            @else
+                {!!$project->content!!}
+            @endif
         </div>
 
         {{-- ====================================================== --}}

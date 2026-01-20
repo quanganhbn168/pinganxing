@@ -165,7 +165,14 @@
 
                 {{-- Nội dung bài viết --}}
                 <div class="post-content mt-4 text-justify">
-                    {!! $contentHtml !!}
+                    @if(empty($contentHtml) || trim(strip_tags($contentHtml)) == '')
+                        <div class="alert alert-light text-center py-5">
+                            <i class="fa-solid fa-file-pen fa-3x mb-3 text-muted"></i>
+                            <p class="text-muted">Nội dung đang được cập nhật...</p>
+                        </div>
+                    @else
+                        {!! $contentHtml !!}
+                    @endif
                 </div>
                 
                 {{-- Chia sẻ lại ở cuối bài --}}

@@ -38,7 +38,14 @@
                 <div class="service-detail">
                     <h1 class="service-title">{{ $service->name }}</h1>
                     <div class="service-content">
-                        {!! $service->content !!}
+                        @if(empty($service->content) || trim(strip_tags($service->content)) == '')
+                            <div class="alert alert-light text-center py-5">
+                                <i class="fa-solid fa-file-pen fa-3x mb-3 text-muted"></i>
+                                <p class="text-muted">Nội dung đang được cập nhật...</p>
+                            </div>
+                        @else
+                            {!! $service->content !!}
+                        @endif
                     </div>
                 </div>
 
