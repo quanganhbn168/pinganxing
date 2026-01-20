@@ -18,6 +18,8 @@ class BrandRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:brands,name,' . $id,
             'slug' => 'nullable|string|max:255|unique:brands,slug,' . $id,
+            'link' => 'nullable|string|max:255',
+            'image_original_path' => 'nullable',
             'status' => 'boolean',
         ];
     }

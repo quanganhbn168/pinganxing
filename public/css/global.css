@@ -1474,16 +1474,16 @@ section.section .section-title h2:before {
     }
 
     .footer .footer-widget:first-child {
-        text-align: center;
+        text-align: left;
     }
 
     .footer .footer-widget:first-child .widget-title::after {
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
+        transform: none;
     }
 
     .footer .footer-widget:first-child .social-list {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
 }
@@ -1491,16 +1491,16 @@ section.section .section-title h2:before {
 @media (max-width: 767px) {
 
     .footer-widget {
-        text-align: center;
+        text-align: left;
     }
 
     .footer-widget .widget-title::after {
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
+        transform: none;
     }
 
     .footer-widget .social-list {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .subscribe-form {

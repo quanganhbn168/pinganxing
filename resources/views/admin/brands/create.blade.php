@@ -18,8 +18,9 @@
                 field="slug"
                 :current-id="null"
             />
+            <x-form.input name="link" label="Website/Link liên kết" :value="old('link')" />
 
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="image_original_path"
                 label="Logo thương hiệu"
                 :multiple="false"

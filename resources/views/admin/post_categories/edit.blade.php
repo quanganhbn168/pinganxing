@@ -108,30 +108,18 @@
 
 
 
-                    <x-admin.form.media-input
-
+                    <x-form.image-picker
                         name="image_original_path"
-
                         label="Ảnh đại diện"
-
                         :multiple="false"
-
-                        :value="$postCategory->mainImage() ? $postCategory->mainImage()->original_path : old('image_original_path')"
-
+                        :value="old('image_original_path', $postCategory->image ?? optional($postCategory->mainImage())->original_path)"
                     />
 
-
-
-                    <x-admin.form.media-input
-
+                    <x-form.image-picker
                         name="banner_original_path"
-
                         label="Banner"
-
                         :multiple="false"
-
-                        :value="$postCategory->bannerImage() ? $postCategory->bannerImage()->original_path : old('banner_original_path')"
-
+                        :value="old('banner_original_path', $postCategory->banner ?? optional($postCategory->bannerImage())->original_path)"
                     />
 
                 </div>

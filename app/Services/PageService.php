@@ -16,14 +16,12 @@ class PageService
         'main' => ['width' => 1024],
         'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
         'quality' => 85,
-        'format' => 'webp'
     ];
 
     private const BANNER_IMAGE_CONFIG = [
         'main' => ['width' => 1920, 'height' => 700, 'fit' => true],
         'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
         'quality' => 85,
-        'format' => 'webp'
     ];
 
     public function __construct(MediaServiceContract $mediaService)

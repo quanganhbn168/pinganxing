@@ -22,7 +22,7 @@
         <div class="card-header"><h3 class="card-title">Quản lý Giá trị</h3></div>
         <div class="card-body">
             {{-- Form thêm giá trị mới --}}
-            <form action="{{ route('admin.attributes.values.store', $attribute) }}" method="POST" class="mb-4 border-bottom pb-3" enctype="multipart/form-data">
+            <form action="{{ route('admin.attributes.values.store', $attribute) }}" method="POST" class="mb-4 border-bottom pb-3">
                 @csrf
                 <h5>Thêm giá trị mới</h5>
                 <div class="row">
@@ -40,10 +40,8 @@
                         @error('color_code') <span class="invalid-feedback">{{ $message }}</span> @enderror
                     </div>
                     @elseif($attribute->type == 'image_swatch')
-                    <div class="form-group col-md-4">
-                        <label for="image">Ảnh minh họa</label>
-                        <input type="file" name="image" id="image" class="form-control @error('image') is-invalid @enderror">
-                        @error('image') <span class="invalid-feedback">{{ $message }}</span> @enderror
+                    <div class="col-md-4">
+                        <x-form.image-picker name="image" label="Ảnh minh họa" />
                     </div>
                     @endif
                     

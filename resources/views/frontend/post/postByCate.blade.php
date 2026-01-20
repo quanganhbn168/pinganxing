@@ -19,11 +19,11 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* --- 2. Xử lý ảnh 4:3 --- */
+    /* --- 2. Xử lý ảnh 16:9 --- */
     .post-item .post-item_image {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 3; /* Tỷ lệ vàng 4:3 */
+        aspect-ratio: 16 / 9; /* Tỷ lệ vàng 16:9 */
         overflow: hidden;
         flex-shrink: 0;
     }
@@ -110,7 +110,7 @@
 
     .post-container.layout-list .post-item_image {
         width: 35%; /* Ảnh 35% */
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 16 / 9;
     }
 
     .post-container.layout-list .post-item_info {

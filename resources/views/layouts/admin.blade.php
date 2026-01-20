@@ -88,7 +88,7 @@
 <script src="{{ asset('vendor/adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
 <script src="{{ asset('js/media-picker.js') }}"></script>
 <script src="{{ asset('js/admin/universal-bulk.js') }}"></script>
-@include('ckfinder::setup')
+
 @livewireScripts
 @stack('js')
 

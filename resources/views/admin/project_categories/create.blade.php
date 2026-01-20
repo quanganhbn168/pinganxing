@@ -62,14 +62,14 @@
 
                     <hr>
 
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
                         :value="old('image_original_path')"
                     />
 
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="banner_original_path"
                         label="Banner"
                         :multiple="false"

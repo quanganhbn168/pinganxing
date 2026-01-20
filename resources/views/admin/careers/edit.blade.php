@@ -92,11 +92,11 @@
                     <hr>
 
                     {{-- Media Manager --}}
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
-                        :value="$career->image"
+                        :value="old('image_original_path', $career->image)"
                     />
                 </div>
                 <div class="card-footer">

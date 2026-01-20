@@ -7,9 +7,12 @@ use App\Models\Brand;
 use App\Http\Requests\BrandRequest;
 use App\Services\BrandService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class BrandController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected BrandService $brandService
     ) {}
@@ -28,7 +31,9 @@ class BrandController extends Controller
     public function store(BrandRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'brands', false);
         
         $this->brandService->create($validatedData);
         
@@ -46,7 +51,16 @@ class BrandController extends Controller
     public function update(BrandRequest $request, Brand $brand)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $currentImage = optional($brand->mainImage())->original_path ?? $brand->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'brands', false);
+        
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
         
         $this->brandService->update($brand, $validatedData);
         

@@ -93,8 +93,12 @@
                 @forelse ($testimonials as $index => $t)
                     @php
                         $row = ($testimonials->currentPage() - 1) * $testimonials->perPage() + $index + 1;
-                        $img = method_exists($t,'mainImage') ? $t->mainImage() : null;
-                        $thumbUrl = $img ? ($img->url('thumbnail') ?: $img->url()) : asset('images/setting/no-image.png');
+                        $thumbUrl = $t->image ? asset($t->image) : null;
+                        if (!$thumbUrl && method_exists($t,'mainImage') && $t->mainImage()) {
+                             $img = $t->mainImage();
+                             $thumbUrl = $img->url('thumbnail') ?: $img->url();
+                        }
+                        $thumbUrl ??= asset('images/setting/no-image.png');
                     @endphp
                     <tr>
                         {{-- [MỚI] Checkbox Item --}}

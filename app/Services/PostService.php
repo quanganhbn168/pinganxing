@@ -5,6 +5,8 @@ use App\Models\PostCategory;
 use App\Contracts\MediaServiceContract;
 use Illuminate\Support\Arr; 
 use Illuminate\Http\Request;
+use App\Services\SlugService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Quản lý logic nghiệp vụ cho Posts.
@@ -17,10 +19,9 @@ class PostService
      * Cấu hình cho ảnh đại diện (main image).
      */
     private const MAIN_IMAGE_CONFIG = [
-        'main' => ['width' => 1200], // Tăng độ phân giải cho ảnh nét căng
-        'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
-        'quality' => 90, // Tăng chất lượng ảnh
-        'format' => 'webp'
+        'main' => ['width' => 1200, 'height' => 675, 'fit' => true], // Force 16:9
+        'variants' => ['thumbnail' => ['width' => 320, 'height' => 180, 'fit' => true]], // 16:9 thumbnail
+        'quality' => 90,
     ];
     /**
      * Cấu hình cho ảnh banner (1920x700).
@@ -29,11 +30,13 @@ class PostService
         'main' => ['width' => 1920, 'height' => 700, 'fit' => true],
         'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
         'quality' => 85,
-        'format' => 'webp'
     ];
-    public function __construct(MediaServiceContract $mediaService)
+    protected SlugService $slugService;
+
+    public function __construct(MediaServiceContract $mediaService, SlugService $slugService)
     {
         $this->mediaService = $mediaService;
+        $this->slugService = $slugService;
     }
 
     /**
@@ -91,26 +94,16 @@ class PostService
      */
     public function create(array $data): Post
     {
+        // Map inputs to columns
+        $data['image'] = $data['image_original_path'] ?? null;
+        $data['banner'] = $data['banner_original_path'] ?? null;
+
         $postData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $post = Post::create($postData);
-        $this->mediaService->updateMedia(
-            $post,
-            $data['image_original_path'] ?? null,
-            'posts', 
-            self::MAIN_IMAGE_CONFIG,
-            fn($imgData) => $post->setMainImage($imgData), 
-            null, 
-            'ảnh đại diện' 
-        );
-        $this->mediaService->updateMedia(
-            $post,
-            $data['banner_original_path'] ?? null,
-            'posts/banner', 
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $post->setBannerImage($imgData), 
-            null, 
-            'ảnh banner' 
-        );
+        
+        // Sync Morph Slug
+        $this->slugService->upsert($post, $post->title);
+
         return $post;
     }
     /**
@@ -118,26 +111,20 @@ class PostService
      */
     public function update(Post $post, array $data): Post
     {
+        // Map inputs to columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+        if (array_key_exists('banner_original_path', $data)) {
+            $data['banner'] = $data['banner_original_path'];
+        }
+
         $postData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $post->update($postData);
-        $this->mediaService->updateMedia(
-            $post,
-            $data['image_original_path'] ?? null,
-            'posts',
-            self::MAIN_IMAGE_CONFIG,
-            fn($imgData) => $post->setMainImage($imgData),
-            fn() => $post->mainImage(), 
-            'ảnh đại diện'
-        );
-        $this->mediaService->updateMedia(
-            $post,
-            $data['banner_original_path'] ?? null,
-            'posts/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $post->setBannerImage($imgData),
-            fn() => $post->bannerImage(), 
-            'ảnh banner'
-        );
+
+        // Sync Morph Slug
+        $this->slugService->upsert($post, $post->title);
+
         return $post;
     }
     /**
@@ -150,6 +137,21 @@ class PostService
             $this->mediaService->deleteProcessedImages($image);
             $image->delete(); 
         }
+        
+        // Delete Morph Slug
+        $post->slugData()->delete();
+        
         $post->delete();
+    }
+
+    /**
+     * Xóa hàng loạt có dọn dẹp ảnh.
+     */
+    public function bulkDelete(array $ids): void
+    {
+        $posts = Post::whereIn('id', $ids)->get();
+        foreach ($posts as $post) {
+            $this->delete($post);
+        }
     }
 }

@@ -28,7 +28,11 @@
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>
                         <a href="{{ route('admin.tags.edit', $item) }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i></a>
-                        <x-form.delete :action="route('admin.tags.destroy', $item)" />
+                        <form action="{{ route('admin.tags.destroy', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach

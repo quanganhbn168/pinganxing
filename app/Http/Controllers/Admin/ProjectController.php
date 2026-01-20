@@ -6,8 +6,12 @@ use Illuminate\Http\Request;
 use App\Services\ProjectService;
 use App\Models\ProjectCategory;
 use App\Http\Requests\ProjectRequest;
+use App\Traits\UploadImageTrait;
+
 class ProjectController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected ProjectService $projectService
     ) {}
@@ -24,11 +28,25 @@ class ProjectController extends Controller
         $categories = ProjectCategory::pluck("name","id");
         return view('admin.projects.create', compact('categories'));
     }
+
     public function store(ProjectRequest $request) 
     {
         $validatedData = $request->validated(); 
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        // Process images (upload/LFM) using Trait
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'projects', false);
+        $validatedData['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'projects/banner', false);
+        
+        // Process gallery: Trait returns string (if LFM/JSON) or might upload if file array?
+        // Note: ProjectService handles JSON decoding of gallery.
+        // If it's a legacy file upload array, processImageInput currently handles SINGLE file.
+        // Since we migrated view to image-picker (LFM), it sends JSON string.
+        // We just pass it through.
+        $validatedData['gallery_original_paths'] = $request->input('gallery_original_paths'); // Processed by Service
+        
+        // If legacy file upload support for gallery is needed, we'd need custom loop here.
+        // Assuming partial migration to LFM first, we rely on LFM JSON string.
+
         $this->projectService->create($validatedData);
         return $request->has('save_new')
         ? redirect()->route('admin.projects.create')->with('success', 'Thêm dự án mới thành công.')
@@ -44,8 +62,35 @@ class ProjectController extends Controller
     public function update(ProjectRequest $request, Project $project)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+
+        // 1. Image
+        $currentImage = optional($project->mainImage())->original_path;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'projects', false);
+        
+        // Only update if changed
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+             unset($validatedData['image_original_path']);
+        }
+
+        // 2. Banner
+        $currentBanner = optional($project->bannerImage())->original_path;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currentBanner, 'projects/banner', false);
+
+        if ($newBanner !== $currentBanner) {
+            $validatedData['banner_original_path'] = $newBanner;
+        } else {
+             unset($validatedData['banner_original_path']);
+        }
+
+        // 3. Gallery
+        // Service handles logic (if null passed, it skips).
+        // If we pass the SAME json, Service re-syncs (deletes all, adds all).
+        // Optimization: Check if gallery changed?
+        // Hard to check JSON vs DB relations efficiently here. Let Service handle it for now.
+        $validatedData['gallery_original_paths'] = $request->input('gallery_original_paths');
+
         $this->projectService->update($project, $validatedData);
         return redirect()->route('admin.projects.index')->with('success', 'Cập nhật dự án thành công.');
     }

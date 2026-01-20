@@ -58,9 +58,13 @@
 </script>
 @endpush
 @section("content")
+@isset($sections['hero'])
 <section id="slider">
     @include("partials.frontend.slide")
 </section>
+@endisset
+@isset($sections['intro'])
+@php $introSection = $sections['intro']; @endphp
 <section class="section section-intro">
     <div class="container">
         <div class="row align-items-center">
@@ -73,14 +77,14 @@
                 <h2 class="">{{$setting->name}}</h2>
                 {!! $introMain->description !!}
                 <div class="intro-action">
-                    <a href="{{ asset('storage/' . $setting->profile) }}" target="_blank" class="btn btn-primary rounded-pill btn-crossover">
-                        <span class="btn-crossover-text">Download Profile</span>
+                    <a href="{{ $introSection->getSetting('button_link', asset('storage/' . $setting->profile)) }}" target="_blank" class="btn btn-primary rounded-pill btn-crossover">
+                        <span class="btn-crossover-text">{{ $introSection->getSetting('button_text', 'Download Profile') }}</span>
                         <span class="btn-crossover-icon">
                             <i class="fa-solid fa-arrow-right-long"></i>
                         </span>
                     </a>
-                    <a href="/gioi-thieu" class="btn btn-outline-primary rounded-pill btn-crossover">
-                        <span class="btn-crossover-text">Xem chi tiết</span>
+                    <a href="{{ $introSection->getSetting('button_2_link', '/gioi-thieu') }}" class="btn btn-outline-primary rounded-pill btn-crossover">
+                        <span class="btn-crossover-text">{{ $introSection->getSetting('button_2_text', 'Xem chi tiết') }}</span>
                         <span class="btn-crossover-icon">
                             <i class="fa-solid fa-arrow-right-long"></i>
                         </span>
@@ -102,11 +106,17 @@
 </div>
     </div>
 </section>
-<section class="section section-fields">
+@endisset
+@isset($sections['fields'])
+@php $fieldsSection = $sections['fields']; @endphp
+<section class="section section-fields" style="background-image: url('{{ $fieldsSection->background_image ? asset($fieldsSection->background_image) : asset('images/setting/contractors-bg-1.png') }}');">
     <h2 class="section-title">
-        <a href="{{ route('frontend.fields.index') }}">Lĩnh vực hoạt động</a>
+        <a href="{{ route('frontend.fields.index') }}">{{ $fieldsSection->title ?? 'Lĩnh vực hoạt động' }}</a>
     </h2>
     <div class="container">
+        @if(!empty($fieldsSection->subtitle))
+            <p class="text-center mb-4 section-subtitle">{{ $fieldsSection->subtitle }}</p>
+        @endif
         <div class="row">
             @foreach($homeFields as $key => $field)
             <div class="col-6 col-md-4 mb-4">
@@ -127,64 +137,83 @@
         </div>
     </div>
 </section>
+@endisset
+@isset($sections['projects'])
+@php $projectsSection = $sections['projects']; @endphp
 <section class="section section-project">
-    <h2 class="section-title"><a href="">Dự án nổi bật</a></h2>
-    @if($homeProjectCategories->isNotEmpty())
-    <ul class="nav nav-pills justify-content-center mb-4" id="projectTabs" role="tablist">
-        @if($homeProjects->isNotEmpty())
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="tab-all-projects" data-toggle="pill" data-target="#pane-all-projects" type="button" role="tab" aria-controls="pane-all-projects" aria-selected="true">Tất cả</button>
-        </li>
+    <div class="container">
+        <h2 class="section-title"><a href="">{{ $projectsSection->title ?? 'Dự án nổi bật' }}</a></h2>
+        @if(!empty($projectsSection->subtitle))
+            <p class="text-center mb-4 section-subtitle">{{ $projectsSection->subtitle }}</p>
         @endif
-        @foreach($homeProjectCategories as $projectCategory)
-        @if($projectCategory->projects->isNotEmpty())
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-{{ $projectCategory->slug }}" data-toggle="pill" data-target="#pane-{{ $projectCategory->slug }}" type="button" role="tab" aria-controls="pane-{{ $projectCategory->slug }}" aria-selected="false">{{ $projectCategory->name }}</button>
-        </li>
+        @if($homeProjectCategories->isNotEmpty())
+        <ul class="nav nav-pills justify-content-center mb-4 d-none d-md-flex" id="projectTabs" role="tablist">
+            @if($homeProjects->isNotEmpty())
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-all-projects" data-toggle="pill" data-target="#pane-all-projects" type="button" role="tab" aria-controls="pane-all-projects" aria-selected="true">Tất cả</button>
+            </li>
+            @endif
+            @foreach($homeProjectCategories as $projectCategory)
+            @if($projectCategory->projects->isNotEmpty())
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-{{ $projectCategory->slug }}" data-toggle="pill" data-target="#pane-{{ $projectCategory->slug }}" type="button" role="tab" aria-controls="pane-{{ $projectCategory->slug }}" aria-selected="false">{{ $projectCategory->name }}</button>
+            </li>
+            @endif
+            @endforeach
+        </ul>
         @endif
-        @endforeach
-    </ul>
-    @endif
-    <div class="tab-content" id="projectTabsContent">
-        @if($homeProjects->isNotEmpty())
-        <div class="tab-pane fade show active" id="pane-all-projects" role="tabpanel" aria-labelledby="tab-all-projects">
-            <div class="project-slider-wrapper">
-                <div class="swiper project-swiper">
-                    <div class="swiper-wrapper">
-                        @foreach($homeProjects as $project)
-                        @include('partials.frontend.project_item', ['project' => $project])
-                        @endforeach
+        <div class="tab-content" id="projectTabsContent">
+            @if($homeProjects->isNotEmpty())
+            {{-- Mobile Title 1 --}}
+            <div class="project-header-mobile is-open d-md-none" data-target="#pane-all-projects">Tất cả</div>
+            <div class="tab-pane fade show active" id="pane-all-projects" role="tabpanel">
+                <div class="project-slider-wrapper">
+                    <div class="swiper project-swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($homeProjects as $project)
+                            @include('partials.frontend.project_item', ['project' => $project])
+                            @endforeach
+                        </div>
                     </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
                 </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
             </div>
-        </div>
-        @endif
-        @foreach($homeProjectCategories as $projectCategory)
-        @if($projectCategory->projects->isNotEmpty())
-        <div class="tab-pane fade" id="pane-{{ $projectCategory->slug }}" role="tabpanel" aria-labelledby="tab-{{ $projectCategory->slug }}">
-            <div class="project-slider-wrapper">
-                <div class="swiper project-swiper">
-                    <div class="swiper-wrapper">
-                        @foreach($projectCategory->projects as $project)
-                        @include('partials.frontend.project_item', ['project' => $project])
-                        @endforeach
+            @endif
+
+            @foreach($homeProjectCategories as $projectCategory)
+            @if($projectCategory->projects->isNotEmpty())
+            {{-- Mobile Title Other --}}
+            <div class="project-header-mobile d-md-none" data-target="#pane-{{ $projectCategory->slug }}">{{ $projectCategory->name }}</div>
+            <div class="tab-pane fade" id="pane-{{ $projectCategory->slug }}" role="tabpanel">
+                <div class="project-slider-wrapper">
+                    <div class="swiper project-swiper">
+                        <div class="swiper-wrapper">
+                            @foreach($projectCategory->projects as $project)
+                            @include('partials.frontend.project_item', ['project' => $project])
+                            @endforeach
+                        </div>
                     </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
                 </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
             </div>
+            @endif
+            @endforeach
         </div>
-        @endif
-        @endforeach
     </div>
 </section>
+@endisset
+@isset($sections['partners'])
+@php $partnersSection = $sections['partners']; @endphp
 <section class="section section-partner">
     <div class="container">
-        <h2 class="section-title"><a href="">Đối tác & khách hàng</a></h2>
+        <h2 class="section-title"><a href="">{{ $partnersSection->title ?? 'Đối tác & khách hàng' }}</a></h2>
+        @if(!empty($partnersSection->subtitle))
+            <p class="text-center mb-4 section-subtitle">{{ $partnersSection->subtitle }}</p>
+        @endif
         <div class="row">
             <div class="col-12 col-lg-6">
                 <div class="partner-testimonial">
@@ -193,21 +222,21 @@
                             <i class="fas fa-quote-left"></i>
                         </div>
                         <p class="quote-text">
-                            Chúng tôi cam kết đem đến cho khách hàng những sản phẩm chất lượng cao và dịch vụ tốt nhất!
+                            {{ $partnersSection->getSetting('quote_text', 'Chúng tôi cam kết đem đến cho khách hàng những sản phẩm chất lượng cao và dịch vụ tốt nhất!') }}
                         </p>
                         <div class="quote-author">
-                            <strong class="author-name">Lê Sỹ Ngà</strong>
-                            <span class="author-title">Giám đốc</span>
+                            <strong class="author-name">{{ $partnersSection->getSetting('quote_author', 'Lê Sỹ Ngà') }}</strong>
+                            <span class="author-title">{{ $partnersSection->getSetting('quote_position', 'Giám đốc') }}</span>
                         </div>
                     </div>
-                    <img src="{{asset('images/setting/bat-tay.png')}}" alt="Ths. Ngô Anh Tuấn" class="director-image" loading="lazy">
+                    <img src="{{ $partnersSection->getSetting('quote_image') ? asset($partnersSection->getSetting('quote_image')) : asset('images/setting/bat-tay.png') }}" alt="{{ $partnersSection->getSetting('quote_author', 'Director') }}" class="director-image" loading="lazy">
                 </div>
             </div>
             <div class="col-12 col-lg-6">
                 <div class="partner-list">
                     @foreach($brands as $brand)
                     <a href="{{ $brand->link ?? '#' }}" class="partner-logo-item" target="_blank">
-                        <img src="{{ optional($brand->mainImage())->url() }}" alt="{{ $brand->name }}">
+                        <img src="{{ !empty($brand->image) ? asset($brand->image) : optional($brand->mainImage())->url() }}" alt="{{ $brand->name }}">
                     </a>
                     @endforeach
                 </div>
@@ -216,6 +245,8 @@
         </div>
     </div>
 </section>
+@endisset
+@isset($sections['core_values'])
 <section class="section section-core-values">
     @foreach ($slide_banners as $slide_banner)
     <div class="coreValueItem">
@@ -223,13 +254,19 @@
     </div>
     @endforeach
 </section>
+@endisset
+@isset($sections['news'])
+@php $newsSection = $sections['news']; @endphp
 <section class="section section-news">
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-8">
-                <h4 class="section-title text-left mb-2">
-                    <a href="">Tin tức - sự kiện</a>
-                </h4>
+                <h2 class="section-title text-left mb-2">
+                    <a href="">{{ $newsSection->title ?? 'Tin tức - sự kiện' }}</a>
+                </h2>
+                @if(!empty($newsSection->subtitle))
+                    <p class="text-left mb-3 section-subtitle">{{ $newsSection->subtitle }}</p>
+                @endif
                 @if($homePostCategories->isNotEmpty())
                 <ul class="nav nav-pills mb-3" id="newsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -309,7 +346,7 @@
             </div>
             <div class="col-12 col-lg-4 mt-4 mt-lg-0">
     <h4 class="section-title">
-        <a href="javascript:void(0)">Video giới thiệu</a>
+        <a href="javascript:void(0)">{{ $newsSection->getSetting('video_title', 'Video giới thiệu') }}</a>
     </h4>
     <div class="video-list">
         <div class="position-relative rounded overflow-hidden" style="background: #000; min-height: 200px;">
@@ -361,6 +398,8 @@
         </div>
     </div>
 </section>
+@endisset
+@isset($sections['careers'])
 <section class="section section-careers">
     <div class="container">
         <div class="row">
@@ -422,9 +461,15 @@
         </div>
     </div>
 </section>
+@endisset
+@isset($sections['testimonials'])
+@php $testimonialsSection = $sections['testimonials']; @endphp
 <section class="section section-testimonial">
     <div class="container">
-        <h2 class="section-title"><a href="">Đánh giá từ khách hàng</a></h2>
+        <h2 class="section-title"><a href="">{{ $testimonialsSection->title ?? 'Đánh giá từ khách hàng' }}</a></h2>
+        @if(!empty($testimonialsSection->subtitle))
+            <p class="text-center mb-4 section-subtitle">{{ $testimonialsSection->subtitle }}</p>
+        @endif
         <div class="swiper testimonial-swiper">
             <div class="swiper-wrapper">
                 @foreach($testimonials as $testimonial)
@@ -450,7 +495,10 @@
         </div>
     </div>
 </section>
-<section class="section-contact-visual" style="background-image: url('{{ asset('images/setting/lien-he-bg.jpg') }}');">
+@endisset
+@isset($sections['contact_form'])
+@php $contactSection = $sections['contact_form']; @endphp
+<section class="section-contact-visual" style="background-image: url('{{ $contactSection->background_image ? asset($contactSection->background_image) : asset('images/setting/lien-he-bg.jpg') }}');">
     <div class="contact-overlay"></div>
     <div class="container position-relative">
         <div class="section-decorator">
@@ -460,12 +508,15 @@
             <div class="col-lg-6">
                 <div class="contact-visual-info">
                     <h2 class="contact-visual-title">
-                        Vui lòng để lại thông tin, Cnet sẽ liên hệ trong thời gian sớm nhất!
+                        {{ $contactSection->title ?? 'Vui lòng để lại thông tin, chúng tôi sẽ liên hệ sớm nhất!' }}
                     </h2>
+                    @if(!empty($contactSection->subtitle))
+                        <p class="contact-visual-subtitle mb-4">{{ $contactSection->subtitle }}</p>
+                    @endif
                     <ul class="contact-visual-features">
-                        <li><i class="fa-solid fa-gears"></i> Quy trình nhanh chóng</li>
-                        <li><i class="fa-solid fa-headset"></i> Đội ngũ tư vấn nhiệt tình</li>
-                        <li><i class="fa-solid fa-tags"></i> Giá cả phù hợp nhất</li>
+                        <li><i class="{{ $contactSection->getSetting('feature_1_icon', 'fa-solid fa-gears') }}"></i> {{ $contactSection->getSetting('feature_1_text', 'Quy trình nhanh chóng') }}</li>
+                        <li><i class="{{ $contactSection->getSetting('feature_2_icon', 'fa-solid fa-headset') }}"></i> {{ $contactSection->getSetting('feature_2_text', 'Đội ngũ tư vấn nhiệt tình') }}</li>
+                        <li><i class="{{ $contactSection->getSetting('feature_3_icon', 'fa-solid fa-tags') }}"></i> {{ $contactSection->getSetting('feature_3_text', 'Giá cả phù hợp nhất') }}</li>
                     </ul>
                 </div>
             </div>
@@ -492,6 +543,7 @@
         </div>
     </div>
 </section>
+@endisset
 @endsection
 @push('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
@@ -555,54 +607,105 @@
 </script>
 <script>
     $(document).ready(function() {
-        // --- 1. Cấu hình chung cho tất cả các slider ---
-        const swiperOptions = {
-            // Bỏ 'effect: coverflow'
+        // --- 1. Hàm để khởi tạo Swiper (đã được tối ưu) ---
+        function initSwiper(paneSelector) {
+            const $pane = $(paneSelector);
+            const swiperEl = $pane.find('.project-swiper')[0];
+            
+            if (swiperEl && !swiperEl.swiper) {
+                const swiperOptions = {
             loop: false,
             rewind: true,
             grabCursor: true,
-            centeredSlides: false, // Slide active sẽ luôn ở giữa
-            slidesPerView: 1.2, // Số slide hiển thị trên mobile, cho phép thấy 1 phần slide kế tiếp
-            spaceBetween: 15, // Khoảng cách trên mobile
+            centeredSlides: false,
+            slidesPerView: 1, // Hiển thị 1 slide trọn vẹn trên mobile
+            spaceBetween: 20, // Khoảng cách giữa các slide
             pagination: {
-                el: '.swiper-pagination',
+                el: paneSelector + ' .swiper-pagination',
                 clickable: true,
             },
             navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
+                nextEl: paneSelector + ' .swiper-button-next',
+                prevEl: paneSelector + ' .swiper-button-prev',
             },
-            // Breakpoints để thay đổi cấu hình trên màn hình lớn hơn
             breakpoints: {
                 // Khi màn hình >= 768px (tablet)
                 768: {
-                    slidesPerView: 2.5, // Hiển thị 2.5 slide
+                    slidesPerView: 2.5,
                     spaceBetween: 30,
                 },
                 // Khi màn hình >= 1024px (desktop)
                 1024: {
-                    slidesPerView: 3.5, // Hiển thị 3.5 slide, tạo hiệu ứng lấp ló 2 bên
+                    slidesPerView: 3.5,
                     spaceBetween: 40,
                 }
             }
         };
-        // --- 2. Hàm để khởi tạo Swiper (đã được tối ưu) ---
-        function initSwiper(paneSelector) {
-            // Tìm đến thẻ swiper bên trong pane được chọn
-            const swiperEl = $(paneSelector).find('.project-swiper')[0];
-            // Chỉ khởi tạo nếu thẻ tồn tại và chưa được khởi tạo swiper trước đó
-            if (swiperEl && !swiperEl.swiper) {
                 new Swiper(swiperEl, swiperOptions);
             }
         }
-        // --- 3. Khởi tạo slider cho tab đầu tiên khi tải trang ---
+        // --- 2. Khởi tạo slider cho tab đầu tiên khi tải trang ---
         initSwiper('#pane-all-projects');
-        // --- 4. Lắng nghe sự kiện khi một tab mới được hiển thị ---
-        $('button[data-toggle="pill"]').on('shown.bs.tab', function(e) {
-            const targetPaneId = $(e.target).data('target');
+        // --- 3. Lắng nghe sự kiện click Desktop ---
+        $('button[data-toggle="pill"]').on('click', function(e) {
+            e.preventDefault();
+            const targetPaneId = $(this).data('target');
             if (targetPaneId) {
+                // Ẩn tất cả panes thủ công cho chắc
+                $('.tab-pane').removeClass('show active');
+                
+                // Hiện pane đích
+                $(targetPaneId).addClass('show active');
+                
+                // Cập nhật Buttons Desktop
+                $('#projectTabs .nav-link').removeClass('active');
+                $(this).addClass('active');
+
+                // Đồng bộ Header Mobile
+                $('.project-header-mobile').removeClass('is-open');
+                $(`.project-header-mobile[data-target="${targetPaneId}"]`).addClass('is-open');
+                
                 initSwiper(targetPaneId);
             }
+        });
+
+        // --- 4. Lắng nghe sự kiện Accordion Mobile ---
+        $('.project-header-mobile').on('click', function() {
+            const targetPaneId = $(this).data('target');
+            if ($(this).hasClass('is-open')) return;
+
+            // Ẩn tất cả panes
+            $('.tab-pane').removeClass('show active');
+            
+            // Hiện pane đích
+            $(targetPaneId).addClass('show active');
+            
+            // Cập nhật giao diện Accordion
+            $('.project-header-mobile').removeClass('is-open');
+            $(this).addClass('is-open');
+
+            // Đồng bộ Tab Desktop
+            $('#projectTabs .nav-link').removeClass('active');
+            $(`button[data-target="${targetPaneId}"]`).addClass('active');
+
+            initSwiper(targetPaneId);
+
+            // Cuộn mượt tới tiêu đề
+            const offset = $(this).offset().top - 60;
+            $('html, body').stop().animate({
+                scrollTop: offset
+            }, 500);
+        });
+
+        // Cập nhật lại Swiper khi resize màn hình
+        let resizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                $('.project-swiper').each(function() {
+                    if (this.swiper) this.swiper.update();
+                });
+            }, 250);
         });
     });
 </script>
@@ -629,7 +732,7 @@
             },
             // Dấu chấm phân trang
             pagination: {
-                el: '.swiper-pagination',
+                el: '.testimonial-swiper .swiper-pagination',
                 clickable: true,
             },
         });

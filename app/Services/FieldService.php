@@ -70,38 +70,24 @@ class FieldService
 
     public function create(array $data): Field
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+
         $fieldData = Arr::except($data, ['image_original_path']);
         $field = Field::create($fieldData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $field,
-            $data['image_original_path'] ?? null,
-            'fields', 
-            self::FIELD_IMAGE_CONFIG,
-            fn($imgData) => $field->setMainImage($imgData), 
-            null, 
-            'ảnh đại diện lĩnh vực' 
-        );
 
         return $field->load(['category', 'images']);
     }
 
     public function update(Field $field, array $data): Field
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+
         $fieldData = Arr::except($data, ['image_original_path']);
         $field->update($fieldData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $field,
-            $data['image_original_path'] ?? null,
-            'fields',
-            self::FIELD_IMAGE_CONFIG,
-            fn($imgData) => $field->setMainImage($imgData),
-            fn() => $field->mainImage(), 
-            'ảnh đại diện lĩnh vực'
-        );
 
         return $field->load(['category', 'images']);
     }

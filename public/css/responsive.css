@@ -152,6 +152,83 @@
         padding: 30px 0 !important;
     }
 
+    /* Slider Section - NO PADDING */
+    #slider,
+    section#slider,
+    section.section-slide,
+    section.hero-slider,
+    .hero-slider-section,
+    .slide-section {
+        padding: 0 !important;
+    }
+
+    /* Main Slider - Better image sizing on mobile */
+    .main-slider {
+        max-height: 250px;
+    }
+
+    .main-slider .swiper-slide img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    /* Hide slider navigation buttons on mobile */
+    .main-slider .swiper-button-prev,
+    .main-slider .swiper-button-next {
+        display: none;
+    }
+
+    /* Careers Section - Center last item */
+    .section-careers .row {
+        justify-content: center;
+    }
+
+    .section-careers .career-item {
+        margin-bottom: 15px;
+    }
+
+    .section-careers .career-item-title {
+        font-size: 14px;
+    }
+
+    .section-careers .career-item-img img {
+        min-height: 150px;
+        height: auto;
+    }
+
+    .section-careers .text-overlay {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .section-careers .career-item-link a {
+        padding: 10px 0;
+        font-size: 12px;
+    }
+
+    /* Project Section - Better display on mobile */
+    .section-project {
+        padding: 20px 0 !important;
+    }
+
+    .project-slider-wrapper {
+        padding: 0 20px;
+    }
+
+    .project-item {
+        height: 300px;
+    }
+
+    .project-overlay {
+        padding: 1rem;
+    }
+
+    .project-info .project-name {
+        font-size: 0.9rem;
+    }
+
     /* Table Responsive Wrapper */
     .table-responsive {
         display: block;

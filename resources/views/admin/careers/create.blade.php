@@ -95,10 +95,11 @@
                     <hr>
 
                     {{-- Image Media Manager --}}
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện tin"
                         :multiple="false"
+                        :value="old('image_original_path')"
                     />
                 </div>
                 <div class="card-footer">

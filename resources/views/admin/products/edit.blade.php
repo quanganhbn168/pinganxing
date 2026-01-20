@@ -157,18 +157,18 @@
                     <h6 class="m-0 font-weight-bold text-primary">Hình ảnh</h6>
                 </div>
                 <div class="card-body">
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
-                        :value="old('image_original_path', optional($product->mainImage())->original_path)"
+                        :value="old('image_original_path', $product->image ?? optional($product->mainImage())->original_path)"
                     />
                     <hr>
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="gallery_original_paths"
                         label="Album ảnh (Gallery)"
                         :multiple="true"
-                        :value="$product->gallery->pluck('original_path')"
+                        :value="old('gallery_original_paths', $product->gallery->pluck('original_path'))"
                     />
                 </div>
             </div>

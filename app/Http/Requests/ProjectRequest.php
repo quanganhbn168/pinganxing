@@ -78,11 +78,11 @@ class ProjectRequest extends FormRequest
             'content'             => ['nullable', 'string'],
 
             // Media (chuẩn MediaService)
-            'image_original_path'  => ['nullable', 'string', 'max:1024'],
-            'banner_original_path' => ['nullable', 'string', 'max:1024'],
+            'image_original_path'  => ['nullable', 'max:1024'], // Chấp nhận string (LFM) hoặc file upload (Legacy)
+            'banner_original_path' => ['nullable', 'max:1024'],
             // Cho phép mảng đường dẫn gallery; nếu để JSON string sẽ được prepareForValidation decode
             'gallery_original_paths'   => ['nullable', 'array'],
-            'gallery_original_paths.*' => ['string', 'max:1024'],
+            'gallery_original_paths.*' => ['string', 'max:1024'], // Gallery chỉ hỗ trợ LFM (string) hoặc legacy array string path
 
             // Cờ
             'status'              => ['required', 'boolean'],

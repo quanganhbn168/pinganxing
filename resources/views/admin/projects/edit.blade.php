@@ -122,16 +122,17 @@
             <hr>
 
             {{-- Ảnh đại diện (single) --}}
-            <x-admin.form.media-input
+            {{-- Ảnh đại diện (single) --}}
+            <x-form.image-picker
                 name="image_original_path"
                 label="Ảnh đại diện"
                 :multiple="false"
                 :value="old('image_original_path', optional($project->mainImage())->original_path)"
-                help="Chọn 1 ảnh làm đại diện. (Media picker → tab Ảnh có sẵn)"
+                help="Chọn 1 ảnh làm đại diện."
             />
 
             {{-- Ảnh banner (single) --}}
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="banner_original_path"
                 label="Ảnh banner (nếu có)"
                 :multiple="false"
@@ -139,12 +140,12 @@
             />
 
             {{-- Gallery (multiple → JSON) --}}
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="gallery_original_paths"
                 label="Thư viện ảnh (Gallery)"
                 :multiple="true"
-                :value="$project->gallery?->pluck('original_path')"
-                help="Chọn nhiều ảnh, trường sẽ lưu JSON mảng đường dẫn."
+                :value="old('gallery_original_paths', $project->gallery?->pluck('original_path'))"
+                help="Chọn nhiều ảnh."
             />
         </div>
     </div>

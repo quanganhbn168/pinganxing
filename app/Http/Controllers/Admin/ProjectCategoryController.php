@@ -7,9 +7,12 @@ use App\Models\ProjectCategory;
 use App\Http\Requests\ProjectCategoryRequest;
 use App\Services\ProjectCategoryService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class ProjectCategoryController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected ProjectCategoryService $projectCategoryService
     ) {}
@@ -29,8 +32,9 @@ class ProjectCategoryController extends Controller
     public function store(ProjectCategoryRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'project_categories');
+        $validatedData['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'project_categories/banner');
         
         $this->projectCategoryService->create($validatedData);
         
@@ -53,8 +57,26 @@ class ProjectCategoryController extends Controller
     public function update(ProjectCategoryRequest $request, ProjectCategory $projectCategory)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        // 1. Image
+        $currentImage = optional($projectCategory->mainImage())->original_path;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'project_categories');
+        
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
+
+        // 2. Banner
+        $currentBanner = optional($projectCategory->bannerImage())->original_path;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currentBanner, 'project_categories/banner');
+
+        if ($newBanner !== $currentBanner) {
+            $validatedData['banner_original_path'] = $newBanner;
+        } else {
+            unset($validatedData['banner_original_path']);
+        }
         
         $this->projectCategoryService->update($projectCategory, $validatedData);
         

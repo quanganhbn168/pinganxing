@@ -42,28 +42,18 @@
 
             />
 
-            <x-admin.form.media-input
-
-                    name="image_original_path"
-
-                    label="Ảnh đại diện"
-
-                    :multiple="false"
-
-                    :value="old('image_original_path')"
-
+            <x-form.image-picker
+                name="image_original_path"
+                label="Ảnh đại diện"
+                :multiple="false"
+                :value="old('image_original_path')"
             />
 
-            <x-admin.form.media-input
-
-                    name="banner_original_path"
-
-                    label="Banner"
-
-                    :multiple="false"
-
-                    :value="old('banner_original_path')"
-
+            <x-form.image-picker
+                name="banner_original_path"
+                label="Banner"
+                :multiple="false"
+                :value="old('banner_original_path')"
             />
 
             <x-form.textarea name="description" label="Mô tả ngắn" />

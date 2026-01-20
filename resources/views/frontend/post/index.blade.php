@@ -19,11 +19,11 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* Ảnh luôn giữ tỷ lệ 4:3 */
+    /* Ảnh luôn giữ tỷ lệ 16:9 */
     .post-item .post-item_image {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 16 / 9;
         overflow: hidden;
         flex-shrink: 0; /* Không bị co lại trong flex */
     }
@@ -113,7 +113,7 @@
 
     .post-container.layout-list .post-item_image {
         width: 35%; /* Ảnh chiếm 35% chiều rộng */
-        aspect-ratio: 4 / 3; /* Vẫn giữ tỷ lệ 4:3 */
+        aspect-ratio: 16 / 9; /* Vẫn giữ tỷ lệ 16:9 */
     }
 
     .post-container.layout-list .post-item_info {

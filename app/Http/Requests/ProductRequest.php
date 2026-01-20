@@ -38,8 +38,8 @@ class ProductRequest extends FormRequest
             'specifications'     => ['nullable', 'string'],
 
             // Media (dùng Media Picker)
-            'image_original_path'    => ['nullable', 'string'], // path tương đối trong disk
-            'gallery_original_paths' => ['nullable', 'string'], // JSON string (mảng path)
+            'image_original_path'    => ['nullable'], // file hoặc string path
+            'gallery_original_paths' => ['nullable'], // JSON string (mảng path)
 
             // (Tuỳ dự án) Giá/tồn kho nếu có trong form — không liên quan biến thể
             'price_discount'   => ['nullable', 'numeric', 'min:0'],

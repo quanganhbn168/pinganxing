@@ -40,26 +40,34 @@ class AttributeService
 
     public function createAttributeValue(Attribute $attribute, array $data): AttributeValue
     {
-        if (isset($data['image'])) {
+        // Nếu data['image'] là file upload (legacy), lưu vào storage
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
             $data['image'] = $data['image']->store('attribute_values', 'public');
         }
+        // Nếu là string (LFM), giữ nguyên path
+        
         return $attribute->values()->create($data);
     }
 
     public function updateAttributeValue(AttributeValue $value, array $data): bool
     {
         if (isset($data['image'])) {
-            if ($value->image) {
-                Storage::disk('public')->delete($value->image);
+            // Nếu upload file mới (legacy)
+            if ($data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                if ($value->image && !str_starts_with($value->image, '/')) {
+                    Storage::disk('public')->delete($value->image);
+                }
+                $data['image'] = $data['image']->store('attribute_values', 'public');
             }
-            $data['image'] = $data['image']->store('attribute_values', 'public');
+            // Nếu là string (LFM), cập nhật path mới. Không xóa file cũ vì LFM là thư viện chung.
         }
         return $value->update($data);
     }
 
     public function deleteAttributeValue(AttributeValue $value): ?bool
     {
-        if ($value->image) {
+        // Chỉ xóa file nếu nó nằm trong storage legacy (không bắt đầu bằng /)
+        if ($value->image && !str_starts_with($value->image, '/')) {
             Storage::disk('public')->delete($value->image);
         }
         return $value->delete();

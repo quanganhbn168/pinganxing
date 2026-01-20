@@ -7,8 +7,12 @@ use App\Models\FieldCategory;
 use App\Http\Requests\FieldCategoryRequest;
 use App\Services\FieldCategoryService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
+
 class FieldCategoryController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected FieldCategoryService $fieldCategoryService
     ) {}
@@ -28,8 +32,9 @@ class FieldCategoryController extends Controller
     public function store(FieldCategoryRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'field_categories');
+        $validatedData['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'field_categories/banner');
         
         $this->fieldCategoryService->create($validatedData);
         
@@ -52,8 +57,26 @@ class FieldCategoryController extends Controller
     public function update(FieldCategoryRequest $request, FieldCategory $fieldCategory)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        // 1. Image
+        $currentImage = optional($fieldCategory->mainImage())->original_path;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'field_categories');
+
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
+
+        // 2. Banner
+        $currentBanner = optional($fieldCategory->bannerImage())->original_path;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currentBanner, 'field_categories/banner');
+
+        if ($newBanner !== $currentBanner) {
+            $validatedData['banner_original_path'] = $newBanner;
+        } else {
+            unset($validatedData['banner_original_path']);
+        }
         
         $this->fieldCategoryService->update($fieldCategory, $validatedData);
         

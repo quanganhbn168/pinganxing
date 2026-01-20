@@ -35,14 +35,6 @@
 @endpush
 
 @push('css')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
-@extends('layouts.master')
-@section('title', $post->title)
-@section('meta_description', $post->meta_description)
-@section('meta_image', optional($post->mainImage())->url() ?? '')
-
-@push('css')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
 
 <style>
     /* =========================================
@@ -172,7 +164,7 @@
     .related-thumb {
         position: relative;
         width: 100%;
-        aspect-ratio: 4 / 3; /* Giữ tỷ lệ 4:3 như yêu cầu cũ cho đẹp */
+        aspect-ratio: 16 / 9; /* Giữ tỷ lệ 16:9 như yêu cầu cũ cho đẹp */
         overflow: hidden;
         border-radius: 8px;
         margin-bottom: 10px;

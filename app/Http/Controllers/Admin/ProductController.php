@@ -12,8 +12,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
+use App\Traits\UploadImageTrait;
+
 class ProductController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected ProductService $productService
     ) {}
@@ -59,7 +63,10 @@ class ProductController extends Controller
     {
 
         $data = $request->validated();
-        $data['image_original_path']    = $request->input('image_original_path');        
+        
+        // Xử lý ảnh (convertToWebp = false)
+        $data['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'products', false);
+        
         $data['gallery_original_paths'] = $request->input('gallery_original_paths');     
 
         $product = $this->productService->create($data);
@@ -79,7 +86,17 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         $data = $request->validated();
-        $data['image_original_path']    = $request->input('image_original_path');
+        
+        // 1. Image (convertToWebp = false)
+        $currentImage = optional($product->mainImage())->original_path ?? $product->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'products', false);
+
+        if ($newImage !== $currentImage) {
+            $data['image_original_path'] = $newImage;
+        } else {
+            unset($data['image_original_path']);
+        }
+
         $data['gallery_original_paths'] = $request->input('gallery_original_paths');
 
         $this->productService->update($product, $data);

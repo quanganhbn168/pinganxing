@@ -8,8 +8,8 @@
     /* Checkbox to dễ bấm */
     .custom-checkbox { width: 18px; height: 18px; cursor: pointer; vertical-align: middle; }
     
-    /* Tinh chỉnh ảnh thumbnail */
-    .table-hover .thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
+    /* Tinh chỉnh ảnh thumbnail 16:9 */
+    .table-hover .thumb { width: 80px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
     
     /* Căn giữa nội dung bảng */
     .table-hover td { vertical-align: middle !important; }
@@ -85,8 +85,15 @@
                             </td>
                             <td>{{ $key + 1 }}</td>
                             <td>
-                                @if($post->mainImage())
-                                    <img src="{{ Storage::url($post->mainImage()->main_path) }}" alt="{{ $post->title }}" class="thumb">
+                                @php
+                                    $img = $post->image;
+                                    if (!$img && $post->mainImage()) {
+                                        $img = Storage::url($post->mainImage()->main_path);
+                                    }
+                                @endphp
+
+                                @if($img)
+                                    <img src="{{ asset($img) }}" alt="{{ $post->title }}" class="thumb">
                                 @else
                                     <span class="text-muted">—</span>
                                 @endif

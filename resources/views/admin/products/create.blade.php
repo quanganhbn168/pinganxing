@@ -165,14 +165,14 @@
                     <h6 class="m-0 font-weight-bold text-primary">Hình ảnh</h6>
                 </div>
                 <div class="card-body">
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
                         :value="old('image_original_path')"
                     />
                     <hr>
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="gallery_original_paths"
                         label="Album ảnh (Gallery)"
                         :multiple="true"

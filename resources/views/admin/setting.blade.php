@@ -22,28 +22,26 @@
             <x-form.input name="address" label="Địa chỉ" :value="$setting->address ?? ''" />
             <x-form.ckeditor name="map" label="Iframe Google Map" :value="$setting->map ?? ''" />
             
-            <x-form.image-input name="logo" label="Logo" :value="$setting->logo ?? ''" />
-            <x-form.image-input name="banner" label="Banner Chung" :value="$setting->banner ?? ''" />
-            <x-form.image-input name="favicon" label="Favicon" :value="$setting->favicon ?? ''" />
+            <div class="row">
+                <div class="col-md-6"><x-form.image-picker name="logo" label="Logo" :value="$setting->logo ?? ''" /></div>
+                <div class="col-md-6"><x-form.image-picker name="banner" label="Banner Chung" :value="$setting->banner ?? ''" /></div>
+            </div>
+            
+            <x-form.image-input name="favicon" label="Favicon" :value="$setting->favicon ?? ''" help="Upload file ảnh để tạo Favicon (cần file thực)" />
 
             <hr>
             
             {{-- [MỚI] 1. Profile Công ty (PDF) --}}
             <div class="form-group">
                 <label for="profile" class="font-weight-bold">Hồ sơ năng lực (Profile PDF)</label>
-                <div class="input-group">
-                    <div class="custom-file">
-                        <input type="file" name="profile" class="custom-file-input" id="profile" accept=".pdf">
-                        <label class="custom-file-label" for="profile">Chọn file PDF...</label>
-                    </div>
-                </div>
+                <x-form.image-picker name="profile" label="" :value="$setting->profile ?? ''" type="file" placeholder="Chọn file PDF..." />
+                
                 @if(!empty($setting->profile))
                     <div class="mt-2">
                         <i class="fas fa-file-pdf text-danger"></i> 
-                        <a href="{{ asset('storage/' . $setting->profile) }}" target="_blank" class="text-primary">Xem tài liệu hiện tại</a>
+                        <a href="{{ asset($setting->profile) }}" target="_blank" class="text-primary">Xem tài liệu hiện tại</a>
                     </div>
                 @endif 
-                @error('profile') <span class="text-danger text-sm">{{ $message }}</span> @enderror
             </div>
 
             <hr>
@@ -74,16 +72,12 @@
                 {{-- Option B: Upload File --}}
                 <div id="box_upload" class="{{ ($setting->video_type ?? '') == 'upload' ? '' : 'd-none' }}">
                     <label for="intro_video">File Video (MP4)</label>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input type="file" name="intro_video" class="custom-file-input" id="intro_video" accept="video/mp4,video/x-m4v,video/*">
-                            <label class="custom-file-label" for="intro_video">Chọn video...</label>
-                        </div>
-                    </div>
+                    <x-form.image-picker name="intro_video" label="" :value="$setting->intro_video ?? ''" type="file" placeholder="Chọn video MP4..." />
+                    
                     @if(!empty($setting->intro_video))
                         <div class="mt-2">
                             <i class="fas fa-video text-success"></i>
-                            <a href="{{ asset('storage/' . $setting->intro_video) }}" target="_blank">Xem video đã upload</a>
+                            <a href="{{ asset($setting->intro_video) }}" target="_blank">Xem video đã chọn</a>
                         </div>
                     @endif
                 </div>
@@ -97,7 +91,7 @@
             <x-form.textarea name="body_script" label="Code trước </body>" :value="$setting->body_script ?? ''" />
             <x-form.textarea name="meta_description" label="Meta Description" :value="$setting->meta_description ?? ''" />
             <x-form.textarea name="meta_keywords" label="Meta Keyword" :value="$setting->meta_keywords ?? ''" />
-            <x-form.image-input name="meta_image" label="Ảnh chia sẻ" :value="$setting->meta_image ?? ''" />
+            <x-form.image-picker name="meta_image" label="Ảnh chia sẻ" :value="$setting->meta_image ?? ''" />
 
        </div>
         <div class="card-footer text-right">

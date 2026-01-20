@@ -49,9 +49,7 @@
         display: none
     }
 
-    .section-index .section-title h2 {
-        font-size: 2rem;
-    }
+
 
     .product-slider .swiper-wrapper {
         overflow: initial;
@@ -136,7 +134,7 @@
 
     /* Global Typography Fixes */
     h1 {
-        font-size: 1.75rem !important;
+        font-size: 1.8rem !important;
     }
 
     h2 {
@@ -144,12 +142,143 @@
     }
 
     h3 {
-        font-size: 1.3rem !important;
+        font-size: 1.25rem !important;
+    }
+
+    .tab-pane {
+        transition: opacity 0.3s ease;
     }
 
     /* Section Spacing */
     section {
         padding: 30px 0 !important;
+    }
+
+    /* Slider Section - NO PADDING */
+    #slider,
+    section#slider,
+    .section-slide,
+    .hero-slider-section {
+        padding: 0 !important;
+    }
+
+    /* Main Slider - Better image sizing on mobile */
+    .main-slider {
+        max-height: 250px;
+    }
+
+    .main-slider .swiper-slide img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    /* Hide slider navigation buttons on mobile */
+    .main-slider .swiper-button-prev,
+    .main-slider .swiper-button-next {
+        display: none;
+    }
+
+    /* Careers Section - Center last item */
+    .section-careers .row {
+        justify-content: center;
+    }
+
+    .section-careers .career-item {
+        margin-bottom: 15px;
+    }
+
+    .section-careers .career-item-title {
+        font-size: 14px;
+    }
+
+    .section-careers .career-item-img img {
+        min-height: 150px;
+        height: auto;
+    }
+
+    .section-careers .text-overlay {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .section-careers .career-item-link a {
+        padding: 10px 0;
+        font-size: 12px;
+    }
+
+    /* Project Section - Better display on mobile */
+    .section-project {
+        padding: 30px 0 !important;
+    }
+
+    .project-slider-wrapper {
+        padding: 0;
+    }
+
+    .project-item {
+        height: 220px;
+        /* Cinematic height (~2:1 ratio) */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .project-overlay {
+        padding: 1.25rem;
+        background: linear-gradient(0deg, rgba(0, 48, 90, 0.85) 0%, rgba(0, 48, 90, 0.3) 60%, transparent 100%);
+    }
+
+    .project-info .project-name {
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .project-info .project-owner {
+        opacity: 1;
+        max-height: 100px;
+        margin-top: 5px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .project-info .project-owner i {
+        color: #fff;
+        margin-right: 5px;
+        width: 14px;
+        text-align: center;
+    }
+
+    .project-info .project-owner p {
+        margin-bottom: 3px;
+    }
+
+    /* Tantiengroup-style segmented pagination */
+    .project-slider-wrapper .swiper-button-next,
+    .project-slider-wrapper .swiper-button-prev {
+        display: none !important;
+        /* Dẹp luôn mũi tên cho gọn */
+    }
+
+    .project-slider-wrapper .swiper-pagination {
+        bottom: -20px !important;
+    }
+
+    .project-slider-wrapper .swiper-pagination-bullet {
+        width: 30px !important;
+        height: 3px !important;
+        border-radius: 0 !important;
+        margin: 0 3px !important;
+        background: #ccc !important;
+        opacity: 0.6 !important;
+    }
+
+    .project-slider-wrapper .swiper-pagination-bullet-active {
+        background: var(--cnet-blue-primary) !important;
+        opacity: 1 !important;
+        width: 40px !important;
+        /* Active dài hơn chút */
     }
 
     /* Table Responsive Wrapper */

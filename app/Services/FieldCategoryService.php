@@ -36,60 +36,28 @@ class FieldCategoryService
 
     public function create(array $data): FieldCategory
     {
+        // Map media inputs to columns
+        $data['image'] = $data['image_original_path'] ?? null;
+        $data['banner'] = $data['banner_original_path'] ?? null;
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $category = FieldCategory::create($categoryData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $category,
-            $data['image_original_path'] ?? null,
-            'field_categories', 
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $category->setMainImage($imgData), 
-            null, 
-            'ảnh danh mục lĩnh vực' 
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $category,
-            $data['banner_original_path'] ?? null,
-            'field_categories/banner', 
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $category->setBannerImage($imgData), 
-            null, 
-            'banner danh mục lĩnh vực' 
-        );
 
         return $category->load(['parent', 'images']);
     }
 
     public function update(FieldCategory $fieldCategory, array $data): FieldCategory
     {
+        // Map media inputs to columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+        if (array_key_exists('banner_original_path', $data)) {
+            $data['banner'] = $data['banner_original_path'];
+        }
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $fieldCategory->update($categoryData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $fieldCategory,
-            $data['image_original_path'] ?? null,
-            'field_categories',
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $fieldCategory->setMainImage($imgData),
-            fn() => $fieldCategory->mainImage(), 
-            'ảnh danh mục lĩnh vực'
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $fieldCategory,
-            $data['banner_original_path'] ?? null,
-            'field_categories/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $fieldCategory->setBannerImage($imgData),
-            fn() => $fieldCategory->bannerImage(), 
-            'banner danh mục lĩnh vực'
-        );
 
         return $fieldCategory->load(['parent', 'images']);
     }

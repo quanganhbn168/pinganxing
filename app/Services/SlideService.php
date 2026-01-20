@@ -20,7 +20,6 @@ class SlideService
             'thumbnail' => ['width' => 300, 'height' => 94, 'fit' => true],
         ],
         'quality'  => 85,
-        'format'   => 'webp',
     ];
 
     public function __construct(
@@ -63,20 +62,13 @@ class SlideService
      */
     public function create(array $data): Slide
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+
         // $data['type'] sẽ được tự động lưu nhờ $fillable và Casting trong Model
         $slideData = Arr::except($data, ['image_original_path']);
 
         $slide = Slide::create($slideData);
-
-        $this->mediaService->updateMedia(
-            $slide,
-            $data['image_original_path'] ?? null,
-            'slides',
-            self::IMAGE_CONFIG,
-            fn ($imgData) => $slide->setMainImage($imgData),
-            null,
-            'Ảnh slide'
-        );
 
         return $slide;
     }
@@ -86,19 +78,14 @@ class SlideService
      */
     public function update(Slide $slide, array $data): Slide
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+
         $slideData = Arr::except($data, ['image_original_path']);
 
         $slide->update($slideData);
-
-        $this->mediaService->updateMedia(
-            $slide,
-            $data['image_original_path'] ?? null,
-            'slides',
-            self::IMAGE_CONFIG,
-            fn ($imgData) => $slide->setMainImage($imgData),
-            fn () => $slide->mainImage(),
-            'Ảnh slide'
-        );
 
         return $slide;
     }

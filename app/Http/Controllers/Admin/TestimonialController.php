@@ -7,9 +7,12 @@ use App\Http\Requests\TestimonialRequest;
 use App\Models\Testimonial;
 use App\Services\TestimonialService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class TestimonialController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected TestimonialService $testimonialService
     ) {}
@@ -35,8 +38,9 @@ class TestimonialController extends Controller
     public function store(TestimonialRequest $request)
     {
         $data = $request->validated();
-        // media-input trả về path ở input hidden "image_original_path"
-        $data['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $data['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'testimonials', false);
 
         $this->testimonialService->create($data);
 
@@ -57,7 +61,16 @@ class TestimonialController extends Controller
     public function update(TestimonialRequest $request, Testimonial $testimonial)
     {
         $data = $request->validated();
-        $data['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $currentImage = optional($testimonial->mainImage())->original_path ?? $testimonial->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'testimonials', false);
+        
+        if ($newImage !== $currentImage) {
+            $data['image_original_path'] = $newImage;
+        } else {
+            unset($data['image_original_path']);
+        }
 
         $this->testimonialService->update($testimonial, $data);
 

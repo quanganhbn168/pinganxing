@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Frontend\IntroController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\PostCategoryController;
 use App\Http\Controllers\Frontend\PostController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\ProjectController;
@@ -30,9 +29,6 @@ Route::middleware(['web'])->group(function () {
     Route::delete('/media-lib/delete', [MediaLibraryController::class, 'destroy'])->name('media.lib.delete');
     Route::post('/media-lib/sync', [MediaLibraryController::class, 'sync'])->name('media.lib.sync');
 });
-Route::any('/ckfinder/connector', [\CKSource\CKFinderBridge\Controller\CKFinderController::class,'requestAction'])
-    ->name('ckfinder_connector');
-Route::any('/ckfinder/browser', [\CKSource\CKFinderBridge\Controller\CKFinderController::class,'browserAction'])->name('ckfinder_browser');
 
 Route::get("/", [HomeController::class,"index"])->name("home");
 Route::middleware('throttle:30,1')->group(function () {

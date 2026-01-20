@@ -6,9 +6,13 @@
     "isEntry": true
   },
   "resources/css/frontend.css": {
-    "file": "assets/frontend-Bdf-vmZY.css",
+    "file": "assets/frontend-Bh-BJm1Z.css",
     "src": "resources/css/frontend.css",
     "isEntry": true
+  },
+  "resources/css/frontend/fonts/Lexend/Lexend-VariableFont_wght.woff2": {
+    "file": "assets/Lexend-VariableFont_wght-CXpDOWlP.woff2",
+    "src": "resources/css/frontend/fonts/Lexend/Lexend-VariableFont_wght.woff2"
   },
   "resources/js/app.js": {
     "file": "assets/app-CAiCLEjY.js",

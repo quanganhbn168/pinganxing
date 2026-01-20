@@ -17,7 +17,6 @@ class TestimonialService
             'thumbnail' => ['width' => 150, 'height' => 150], // Fit true ở đây ok vì thumb thường bé
         ],
         'quality'  => 85,
-        'format'   => 'webp',
     ];
 
     public function __construct(
@@ -54,20 +53,12 @@ class TestimonialService
      */
     public function create(array $data): Testimonial
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+
         $testimonialData = Arr::except($data, ['image_original_path']);
 
         $testimonial = Testimonial::create($testimonialData);
-
-        // Xử lý ảnh đại diện (nếu có)
-        $this->mediaService->updateMedia(
-            $testimonial,
-            $data['image_original_path'] ?? null,
-            'testimonials',                         // thư mục đích
-            self::IMAGE_CONFIG,
-            fn ($imgData) => $testimonial->setMainImage($imgData), // setter từ HasImages
-            null,
-            'Ảnh testimonial'
-        );
 
         return $testimonial;
     }
@@ -78,20 +69,14 @@ class TestimonialService
      */
     public function update(Testimonial $testimonial, array $data): Testimonial
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+
         $testimonialData = Arr::except($data, ['image_original_path']);
 
         $testimonial->update($testimonialData);
-
-        // Cập nhật ảnh nếu có path mới
-        $this->mediaService->updateMedia(
-            $testimonial,
-            $data['image_original_path'] ?? null,
-            'testimonials',
-            self::IMAGE_CONFIG,
-            fn ($imgData) => $testimonial->setMainImage($imgData),
-            fn () => $testimonial->mainImage(), // trả về Image hiện tại để service biết xoá/thay
-            'Ảnh testimonial'
-        );
 
         return $testimonial;
     }

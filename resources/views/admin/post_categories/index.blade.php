@@ -8,8 +8,8 @@
     /* Checkbox to dễ bấm */
     .custom-checkbox { width: 18px; height: 18px; cursor: pointer; vertical-align: middle; }
     
-    /* Tinh chỉnh ảnh thumbnail */
-    .table-hover .thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
+    /* Tinh chỉnh ảnh thumbnail 16:9 */
+    .table-hover .thumb { width: 80px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
     
     /* Căn giữa nội dung bảng */
     .table-hover td { vertical-align: middle !important; }

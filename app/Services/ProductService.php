@@ -15,8 +15,7 @@ class ProductService
         'variants' => [
             'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]
         ],
-        'quality' => 85,
-        'format' => 'webp',
+        'quality' => 90,
     ];
 
     private const GALLERY_IMAGE_CONFIG = [
@@ -24,8 +23,7 @@ class ProductService
         'variants' => [
             'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]
         ],
-        'quality' => 85,
-        'format' => 'webp',
+        'quality' => 90,
     ];
 
     public function __construct(
@@ -47,6 +45,9 @@ class ProductService
      */
     public function create(array $data): Product
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+
         $productData = Arr::except($data, [
             'image_original_path',
             'gallery_original_paths'
@@ -54,17 +55,6 @@ class ProductService
 
         $productData['slug'] = Str::slug($data['name']);
         $product = Product::create($productData);
-
-        // Ảnh đại diện
-        $this->mediaService->updateMedia(
-            $product,
-            $data['image_original_path'] ?? null,
-            'products',
-            self::MAIN_IMAGE_CONFIG,
-            fn($img) => $product->setMainImage($img),
-            null,
-            'Ảnh đại diện'
-        );
 
         // Gallery
         $this->updateGallery($product, $data['gallery_original_paths'] ?? null);
@@ -77,23 +67,17 @@ class ProductService
      */
     public function update(Product $product, array $data): Product
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+
         $productData = Arr::except($data, [
             'image_original_path',
             'gallery_original_paths'
         ]);
 
         $product->update($productData);
-
-        // Cập nhật ảnh đại diện
-        $this->mediaService->updateMedia(
-            $product,
-            $data['image_original_path'] ?? null,
-            'products',
-            self::MAIN_IMAGE_CONFIG,
-            fn($img) => $product->setMainImage($img),
-            fn() => $product->mainImage(),
-            'Ảnh đại diện'
-        );
 
         // Cập nhật gallery
         $this->updateGallery($product, $data['gallery_original_paths'] ?? null);

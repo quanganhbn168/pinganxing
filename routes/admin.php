@@ -218,4 +218,13 @@ Route::middleware(['auth:admin'])->prefix('admin')->as('admin.')->group(function
 
      Route::get('/profile', \App\Livewire\Admin\UserProfile::class)->name('profile');
      Route::get('/notifications', \App\Livewire\Admin\NotificationList::class)->name('notifications.index');
+
+     // Homepage Sections (Quản lý nội dung trang chủ)
+     Route::prefix('homepage-sections')->name('homepage-sections.')->controller(\App\Http\Controllers\Admin\HomepageSectionController::class)->group(function () {
+         Route::get('/', 'index')->name('index');
+         Route::get('/{id}/edit', 'edit')->name('edit');
+         Route::put('/{id}', 'update')->name('update');
+         Route::post('/{id}/toggle', 'toggleActive')->name('toggle');
+         Route::post('/reorder', 'reorder')->name('reorder');
+     });
 });

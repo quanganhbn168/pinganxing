@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -10,6 +11,53 @@ use Intervention\Image\Drivers\Gd\Driver;
 
 trait UploadImageTrait
 {
+    /**
+     * Xử lý input ảnh từ Form:
+     * - Nếu là file upload (legacy): Upload và trả về path mới.
+     * - Nếu là string (LFM): Trả về nguyên path.
+     * - Xử lý xóa ảnh cũ nếu có thay đổi.
+     * 
+     * @param Request $request
+     * @param string $field Tên field input
+     * @param string|null $currentPath Path ảnh hiện tại (để xóa nếu thay đổi)
+     * @param string $folder Folder upload (nếu là file mới)
+     * @return string|null Path cuối cùng
+     */
+    public function processImageInput(Request $request, string $field, ?string $currentPath = null, string $folder = 'uploads/images', bool $convertToWebp = true): ?string
+    {
+        // 1. Nếu có file upload (ưu tiên cao nhất)
+        if ($request->hasFile($field)) {
+            // Delete old file if it exists and is a physical file
+            if ($currentPath && $currentPath !== $request->input($field)) {
+                $this->deleteImage($currentPath);
+            }
+            // Pass convertToWebp (defaults: width=1920, height=null)
+            return $this->uploadImage($request->file($field), $folder, 1920, null, $convertToWebp);
+        }
+
+        // 2. Nếu là string path (LFM gửi về)
+        if ($request->filled($field)) {
+            $newValue = $request->input($field);
+            
+            // Nếu input là JSON string (Gallery)
+            if ($this->isJson($newValue)) {
+                 return $newValue;
+            }
+
+            // Nếu input là path ảnh đơn
+            // Rule: Don't delete logic for now when switching LFM paths to avoid accidental data loss.
+            return $newValue;
+        }
+
+        // 3. Giữ nguyên giá trị cũ
+        return $currentPath;
+    }
+
+    private function isJson($string) {
+        json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE);
+    }
+
     /**
      * Upload ảnh (hỗ trợ raster & SVG) với resize, WebP, watermark — tương thích Intervention Image v3.
      *

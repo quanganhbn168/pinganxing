@@ -8,9 +8,12 @@ use App\Models\FieldCategory;
 use App\Http\Requests\FieldRequest;
 use App\Services\FieldService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class FieldController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected FieldService $fieldService
     ) {}
@@ -31,7 +34,7 @@ class FieldController extends Controller
     public function store(FieldRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'fields');
         
         $this->fieldService->create($validatedData);
         
@@ -50,7 +53,16 @@ class FieldController extends Controller
     public function update(FieldRequest $request, Field $field)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        
+        // Image
+        $currentImage = optional($field->mainImage())->original_path;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'fields');
+        
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
         
         $this->fieldService->update($field, $validatedData);
         

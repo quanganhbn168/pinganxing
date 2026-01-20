@@ -76,19 +76,19 @@
                         </div>
 
                         {{-- Image --}}
-                        <x-admin.form.media-input
-                            id="image_original_path_{{ $page->id }}"  {{-- THÊM DÒNG NÀY --}}
-    name="image_original_path[{{ $page->id }}]"
+                        <x-form.image-picker
+                            name="image_original_path[{{ $page->id }}]"
                             label="Ảnh đại diện"
                             :multiple="false"
-                            :value="optional($page->mainImage())->original_path" />
+                            :value="optional($page->mainImage())->original_path" 
+                        />
 
-                        <x-admin.form.media-input
-                            id="banner_original_path_{{ $page->id }}" {{-- THÊM DÒNG NÀY --}}
-    name="banner_original_path[{{ $page->id }}]"
+                        <x-form.image-picker
+                            name="banner_original_path[{{ $page->id }}]"
                             label="Banner"
                             :multiple="false"
-                            :value="optional($page->bannerImage())->original_path" />
+                            :value="optional($page->bannerImage())->original_path" 
+                        />
 
                         {{-- Description --}}
                         <div class="form-group">

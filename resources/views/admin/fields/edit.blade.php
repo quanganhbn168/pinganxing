@@ -53,7 +53,7 @@
             />
 
             {{-- Ảnh đại diện --}}
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="image_original_path"
                 label="Ảnh đại diện"
                 :multiple="false"

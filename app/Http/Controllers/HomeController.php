@@ -21,11 +21,15 @@ use App\Models\Career;
 use App\Models\ProjectCategory;
 use App\Models\Partner;
 use App\Models\Brand;
+use App\Models\HomepageSection;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        // Lấy tất cả sections active từ database
+        $sections = HomepageSection::active()->ordered()->get()->keyBy('key');
+
         $slides         = Slide::where("status", 1)->where("type", \App\Enums\SliderType::HOME)->get();
         $slide_banners = Slide::where("status", 1)->where("type", \App\Enums\SliderType::BANNER_AD)->get();
         $introMain      = Intro::findOrFail(1);
@@ -58,6 +62,7 @@ class HomeController extends Controller
         $tuyendung = Page::where('slug','tuyen-dung')->first();
         $daily = Page::where('slug','dai-ly')->first();
         return view('frontend.index', compact(
+            "sections",
             "slides",
             "tuyendung",
             "daily",

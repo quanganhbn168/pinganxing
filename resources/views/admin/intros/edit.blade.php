@@ -53,28 +53,18 @@
 
 
 
-            <x-admin.form.media-input
-
+            <x-form.image-picker
                 name="image_original_path"
-
                 label="Ảnh đại diện"
-
                 :multiple="false"
-
-                :value="optional($intro->mainImage())->original_path"
-
+                :value="old('image_original_path', $intro->image ?? optional($intro->mainImage())->original_path)"
             />
 
-            <x-admin.form.media-input
-
+            <x-form.image-picker
                 name="banner_original_path"
-
                 label="Banner"
-
                 :multiple="false"
-
-                :value="optional($intro->bannerImage())->original_path"
-
+                :value="old('banner_original_path', $intro->banner ?? optional($intro->bannerImage())->original_path)"
             />
 
 

@@ -29,6 +29,9 @@ class FieldCategoryRequest extends FormRequest
             'content' => 'nullable|string',
             'status' => 'boolean',
             'order' => 'nullable|integer|min:0',
+            // Media
+            'image_original_path'  => ['nullable', 'max:1024'],
+            'banner_original_path' => ['nullable', 'max:1024'],
         ];
     }
 

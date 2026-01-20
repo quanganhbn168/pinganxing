@@ -46,81 +46,34 @@
 <script>
 
 (function () {
-
-  if (!window.Swiper) return;
-
-
+  if (typeof Swiper === 'undefined') return;
 
   new Swiper('.main-slider', {
-
     loop: true,
-
-    speed: 600,
-
-    centeredSlides: true,
-
-    spaceBetween: 8,
-
-
+    speed: 800,
+    slidesPerView: 1,
+    spaceBetween: 0, 
+    threshold: 15, // Kéo mạnh hơn chút để tránh nhạy quá gây nhảy 2 slide
+    touchMoveStopPropagation: true,
 
     autoplay: {
-
-      delay: 3500,
-
+      delay: 5000,
       disableOnInteraction: false,
-
       pauseOnMouseEnter: true
-
     },
 
-
-
     pagination: {
-
       el: '.main-slider .swiper-pagination',
-
       clickable: true
-
     },
 
     navigation: {
-
       nextEl: '.main-slider .swiper-button-next',
-
       prevEl: '.main-slider .swiper-button-prev'
-
     },
 
-
-
-    keyboard: { enabled: true },
-
-    a11y: {
-
-      enabled: true,
-
-      prevSlideMessage: 'Slide trước',
-
-      nextSlideMessage: 'Slide sau'
-
-    },
-
-
-
-    breakpoints: {
-
-      576: { spaceBetween: 10 },
-
-      768: { spaceBetween: 12 },
-
-      992: { spaceBetween: 14 },
-
-      1200:{ spaceBetween: 16 }
-
-    }
-
+    keyboard: { enabled: true }
   });
-
 })();
 
 </script>

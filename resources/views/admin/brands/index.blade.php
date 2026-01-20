@@ -89,10 +89,13 @@
                     @php
                         $row = ($brands->currentPage() - 1) * $brands->perPage() + $index + 1;
                         
-                        // Xử lý ảnh: Ưu tiên Media Manager -> Fallback cột image cũ -> Ảnh mặc định
-                        $img = method_exists($item, 'mainImage') ? $item->mainImage() : null;
-                        $thumbUrl = $img ? ($img->url('thumbnail') ?: $img->url()) : null;
-                        $thumbUrl ??= $item->image ? asset($item->image) : asset('images/setting/no-image.png');
+                        // Xử lý ảnh: Ưu tiên cột image mới -> Fallback Media Manager -> Ảnh mặc định
+                        $thumbUrl = $item->image ? asset($item->image) : null;
+                        if (!$thumbUrl && method_exists($item, 'mainImage') && $item->mainImage()) {
+                             $img = $item->mainImage();
+                             $thumbUrl = $img->url('thumbnail') ?: $img->url();
+                        }
+                        $thumbUrl ??= asset('images/setting/no-image.png');
                     @endphp
                     <tr>
                         {{-- [MỚI] Checkbox Item --}}

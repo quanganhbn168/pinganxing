@@ -13,7 +13,7 @@
             <x-form.input name="slug" label="Slug" :value="$tag->slug" />
         </div>
         <div class="card-footer">
-            <x-form.footer />
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-1"></i> Lưu</button>
         </div>
     </div>
 </form>

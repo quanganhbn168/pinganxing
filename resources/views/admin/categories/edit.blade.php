@@ -48,17 +48,17 @@
                     <hr>
                     <x-form.input name="position" label="Vị trí" type="number" :value="old('position', $category->position)" />
                     <hr>
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
-                        :value="old('image_original_path', optional($category->mainImage())->original_path)"
+                        :value="old('image_original_path', $category->image ?? optional($category->mainImage())->original_path)"
                     />
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="banner_original_path"
                         label="Banner"
                         :multiple="false"
-                        :value="old('banner_original_path', optional($category->bannerImage())->original_path)"
+                        :value="old('banner_original_path', $category->banner ?? optional($category->bannerImage())->original_path)"
                     />
                     <hr>
                     <x-form.textarea name="meta_description" label="Meta Description" :value="old('meta_description', $category->meta_description)" />

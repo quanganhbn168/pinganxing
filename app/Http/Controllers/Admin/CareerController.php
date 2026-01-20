@@ -7,9 +7,12 @@ use App\Http\Requests\CareerRequest;
 use App\Models\Career;
 use App\Services\CareerService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class CareerController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(protected CareerService $service) {}
 
     public function index(Request $request)
@@ -27,7 +30,11 @@ class CareerController extends Controller
     public function store(CareerRequest $request)
     {
         try {
-            $this->service->create($request->validated());
+            $data = $request->validated();
+            // Handle image (convertToWebp = false)
+            $data['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'careers', false);
+
+            $this->service->create($data);
             return redirect()->route('admin.careers.index')->with('success', 'Thêm tin tuyển dụng thành công.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Lỗi: ' . $e->getMessage());
@@ -42,7 +49,19 @@ class CareerController extends Controller
     public function update(CareerRequest $request, Career $career)
     {
         try {
-            $this->service->update($career, $request->validated());
+            $data = $request->validated();
+            
+            // Handle image (convertToWebp = false)
+            $currentImage = $career->image;
+            $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'careers', false);
+            
+            if ($newImage !== $currentImage) {
+                $data['image_original_path'] = $newImage;
+            } else {
+                unset($data['image_original_path']);
+            }
+
+            $this->service->update($career, $data);
             return redirect()->route('admin.careers.index')->with('success', 'Cập nhật tin tuyển dụng thành công.');
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Lỗi: ' . $e->getMessage());

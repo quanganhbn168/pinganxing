@@ -8,9 +8,12 @@ use App\Models\Slide;
 use App\Services\SlideService;
 use App\Enums\SliderType; // <--- QUAN TRỌNG: Import Enum ở đây
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class SlideController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected SlideService $slideService
     ) {}
@@ -42,7 +45,9 @@ class SlideController extends Controller
     public function store(SlideRequest $request)
     {
         $data = $request->validated();
-        $data['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $data['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'slides', false);
 
         $this->slideService->create($data);
 
@@ -68,7 +73,16 @@ class SlideController extends Controller
     public function update(SlideRequest $request, Slide $slide)
     {
         $data = $request->validated();
-        $data['image_original_path'] = $request->input('image_original_path');
+        
+        // Handle image (convertToWebp = false)
+        $currentImage = optional($slide->mainImage())->original_path ?? $slide->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'slides', false);
+        
+        if ($newImage !== $currentImage) {
+            $data['image_original_path'] = $newImage;
+        } else {
+            unset($data['image_original_path']);
+        }
 
         $this->slideService->update($slide, $data);
 

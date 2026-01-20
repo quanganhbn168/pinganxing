@@ -18,7 +18,6 @@ class ProjectService
             'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
         ],
         'quality'  => 85,
-        'format'   => 'webp',
     ];
 
     /** Ảnh banner */
@@ -28,7 +27,6 @@ class ProjectService
             'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
         ],
         'quality'  => 85,
-        'format'   => 'webp',
     ];
 
     /** Gallery */
@@ -38,7 +36,6 @@ class ProjectService
             'thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true],
         ],
         'quality'  => 85,
-        'format'   => 'webp',
     ];
 
     public function __construct(
@@ -98,6 +95,10 @@ class ProjectService
      */
     public function create(array $data): Project
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+        $data['banner'] = $data['banner_original_path'] ?? null;
+
         $projectData = Arr::except($data, [
             'image_original_path',
             'banner_original_path',
@@ -111,39 +112,25 @@ class ProjectService
 
         $project = Project::create($projectData);
 
-        // Ảnh đại diện
-        $this->mediaService->updateMedia(
-            $project,
-            $data['image_original_path'] ?? null,
-            'projects',
-            self::MAIN_IMAGE_CONFIG,
-            fn ($img) => $project->setMainImage($img),
-            null,
-            'Ảnh đại diện'
-        );
-
-        // Banner
-        $this->mediaService->updateMedia(
-            $project,
-            $data['banner_original_path'] ?? null,
-            'projects/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn ($img) => $project->setBannerImage($img),
-            null,
-            'Ảnh banner'
-        );
-
-        // Gallery
+        // Gallery (vẫn dùng bảng images)
         $this->updateGallery($project, $data['gallery_original_paths'] ?? null);
 
         return $project;
     }
 
     /**
-     * Cập nhật Project + media (giữ nguyên nếu không truyền path mới)
+     * Cập nhật Project + media
      */
     public function update(Project $project, array $data): Project
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+        if (array_key_exists('banner_original_path', $data)) {
+            $data['banner'] = $data['banner_original_path'];
+        }
+
         $projectData = Arr::except($data, [
             'image_original_path',
             'banner_original_path',
@@ -156,28 +143,6 @@ class ProjectService
         }
 
         $project->update($projectData);
-
-        // Ảnh đại diện
-        $this->mediaService->updateMedia(
-            $project,
-            $data['image_original_path'] ?? null,
-            'projects',
-            self::MAIN_IMAGE_CONFIG,
-            fn ($img) => $project->setMainImage($img),
-            fn () => $project->mainImage(),
-            'Ảnh đại diện'
-        );
-
-        // Banner
-        $this->mediaService->updateMedia(
-            $project,
-            $data['banner_original_path'] ?? null,
-            'projects/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn ($img) => $project->setBannerImage($img),
-            fn () => $project->bannerImage(),
-            'Ảnh banner'
-        );
 
         // Gallery (nếu truyền JSON mới thì sync thay thế)
         $this->updateGallery($project, $data['gallery_original_paths'] ?? null);

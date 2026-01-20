@@ -10,13 +10,14 @@ use Illuminate\Http\Request;
 
 use App\Services\PostService;
 
-use App\Models\PostCategory;
-
+use App\Services\PostCategoryService;
 use App\Http\Requests\PostRequest;
+use App\Traits\UploadImageTrait;
 
 class PostController extends Controller
 
 {
+    use UploadImageTrait;
 
     public function __construct(
 
@@ -56,9 +57,9 @@ class PostController extends Controller
 
         $validatedData = $request->validated(); 
 
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'posts', false);
 
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        $validatedData['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'posts/banner', false);
 
         $this->postService->create($validatedData);
 
@@ -86,9 +87,25 @@ class PostController extends Controller
 
         $validatedData = $request->validated();
 
-        $validatedData['image_original_path'] = $request->input('image_original_path');
+        // 1. Image
+        $currentImage = optional($post->mainImage())->original_path ?? $post->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'posts', false);
 
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
+
+        // 2. Banner
+        $currentBanner = optional($post->bannerImage())->original_path ?? $post->banner;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currentBanner, 'posts/banner', false);
+
+        if ($newBanner !== $currentBanner) {
+            $validatedData['banner_original_path'] = $newBanner;
+        } else {
+            unset($validatedData['banner_original_path']);
+        }
 
         $this->postService->update($post, $validatedData);
 
@@ -119,8 +136,7 @@ class PostController extends Controller
 
         switch ($action) {
             case 'delete':
-                // Xóa nhanh
-                Post::whereIn('id', $ids)->delete();
+                $this->postService->bulkDelete($ids);
                 $message = "Đã xóa thành công $count bài viết.";
                 break;
             

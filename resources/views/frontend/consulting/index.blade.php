@@ -72,13 +72,6 @@
     filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2)); 
 }
 
-.consulting-form-container {
-    background-color: #fff;
-    padding: 40px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    border-radius: 4px;
-    border-top: 4px solid #1072ba;
-}
 </style>
 @endpush
 
@@ -122,8 +115,8 @@
         
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="consulting-form-container">
-                    <p class="text-center mb-4 text-muted">Vui lòng mô tả yêu cầu hoặc tải lên bản vẽ, chúng tôi sẽ phản hồi trong vòng 24h.</p>
+                <div class="card shadow-sm border-0 p-4 p-md-5" style="border-top: 4px solid #1072ba !important; border-radius: 4px;">
+                    <p class="text-center mb-4 text-muted mt-2">Vui lòng mô tả yêu cầu hoặc tải lên bản vẽ, chúng tôi sẽ phản hồi trong vòng 24h.</p>
                     
                     <form action="{{ route('consulting.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -181,7 +174,7 @@
                                     <input type="file" name="file" class="custom-file-input" id="customFile">
                                     <label class="custom-file-label" for="customFile" style="height: 48px; line-height: 2.5;">Chọn file...</label>
                                 </div>
-                                <small class="text-muted mt-1 d-block">Hỗ trợ PDF, DOCX, IMG, CAD. Max 10MB.</small>
+                                <small class="text-muted mt-3 d-block">Hỗ trợ PDF, DOCX, IMG, CAD. Max 10MB.</small>
                             </div>
                         </div>
 

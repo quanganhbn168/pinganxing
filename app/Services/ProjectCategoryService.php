@@ -42,60 +42,28 @@ class ProjectCategoryService
 
     public function create(array $data): ProjectCategory
     {
+        // Map media inputs to columns
+        $data['image'] = $data['image_original_path'] ?? null;
+        $data['banner'] = $data['banner_original_path'] ?? null;
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $category = ProjectCategory::create($categoryData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $category,
-            $data['image_original_path'] ?? null,
-            'project_categories', 
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $category->setMainImage($imgData), 
-            null, 
-            'ảnh danh mục dự án' 
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $category,
-            $data['banner_original_path'] ?? null,
-            'project_categories/banner', 
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $category->setBannerImage($imgData), 
-            null, 
-            'banner danh mục dự án' 
-        );
 
         return $category->load(['parent', 'images']);
     }
 
     public function update(ProjectCategory $projectCategory, array $data): ProjectCategory
     {
+        // Map media inputs to columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+        if (array_key_exists('banner_original_path', $data)) {
+            $data['banner'] = $data['banner_original_path'];
+        }
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $projectCategory->update($categoryData);
-
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $projectCategory,
-            $data['image_original_path'] ?? null,
-            'project_categories',
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $projectCategory->setMainImage($imgData),
-            fn() => $projectCategory->mainImage(), 
-            'ảnh danh mục dự án'
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $projectCategory,
-            $data['banner_original_path'] ?? null,
-            'project_categories/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $projectCategory->setBannerImage($imgData),
-            fn() => $projectCategory->bannerImage(), 
-            'banner danh mục dự án'
-        );
 
         return $projectCategory->load(['parent', 'images']);
     }

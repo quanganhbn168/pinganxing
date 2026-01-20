@@ -21,7 +21,7 @@ class SettingRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name'             => 'required|string|max:255',
             'email'            => 'nullable|email',
             'phone'            => 'nullable|string|max:20',
@@ -30,9 +30,6 @@ class SettingRequest extends FormRequest
             'schema_script'    => 'nullable|string',
             'head_script'      => 'nullable|string',
             'body_script'      => 'nullable|string',
-            'logo'             => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
-            'banner'           => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
-            'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048',
             'meta_description' => 'nullable|string|max:500',
             'meta_keywords'    => 'nullable|string|max:255',
             'zalo'             => 'nullable|url',
@@ -40,11 +37,46 @@ class SettingRequest extends FormRequest
             'tiktok'           => 'nullable|url',
             'youtube'          => 'nullable|url',
             'favicon'          => 'nullable|image|mimes:ico,png,jpg,jpeg|max:512',
-            'profile'         => 'nullable|file|mimes:pdf|max:10240',
             'video_type'      => 'nullable|string|in:youtube,upload',
-            'intro_video'     => 'nullable|file|mimes:mp4,mov,avi|max:51200',
             'intro_video_url' => 'nullable|url',
         ];
+
+        // Logo
+        if ($this->hasFile('logo')) {
+            $rules['logo'] = 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048';
+        } else {
+            $rules['logo'] = 'nullable|string';
+        }
+
+        // Banner
+        if ($this->hasFile('banner')) {
+            $rules['banner'] = 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048';
+        } else {
+            $rules['banner'] = 'nullable|string';
+        }
+
+        // Meta Image
+        if ($this->hasFile('meta_image')) {
+            $rules['meta_image'] = 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:2048';
+        } else {
+            $rules['meta_image'] = 'nullable|string';
+        }
+
+        // Profile (PDF)
+        if ($this->hasFile('profile')) {
+            $rules['profile'] = 'nullable|file|mimes:pdf|max:10240';
+        } else {
+            $rules['profile'] = 'nullable|string';
+        }
+
+        // Intro Video
+        if ($this->hasFile('intro_video')) {
+            $rules['intro_video'] = 'nullable|file|mimes:mp4,mov,avi|max:51200';
+        } else {
+            $rules['intro_video'] = 'nullable|string';
+        }
+
+        return $rules;
     }
 
     /**

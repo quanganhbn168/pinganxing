@@ -19,11 +19,12 @@
                 field="slug"                 {{-- cột slug của bảng --}}
                 :current-id="$brand->id"           {{-- tạo mới: null --}}
             />
-            <x-admin.form.media-input
+            <x-form.input name="link" label="Website/Link liên kết" :value="$brand->link" />
+            <x-form.image-picker
                 name="image_original_path"
-                label="Ảnh đại diện"
+                label="Logo thương hiệu"
                 :multiple="false"
-                :value="optional($brand->mainImage())->original_path"
+                :value="old('image_original_path', $brand->image ?? optional($brand->mainImage())->original_path)"
             />
             <x-form.switch name="status" label="Hiển thị" :checked="$brand->status" />
         </div>

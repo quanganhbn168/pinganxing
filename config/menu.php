@@ -13,6 +13,7 @@ return [
     // ================================================================
     // NHÓM 1: QUẢN LÝ CÔNG VIỆC (JOB & CRM)
     // ================================================================
+    /*
     ['type' => 'header', 'title' => 'QUẢN LÝ CÔNG VIỆC'],
 
     [
@@ -89,6 +90,7 @@ return [
         'active_pattern' => 'admin.finance.*',
         'permission' => 'view_finance',
     ],
+    */
 
     // ================================================================
     // NHÓM 2: SẢN PHẨM & DỊCH VỤ
@@ -112,6 +114,13 @@ return [
     // ================================================================
     ['type' => 'header', 'title' => 'NỘI DUNG & MEDIA'],
 
+    [
+        'title' => 'Nội dung Trang chủ',
+        'icon' => 'bi bi-house-heart', 
+        'route' => 'admin.homepage-sections.index', 
+        'active_pattern' => 'admin.homepage-sections.*',
+        'permission' => 'view_settings',
+    ],
     [
         'title' => 'Quản lý Media',
         'icon' => 'bi bi-folder2-open', 

@@ -18,8 +18,7 @@ class BrandService
     private const BRAND_IMAGE_CONFIG = [
         'main' => ['width' => 300, 'height' => 300], // Bỏ 'fit' => true để scaleDown thay vì crop
         'variants' => ['thumbnail' => ['width' => 100, 'height' => 100]],
-        'quality' => 90, // Tăng quality lên chút cho logo nét
-        'format' => 'webp'
+        'quality' => 90,
     ];
 
     public function __construct(MediaServiceContract $mediaService)
@@ -34,6 +33,9 @@ class BrandService
 
     public function create(array $data): Brand
     {
+        // Map input paths to model columns
+        $data['image'] = $data['image_original_path'] ?? null;
+
         $brandData = Arr::except($data, ['image_original_path']);
         
         // Tạo slug nếu chưa có
@@ -43,22 +45,16 @@ class BrandService
 
         $brand = Brand::create($brandData);
 
-        // Xử lý ảnh brand
-        $this->mediaService->updateMedia(
-            $brand,
-            $data['image_original_path'] ?? null,
-            'brands', 
-            self::BRAND_IMAGE_CONFIG,
-            fn($imgData) => $brand->setMainImage($imgData), 
-            null, 
-            'logo thương hiệu' 
-        );
-
         return $brand->load('images');
     }
 
     public function update(Brand $brand, array $data): bool
     {
+        // Map input paths to model columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+
         $brandData = Arr::except($data, ['image_original_path']);
         
         // Tạo slug mới nếu name thay đổi
@@ -67,17 +63,6 @@ class BrandService
         }
 
         $updateResult = $brand->update($brandData);
-
-        // Xử lý ảnh brand
-        $this->mediaService->updateMedia(
-            $brand,
-            $data['image_original_path'] ?? null,
-            'brands',
-            self::BRAND_IMAGE_CONFIG,
-            fn($imgData) => $brand->setMainImage($imgData),
-            fn() => $brand->mainImage(), 
-            'logo thương hiệu'
-        );
 
         return $updateResult;
     }

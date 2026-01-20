@@ -91,8 +91,12 @@
                 @forelse ($intros as $index => $intro)
                     @php
                         $row = ($intros->currentPage() - 1) * $intros->perPage() + $index + 1;
-                        $img = method_exists($intro,'mainImage') ? $intro->mainImage() : null;
-                        $thumbUrl = $img ? ($img->url('thumbnail') ?: $img->url()) : asset('images/setting/no-image.png');
+                        $thumbUrl = $intro->image ? asset($intro->image) : null;
+                        if (!$thumbUrl && method_exists($intro,'mainImage') && $intro->mainImage()) {
+                             $img = $intro->mainImage();
+                             $thumbUrl = $img->url('thumbnail') ?: $img->url();
+                        }
+                        $thumbUrl ??= asset('images/setting/no-image.png');
                         
                         // Kiểm tra Intro mặc định (ID=1)
                         $isDefault = ($intro->id == 1);

@@ -79,11 +79,11 @@
             <hr>
 
             {{-- Ảnh slide --}}
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="image_original_path"
                 label="Ảnh slide (chuẩn: 1920×600px)"
                 :multiple="false"
-                :value="old('image_original_path', optional($slide->mainImage())->original_path)"
+                :value="old('image_original_path', $slide->image ?? optional($slide->mainImage())->original_path)"
             />
         </div>
     </div>

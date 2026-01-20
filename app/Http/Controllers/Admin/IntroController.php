@@ -7,9 +7,12 @@ use App\Http\Requests\IntroRequest; // nếu chưa có, dùng FormRequest riêng
 use App\Models\Intro;
 use App\Services\IntroService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class IntroController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected IntroService $introService
     ) {}
@@ -31,9 +34,9 @@ class IntroController extends Controller
     public function store(IntroRequest $request)
     {
         $data = $request->validated();
-        // media-input trả về hidden inputs
-        $data['image_original_path']  = $request->input('image_original_path');
-        $data['banner_original_path'] = $request->input('banner_original_path');
+        
+        $data['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'intros', false);
+        $data['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'intros/banner', false);
 
         $this->introService->create($data);
 
@@ -54,8 +57,24 @@ class IntroController extends Controller
     public function update(IntroRequest $request, Intro $intro)
     {
         $data = $request->validated();
-        $data['image_original_path']  = $request->input('image_original_path');
-        $data['banner_original_path'] = $request->input('banner_original_path');
+        
+        // Image
+        $currImg = optional($intro->mainImage())->original_path ?? $intro->image;
+        $newImg = $this->processImageInput($request, 'image_original_path', $currImg, 'intros', false);
+        if ($newImg !== $currImg) {
+            $data['image_original_path'] = $newImg;
+        } else {
+            unset($data['image_original_path']);
+        }
+
+        // Banner
+        $currBanner = optional($intro->bannerImage())->original_path ?? $intro->banner;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currBanner, 'intros/banner', false);
+        if ($newBanner !== $currBanner) {
+            $data['banner_original_path'] = $newBanner;
+        } else {
+            unset($data['banner_original_path']);
+        }
 
         $this->introService->update($intro, $data);
 

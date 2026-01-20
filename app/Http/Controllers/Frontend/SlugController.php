@@ -1,46 +1,51 @@
 <?php
+
 namespace App\Http\Controllers\Frontend;
+
 use App\Http\Controllers\Controller;
 use App\Models\Slug;
+use App\Models\Post;
+use App\Models\PostCategory;
+use App\Models\Product;
 use App\Models\Category;
+use App\Models\Project;
+use App\Models\Service;
+use App\Models\ServiceCategory;
+use App\Models\Field;
+use App\Models\FieldCategory;
+use App\Models\Intro;
+use App\Models\Career;
 use Illuminate\Http\Request;
+
 class SlugController extends Controller
 {
     /**
-     * Xử lý một slug đến từ URL.
-     *
-     * @param string $slug
-     * @param Request $request 
-     * @return \Illuminate\View\View|\Illuminate\Http\Response
+     * Xử lý route động cho các slug đa hình (Polymorphic Slugs).
      */
-    public function handle($slug, Request $request)
+    public function handle(Request $request, $slug)
     {
-        $slugInstance = Slug::where('slug', $slug)->firstOrFail();
-        $model = $slugInstance->sluggable;
-        if (!$model) {
+        $slugData = Slug::where('slug', $slug)->first();
+
+        if (!$slugData || !$slugData->sluggable) {
             abort(404);
         }
-        $controllerAction = match (get_class($model)) {
-            \App\Models\Product::class => [\App\Http\Controllers\Frontend\ProductController::class, 'show'],
-            \App\Models\FieldCategory::class => [\App\Http\Controllers\Frontend\FieldController::class, 'byCategory'],
-            \App\Models\Field::class => [\App\Http\Controllers\Frontend\FieldController::class, 'detail'],
-            \App\Models\ServiceCategory::class => [\App\Http\Controllers\Frontend\ServiceController::class, 'byCategory'],
-            \App\Models\Service::class => [\App\Http\Controllers\Frontend\ServiceController::class, 'detail'],
-            \App\Models\Project::class => [\App\Http\Controllers\Frontend\ProjectController::class, 'detail'],
-            \App\Models\Category::class => [\App\Http\Controllers\Frontend\ProductController::class, 'byCategory'],
-            \App\Models\Intro::class => [\App\Http\Controllers\Frontend\IntroController::class, 'getBySlug'], 
-            \App\Models\PostCategory::class => [\App\Http\Controllers\Frontend\PostController::class, 'postByCate'],   
-            \App\Models\Post::class => [\App\Http\Controllers\Frontend\PostController::class, 'detail'],   
-            default => null,
+
+        $model = $slugData->sluggable;
+
+        // Sử dụng match cho code ngắn gọn và dễ quản lý hơn
+        return match (true) {
+            $model instanceof Post         => app(PostController::class)->detail($model),
+            $model instanceof PostCategory => app(PostController::class)->postByCate($model),
+            $model instanceof Product      => app(ProductController::class)->show($model),
+            $model instanceof Category     => app(ProductController::class)->byCategory($model, $request),
+            $model instanceof Project      => app(ProjectController::class)->detail($model),
+            $model instanceof Service      => app(ServiceController::class)->detail($model),
+            $model instanceof ServiceCategory => app(ServiceController::class)->byCategory($model),
+            $model instanceof Field        => app(FieldController::class)->detail($model),
+            $model instanceof FieldCategory => app(FieldController::class)->byCategory($model),
+            $model instanceof Intro        => app(IntroController::class)->getBySlug($model),
+            $model instanceof Career       => app(CareerController::class)->show($model),
+            default                        => abort(404),
         };
-        if ($controllerAction) {
-            $controllerInstance = app($controllerAction[0]);
-            $method = $controllerAction[1];
-            if ($model instanceof Category) {
-                return $controllerInstance->{$method}($model, $request);
-            }
-            return $controllerInstance->{$method}($model);
-        }
-        abort(500, 'Controller action not defined for this model type.');
     }
 }

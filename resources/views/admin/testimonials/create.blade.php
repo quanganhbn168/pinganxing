@@ -32,12 +32,11 @@
     <div class="card shadow mb-4">
         <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Ảnh đại diện</h6></div>
         <div class="card-body">
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="image_original_path"
                 label="Ảnh khách hàng"
                 :multiple="false"
                 :value="old('image_original_path')"
-                help="Kích thước gợi ý 500×500px. Media sẽ được convert WebP + thumbnail."
             />
         </div>
     </div>

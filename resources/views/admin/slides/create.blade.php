@@ -62,7 +62,7 @@
             <hr>
 
             {{-- Ảnh slide --}}
-            <x-admin.form.media-input
+            <x-form.image-picker
                 name="image_original_path"
                 label="Ảnh slide (chuẩn: 1920×600px)"
                 :multiple="false"

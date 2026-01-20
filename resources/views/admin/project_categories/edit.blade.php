@@ -65,18 +65,18 @@
 
                     <hr>
 
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="image_original_path"
                         label="Ảnh đại diện"
                         :multiple="false"
-                        :value="$projectCategory->mainImage() ? $projectCategory->mainImage()->original_path : old('image_original_path')"
+                        :value="old('image_original_path', optional($projectCategory->mainImage())->original_path)"
                     />
 
-                    <x-admin.form.media-input
+                    <x-form.image-picker
                         name="banner_original_path"
                         label="Banner"
                         :multiple="false"
-                        :value="$projectCategory->bannerImage() ? $projectCategory->bannerImage()->original_path : old('banner_original_path')"
+                        :value="old('banner_original_path', optional($projectCategory->bannerImage())->original_path)"
                     />
 
                     <hr>

@@ -30,47 +30,59 @@ class SettingController extends Controller
         $data = $request->validated();
 
         // --- XỬ LÝ ẢNH (Giữ nguyên logic của bạn) ---
+        // --- XỬ LÝ ẢNH ---
+        // Logo
         if ($request->hasFile('logo')) {
             if ($setting && $setting->logo) $this->deleteImage($setting->logo);
             $data['logo'] = $this->uploadImage($request->file('logo'), 'settings', 512, null, true);
+        } elseif ($request->filled('logo')) {
+            $data['logo'] = $request->input('logo');
         }
 
+        // Banner
         if ($request->hasFile('banner')) {
             if ($setting && $setting->banner) $this->deleteImage($setting->banner);
             $data['banner'] = $this->uploadImage($request->file('banner'), 'settings', 1920, 300, true, null, false);
+        } elseif ($request->filled('banner')) {
+            $data['banner'] = $request->input('banner');
         }
 
+        // Meta Image
         if ($request->hasFile('meta_image')) {
             if ($setting && $setting->meta_image) $this->deleteImage($setting->meta_image);
             $data['meta_image'] = $this->uploadImage($request->file('meta_image'), 'settings', 1200, 630, false, null, false);
+        } elseif ($request->filled('meta_image')) {
+            $data['meta_image'] = $request->input('meta_image');
         }
 
         if ($request->hasFile('favicon')) {
             $data['favicon'] = $this->generateFavicon($request->file('favicon'));
         }
 
-        // --- [MỚI] XỬ LÝ FILE PROFILE (PDF) ---
+        // --- XỬ LÝ FILE PROFILE (PDF) ---
         if ($request->hasFile('profile')) {
-            // Xoá file cũ nếu có
-            if ($setting && $setting->profile && Storage::disk('public')->exists($setting->profile)) {
+            // Xoá file cũ nếu có (chỉ xóa nếu nằm trong profiles cũ)
+            if ($setting && $setting->profile && !str_starts_with($setting->profile, '/') && Storage::disk('public')->exists($setting->profile)) {
                 Storage::disk('public')->delete($setting->profile);
             }
-            // Lưu file mới vào folder 'profiles' trong storage/app/public
             $data['profile'] = $request->file('profile')->store('profiles', 'public');
+        } elseif ($request->filled('profile')) {
+             $data['profile'] = $request->input('profile');
         }
 
-        // --- [MỚI] XỬ LÝ VIDEO ---
-        // Lưu loại video (youtube hay upload) để hiển thị đúng ở frontend
+        // --- XỬ LÝ VIDEO ---
         $data['video_type'] = $request->input('video_type', 'youtube');
 
-        // Nếu chọn Upload Video
-        if ($data['video_type'] === 'upload' && $request->hasFile('intro_video')) {
-            // Xoá video cũ
-            if ($setting && $setting->intro_video && Storage::disk('public')->exists($setting->intro_video)) {
-                Storage::disk('public')->delete($setting->intro_video);
+        if ($data['video_type'] === 'upload') {
+            if ($request->hasFile('intro_video')) {
+                 // Xoá video cũ nếu có (chỉ xóa nếu nằm trong videos cũ)
+                if ($setting && $setting->intro_video && !str_starts_with($setting->intro_video, '/') && Storage::disk('public')->exists($setting->intro_video)) {
+                    Storage::disk('public')->delete($setting->intro_video);
+                }
+                $data['intro_video'] = $request->file('intro_video')->store('videos', 'public');
+            } elseif ($request->filled('intro_video')) {
+                $data['intro_video'] = $request->input('intro_video');
             }
-            // Lưu video mới
-            $data['intro_video'] = $request->file('intro_video')->store('videos', 'public');
         }
 
         $setting ? $setting->update($data) : Setting::create($data);

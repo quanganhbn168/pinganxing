@@ -92,9 +92,12 @@
                 @forelse ($slides as $index => $slide)
                     @php
                         $row = ($slides->currentPage() - 1) * $slides->perPage() + $index + 1;
-                        $img = method_exists($slide,'mainImage') ? $slide->mainImage() : null;
-                        $thumbUrl = $img ? ($img->url('thumbnail') ?: $img->url()) : null;
-                        $thumbUrl ??= $slide->image ? asset($slide->image) : asset('images/setting/no-image.png');
+                        $thumbUrl = $slide->image ? asset($slide->image) : null;
+                        if (!$thumbUrl && method_exists($slide,'mainImage') && $slide->mainImage()) {
+                             $img = $slide->mainImage();
+                             $thumbUrl = $img->url('thumbnail') ?: $img->url();
+                        }
+                        $thumbUrl ??= asset('images/setting/no-image.png');
                     @endphp
                     <tr>
                         {{-- [MỚI] Checkbox Item --}}

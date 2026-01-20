@@ -7,9 +7,12 @@ use App\Models\PostCategory;
 use App\Http\Requests\PostCategoryRequest;
 use App\Services\PostCategoryService;
 use Illuminate\Http\Request;
+use App\Traits\UploadImageTrait;
 
 class PostCategoryController extends Controller
 {
+    use UploadImageTrait;
+
     public function __construct(
         protected PostCategoryService $postCategoryService
     ) {}
@@ -33,8 +36,9 @@ class PostCategoryController extends Controller
     public function store(PostCategoryRequest $request)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        $validatedData['image_original_path'] = $this->processImageInput($request, 'image_original_path', null, 'post_categories');
+        $validatedData['banner_original_path'] = $this->processImageInput($request, 'banner_original_path', null, 'post_categories/banner');
         
         $this->postCategoryService->create($validatedData);
         
@@ -57,8 +61,26 @@ class PostCategoryController extends Controller
     public function update(PostCategoryRequest $request, PostCategory $postCategory)
     {
         $validatedData = $request->validated();
-        $validatedData['image_original_path'] = $request->input('image_original_path');
-        $validatedData['banner_original_path'] = $request->input('banner_original_path');
+        
+        // 1. Image
+        $currentImage = optional($postCategory->mainImage())->original_path ?? $postCategory->image;
+        $newImage = $this->processImageInput($request, 'image_original_path', $currentImage, 'post_categories');
+
+        if ($newImage !== $currentImage) {
+            $validatedData['image_original_path'] = $newImage;
+        } else {
+            unset($validatedData['image_original_path']);
+        }
+
+        // 2. Banner
+        $currentBanner = optional($postCategory->bannerImage())->original_path ?? $postCategory->banner;
+        $newBanner = $this->processImageInput($request, 'banner_original_path', $currentBanner, 'post_categories/banner');
+
+        if ($newBanner !== $currentBanner) {
+            $validatedData['banner_original_path'] = $newBanner;
+        } else {
+            unset($validatedData['banner_original_path']);
+        }
         
         $this->postCategoryService->update($postCategory, $validatedData);
         
@@ -81,9 +103,7 @@ class PostCategoryController extends Controller
 
         switch ($action) {
             case 'delete':
-                // Xóa nhanh bằng 1 lệnh SQL
-                PostCategory::whereIn('id', $ids)->delete();
-                
+                $this->postCategoryService->bulkDelete($ids);
                 $message = "Đã xóa thành công $count danh mục bài viết.";
                 break;
 

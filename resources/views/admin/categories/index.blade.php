@@ -87,8 +87,11 @@
                             </td>
                             <td>{{ $key + 1 }}</td>
                             <td>
-                                @if($category->mainImage())
-                                    <img src="{{ Storage::url($category->mainImage()->main_path) }}" alt="{{ $category->name }}" class="thumb">
+                                @php
+                                    $img = $category->image ? asset($category->image) : ($category->mainImage() ? $category->mainImage()->url() : null);
+                                @endphp
+                                @if($img)
+                                    <img src="{{ $img }}" alt="{{ $category->name }}" class="thumb">
                                 @else
                                     <span class="text-muted small">No img</span>
                                 @endif

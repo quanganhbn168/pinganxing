@@ -38,8 +38,9 @@ class PostRequest extends FormRequest
                 'max:255',
                 Rule::unique('posts', 'slug')->ignore($postId),
             ],
-            'image'            => ['nullable', 'string',],
-            'banner'           => ['nullable', 'string',],
+            // Media
+            'image_original_path'  => ['nullable', 'max:1024'],
+            'banner_original_path' => ['nullable', 'max:1024'],
             'description'      => ['nullable', 'string'],
             'content'          => ['nullable', 'string'],
             'is_featured'      => ['sometimes', 'in:0,1'],

@@ -117,7 +117,7 @@
                 <tbody>
                 @forelse ($products as $product)
                     @php
-                        $img = $product->mainImage() ? $product->mainImage()->url() : asset('images/no-image.png'); 
+                        $img = $product->image ? asset($product->image) : ($product->mainImage() ? $product->mainImage()->url() : asset('images/no-image.png'));
                         $price = (float)$product->price;
                         $discount = (float)$product->price_discount;
                         $hasDiscount = $price > 0 && $discount > 0 && $discount < $price;

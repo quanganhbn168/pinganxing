@@ -29,6 +29,9 @@ class PostCategoryRequest extends FormRequest
             ],
             'status' => 'boolean',
             'is_home' => 'boolean',
+            // Media
+            'image_original_path'  => ['nullable', 'max:1024'],
+            'banner_original_path' => ['nullable', 'max:1024'],
         ];
     }
 

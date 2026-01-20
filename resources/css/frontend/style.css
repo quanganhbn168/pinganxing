@@ -1,11 +1,13 @@
 .section-title {
     text-align: center;
     margin-bottom: 40px;
-    font-size: clamp(1.05rem, calc(1.25rem + 1vw), 2rem);
+    font-size: inherit;
+    /* Sử dụng size từ h2, h3... chuẩn */
     font-weight: 700;
     text-transform: uppercase;
     position: relative;
     padding-bottom: 15px;
+    color: var(--cnet-blue-primary);
 }
 
 .section-title a {
@@ -92,22 +94,12 @@
 .project-swiper {
     width: 100%;
     padding: 20px 0;
-    overflow: visible !important;
+    overflow: hidden;
 }
 
 .project-swiper .swiper-slide {
-    transition: transform 0.4s ease, opacity 0.4s ease;
-    opacity: 0.6;
-    height: auto;
-}
-
-.project-swiper .swiper-slide-active,
-.project-swiper .swiper-slide-duplicate-active,
-.project-swiper .swiper-slide-prev,
-.project-swiper .swiper-slide-next {
-    transform: scale(1);
     opacity: 1;
-    z-index: 10;
+    height: auto;
 }
 
 .project-item {
@@ -153,10 +145,9 @@
 }
 
 .project-info .project-name {
-    font-size: clamp(.65rem, calc(0.65rem + 2vw), 1.15rem);
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--cnet-blue-primary);
-    /* text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6); */
     transition: all 0.4s ease-out;
 }
 
@@ -569,7 +560,7 @@
 
 .section-fields {
     background-color: #F5FCFF;
-    background-image: url('/images/setting/contractors-bg-1.png');
+    /* Background image loaded from public folder - using CSS variable or inline style recommended for dynamic paths */
     background-position: calc(100% - 20px) calc(100% - 30px);
     background-repeat: no-repeat;
 }
@@ -668,8 +659,6 @@
     max-height: 55px;
     /* Giảm max-height ảnh cho phù hợp box mới */
     object-fit: contain;
-    filter: grayscale(100%);
-    opacity: 0.7;
     transition: all 0.4s ease;
 }
 
@@ -680,14 +669,11 @@
 }
 
 .partner-logo-item:hover img {
-    filter: grayscale(0%);
     opacity: 1;
     transform: scale(1.05);
 }
 
-.partner-logo-item:hover img {
-    filter: grayscale(0%);
-}
+
 
 .view-all-partners {
     display: block;

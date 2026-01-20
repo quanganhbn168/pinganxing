@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\PostCategory;
 use App\Contracts\MediaServiceContract;
 use Illuminate\Support\Arr;
+use App\Services\SlugService;
 
 class PostCategoryService
 {
@@ -14,8 +15,8 @@ class PostCategoryService
      * Cấu hình cho ảnh đại diện category.
      */
     private const CATEGORY_IMAGE_CONFIG = [
-        'main' => ['width' => 400],
-        'variants' => ['thumbnail' => ['width' => 150, 'height' => 150, 'fit' => true]],
+        'main' => ['width' => 800, 'height' => 450, 'fit' => true],
+        'variants' => ['thumbnail' => ['width' => 320, 'height' => 180, 'fit' => true]],
         'quality' => 85,
         'format' => 'webp'
     ];
@@ -30,9 +31,12 @@ class PostCategoryService
         'format' => 'webp'
     ];
 
-    public function __construct(MediaServiceContract $mediaService)
+    protected SlugService $slugService;
+
+    public function __construct(MediaServiceContract $mediaService, SlugService $slugService)
     {
         $this->mediaService = $mediaService;
+        $this->slugService = $slugService;
     }
 
     public function getAll()
@@ -42,60 +46,34 @@ class PostCategoryService
 
     public function create(array $data): PostCategory
     {
+        // Map media inputs to columns
+        $data['image'] = $data['image_original_path'] ?? null;
+        $data['banner'] = $data['banner_original_path'] ?? null;
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $category = PostCategory::create($categoryData);
 
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $category,
-            $data['image_original_path'] ?? null,
-            'post_categories', 
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $category->setMainImage($imgData), 
-            null, 
-            'ảnh danh mục bài viết' 
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $category,
-            $data['banner_original_path'] ?? null,
-            'post_categories/banner', 
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $category->setBannerImage($imgData), 
-            null, 
-            'banner danh mục bài viết' 
-        );
+        // Sync Morph Slug
+        $this->slugService->upsert($category, $category->name);
 
         return $category->load(['parent', 'images']);
     }
 
     public function update(PostCategory $postCategory, array $data): PostCategory
     {
+        // Map media inputs to columns
+        if (array_key_exists('image_original_path', $data)) {
+            $data['image'] = $data['image_original_path'];
+        }
+        if (array_key_exists('banner_original_path', $data)) {
+            $data['banner'] = $data['banner_original_path'];
+        }
+
         $categoryData = Arr::except($data, ['image_original_path', 'banner_original_path']);
         $postCategory->update($categoryData);
 
-        // Xử lý ảnh đại diện
-        $this->mediaService->updateMedia(
-            $postCategory,
-            $data['image_original_path'] ?? null,
-            'post_categories',
-            self::CATEGORY_IMAGE_CONFIG,
-            fn($imgData) => $postCategory->setMainImage($imgData),
-            fn() => $postCategory->mainImage(), 
-            'ảnh danh mục bài viết'
-        );
-
-        // Xử lý banner
-        $this->mediaService->updateMedia(
-            $postCategory,
-            $data['banner_original_path'] ?? null,
-            'post_categories/banner',
-            self::BANNER_IMAGE_CONFIG,
-            fn($imgData) => $postCategory->setBannerImage($imgData),
-            fn() => $postCategory->bannerImage(), 
-            'banner danh mục bài viết'
-        );
+        // Sync Morph Slug
+        $this->slugService->upsert($postCategory, $postCategory->name);
 
         return $postCategory->load(['parent', 'images']);
     }
@@ -108,6 +86,20 @@ class PostCategoryService
             $image->delete(); 
         }
 
+        // Delete Morph Slug
+        $postCategory->slugData()->delete();
+
         $postCategory->delete();
+    }
+
+    /**
+     * Xóa hàng loạt có dọn dẹp ảnh.
+     */
+    public function bulkDelete(array $ids): void
+    {
+        $categories = PostCategory::whereIn('id', $ids)->get();
+        foreach ($categories as $category) {
+            $this->delete($category);
+        }
     }
 }
