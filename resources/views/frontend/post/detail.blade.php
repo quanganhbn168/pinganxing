@@ -249,9 +249,19 @@
     /* =========================================
        3. SIDEBAR STYLES
        ========================================= */
+    /* =========================================
+       3. SIDEBAR STYLES
+       ========================================= */
     .post-sidebar {
+        /* Không dùng sticky ở đây nữa để tránh đè lên TOC */
+        margin-bottom: 20px;
+    }
+    
+    /* Class mới cho TOC Wrapper */
+    .sticky-toc {
         position: sticky;
         top: 100px;
+        z-index: 10;
     }
     
     .sidebar-widget {
@@ -402,7 +412,9 @@
 					</div>
 				</aside>
 				
-				<x-toc :list="$tocList" />
+				<div class="sticky-toc">
+					<x-toc :list="$tocList" />
+				</div>
 				
 			</div>
 		</div>
