@@ -37,7 +37,7 @@ class BrandController extends Controller
         
         $this->brandService->create($validatedData);
         
-        return $request->has('save_new')
+        return $request->has('save_create')
             ? redirect()->route('admin.brands.create')->with('success', 'Thêm thương hiệu thành công.')
             : redirect()->route('admin.brands.index')->with('success', 'Thêm thương hiệu thành công.');
     }
@@ -64,7 +64,9 @@ class BrandController extends Controller
         
         $this->brandService->update($brand, $validatedData);
         
-        return redirect()->route('admin.brands.index')->with('success', 'Cập nhật thương hiệu thành công.');
+        return $request->has('save_create')
+            ? redirect()->route('admin.brands.create')->with('success', 'Cập nhật thương hiệu thành công và sẵn sàng thêm mới.')
+            : redirect()->route('admin.brands.index')->with('success', 'Cập nhật thương hiệu thành công.');
     }
     public function bulkAction(Request $request)
     {

@@ -49,6 +49,15 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('headerMenu', $headerMenu);
         });
+        // Share data specific for footer
+        View::composer('partials.frontend.footer', function ($view) {
+            $footerPolicies = \App\Models\Post::whereHas('category', function($q) {
+                $q->where('slug', 'chinh-sach');
+            })->where('status', 1)->latest()->get();
+            
+            $view->with('footerPolicies', $footerPolicies);
+        });
+
         Paginator::useBootstrapFour();
 
         

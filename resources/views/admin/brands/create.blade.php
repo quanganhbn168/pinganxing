@@ -31,6 +31,7 @@
     </div>
     <div class="card-footer">
         <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        <button type="submit" name="save_create" value="1" class="btn btn-success">Lưu và thêm mới</button>
         <a href="{{ route('admin.brands.index') }}" class="btn btn-secondary">Quay lại</a>
     </div>
 </form>

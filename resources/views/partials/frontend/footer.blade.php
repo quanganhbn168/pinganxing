@@ -3,8 +3,8 @@
         <div class="container">
             <div class="row gy-4"> {{-- gy-4 để tạo khoảng cách giữa các cột trên mobile --}}
 
-                {{-- Cột 1: Thông tin công ty --}}
-                <div class="col-12 col-lg-4">
+                {{-- Cột 1: Thông tin công ty (3/12) --}}
+                <div class="col-12 col-md-6 col-lg-3">
                     <div class="footer-widget">
                         <div class="logo-footer mb-3">
                             <a href="/" title="{{ $setting->name }}">
@@ -22,33 +22,48 @@
                     </div>
                 </div>
 
-                {{-- Lặp qua các cột menu được định nghĩa trong config/menu_footer.php --}}
-                @foreach(get_menu_footer() as $menuColumn)
-                <div class="col-12 col-md-6 col-lg-2">
+                {{-- Cột 2: Về Cnetpos (Fix cứng) --}}
+                <div class="col-12 col-md-6 col-lg-3">
                     <div class="footer-widget">
-                        @if(!empty($menuColumn['items']))
+                        <h4 class="widget-title">Về Cnetpos</h4>
                         <ul class="menu-list">
-                            @foreach($menuColumn['items'] as $item)
-                            <li><a href="{{ $item['url'] }}">{{ $item['title'] }}</a></li>
+                            <li><a href="/">Trang chủ</a></li>
+                            <li><a href="{{ route('frontend.intro.index') }}">Giới thiệu chung</a></li>
+                            <li><a href="/du-an">Dự án đã thực hiện</a></li>
+                            <li><a href="/lien-he">Liên hệ</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                {{-- Cột 3: Chính sách và hướng dẫn (Động từ danh mục) --}}
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="footer-widget">
+                        <h4 class="widget-title">Chính sách và hướng dẫn</h4>
+                        @if(isset($footerPolicies) && $footerPolicies->count() > 0)
+                        <ul class="menu-list">
+                            @foreach($footerPolicies as $policy)
+                            <li>
+                                <a href="{{ route('frontend.slug.handle', ['slug' => $policy->slug]) }}">
+                                    {{ $policy->title }}
+                                </a>
+                            </li>
                             @endforeach
                         </ul>
                         @endif
                     </div>
                 </div>
-                @endforeach
 
-                {{-- Cột 4: Đăng ký nhận tin & Mạng xã hội --}}
-                <div class="col-12 col-lg-4">
+                {{-- Cột 4: Đăng ký nhận tin & Mạng xã hội (3/12) --}}
+                <div class="col-12 col-md-6 col-lg-3">
                     <div class="footer-widget">
-                        <h4 class="widget-title">Đăng ký nhận tin</h4>
-                        <p>Nhận thông tin mới nhất về sản phẩm và các chương trình khuyến mãi của chúng tôi.</p>
+                        <h4 class="widget-title">Kết nối với chúng tôi</h4>
+                        <p>Nhận thông tin mới nhất về sản phẩm và khuyến mãi.</p>
                         
-                        {{-- Sửa lại form theo cấu trúc input-group của Bootstrap --}}
-                        <form class="subscribe-form mt-4">
+                        <form class="subscribe-form mt-3">
                             <div class="input-group">
-                                <input type="email" class="form-control" placeholder="Nhập email của bạn..." aria-label="Nhập email của bạn">
+                                <input type="email" class="form-control" placeholder="Email nhận tin..." aria-label="Email">
                                 <button type="submit" class="btn btn-primary" id="button-subscribe">
-                                    <i class="fas fa-paper-plane"></i> {{-- Icon gửi thư --}}
+                                    <i class="fas fa-paper-plane"></i>
                                 </button>
                             </div>
                         </form>
@@ -56,7 +71,6 @@
                         <div class="social-list mt-4">
                             <a href="{{ $setting->youtube ?? '#' }}" target="_blank" title="Youtube"><i class="fab fa-youtube"></i></a>
                             <a href="{{ $setting->facebook ?? '#' }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            {{-- Đổi icon Zalo cho hiện đại hơn --}}
                             <a href="{{ $setting->zalo ?? '#' }}" target="_blank" title="Zalo"><i class="fas fa-paper-plane"></i></a>
                         </div>
                     </div>
