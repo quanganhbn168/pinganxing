@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
         // Share data specific for footer
         View::composer('partials.frontend.footer', function ($view) {
             $footerPolicies = \App\Models\Post::whereHas('category', function($q) {
-                $q->where('slug', 'chinh-sach');
+                $q->whereIn('slug', ['chinh-sach', 'huong-dan']);
             })->where('status', 1)->latest()->get();
             
             $view->with('footerPolicies', $footerPolicies);
