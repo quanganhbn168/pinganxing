@@ -18,8 +18,6 @@
 
 {{-- Phần Banner --}}
 
-<div class="banner">
-
     <div class="banner">
 
         <img src="{{ optional($current_category->bannerImage())->url() ?? '' }}" alt="{{$current_category->name}}">
@@ -73,9 +71,10 @@
                 </div>
                 @empty
                 <div class="col-12">
-
-                    <div class="alert alert-warning">Thông tin đang được cập nhật...</div>
-
+                     <div class="alert alert-light text-center py-5">
+                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-muted"></i>
+                        <p class="text-muted">Danh mục đang được cập nhật...</p>
+                    </div>
                 </div>
             @endforelse
 
