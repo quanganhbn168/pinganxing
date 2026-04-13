@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('post_category_id');
             $table->string('title');
-            $table->string('slug')->unique();
-            $table->string('image');
-            $table->string('banner')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->json('gallery')->nullable();
+            $table->unsignedBigInteger('banner_id')->nullable();
             $table->text('description')->nullable();
             $table->longText('content');
             $table->boolean('is_featured')->default(0);
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('is_footer')->default(1);
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();   
-            $table->string('meta_image')->nullable();   
+            $table->unsignedBigInteger('meta_image_id')->nullable();   
             $table->timestamps();
 
             $table->foreign('post_category_id')->references('id')->on('post_categories')->onDelete('cascade');

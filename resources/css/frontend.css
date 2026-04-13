@@ -1,7 +1,65 @@
-/* Main Frontend CSS Entry Point */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Lexend:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
-@import './frontend/slide.css';
-@import './frontend/global.css';
-@import './frontend/style.css';
-@import './frontend/responsive.css';
-@import './frontend/project-slider.css';
+@theme {
+  /* Brand Blue #0e4a86 */
+  --color-brand-50: #f0f7ff;
+  --color-brand-100: #e0effe;
+  --color-brand-200: #b9ddfe;
+  --color-brand-300: #7cc1fd;
+  --color-brand-400: #36a4fa;
+  --color-brand-500: #0a8bf1;
+  --color-brand-600: #026ed3;
+  --color-brand-700: #0357a8;
+  --color-brand-800: #0e4a86; /* Main */
+  --color-brand-900: #0b3762;
+  --color-brand-950: #082647;
+
+  /* Brand Orange #f39221 */
+  --color-accent-50: #fff9ed;
+  --color-accent-100: #ffefd4;
+  --color-accent-200: #ffdb85;
+  --color-accent-300: #ffc46a;
+  --color-accent-400: #ffaa42;
+  --color-accent-500: #f39221; /* Main */
+  --color-accent-600: #e0740b;
+  --color-accent-700: #ba560b;
+  --color-accent-800: #944211;
+  --color-accent-900: #783711;
+
+  --font-sans: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Archivo', 'Lexend', sans-serif;
+
+  /* Marquee Animation */
+  --animate-marquee: marquee 30s linear infinite;
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+  
+  input[type='text'], input[type='email'], input[type='password'], input[type='number'], select, textarea {
+    @apply border-gray-300 rounded-sm focus:ring-brand-500 focus:border-brand-500 shadow-none hover:border-gray-400 transition-colors bg-gray-50 focus:bg-white;
+  }
+}
+
+/* Swiper Custom Pagination */
+.swiper-pagination-bullet {
+  width: 25px !important;
+  height: 5px !important;
+  border-radius: 3px !important;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--color-brand-800) !important;
+  opacity: 0.4 !important;
+}
+.swiper-pagination-bullet-active {
+  width: 40px !important;
+  background-color: var(--color-brand-600) !important;
+  opacity: 1 !important;
+}

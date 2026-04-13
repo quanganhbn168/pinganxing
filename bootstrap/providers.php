@@ -2,12 +2,7 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\AuthServiceProvider::class,
-    App\Providers\RepositoryServiceProvider::class,
-    App\Providers\SettingServiceProvider::class,
+    App\Providers\Filament\AdminPanelProvider::class,
+    App\Providers\MenuServiceProvider::class,
     App\Providers\SlugServiceProvider::class,
-    App\Providers\ViewServiceProvider::class,
-    App\Providers\ViewShareServiceProvider::class,
-    App\Providers\MenuViewServiceProvider::class,
-    App\Providers\MenuObserverServiceProvider::class,
 ];

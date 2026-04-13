@@ -6,16 +6,33 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Page;
+use App\Models\Slug;
+use App\Settings\PageSettings;
 
 class ProductController extends Controller
 {
+    /**
+     * Resolve slug cho prefix /san-pham/{slug}.
+     * Tự phân biệt Product (detail) vs Category (listing).
+     */
+    public function resolveBySlug(string $slug, Request $request)
+    {
+        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $model = $slugData->sluggable;
+
+        return match (true) {
+            $model instanceof Category => $this->byCategory($model, $request),
+            $model instanceof Product  => $this->show($model),
+            default => abort(404),
+        };
+    }
+
     /**
      * Hiển thị trang danh sách sản phẩm theo từng root category (Option A)
      */
     public function index(Request $request)
     {
-        $page = Page::where('slug', 'san-pham')->first();
+        $pageSettings = app(PageSettings::class);
         $perCategoryLimit = (int) $request->input('limit', 12);
         $allCategories = Category::whereNull('parent_id')->where('status', 1)->orderBy('name')->get();
         
@@ -79,7 +96,7 @@ class ProductController extends Controller
             $allCategoryAndProduct->push($obj);
         }
 
-        return view('frontend.products.index', compact('allCategoryAndProduct', 'page', 'allCategories'));
+        return view('frontend.products.index', compact('allCategoryAndProduct', 'pageSettings', 'allCategories'));
     }
     /**
      * Route cho trang danh mục, sẽ chuyển hướng logic về hàm index.

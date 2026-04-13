@@ -1,89 +1,51 @@
 @extends('layouts.master')
-
 @section('title', $pageTitle)
-
-
-
-@push('css')
-
-<link rel="stylesheet" href="{{ asset('css/product.css') }}">
-
-@endpush
-
-
-
 @section('content')
 
 
 
-{{-- Phần Banner --}}
+<x-frontend.page-hero 
+    :image="$bannerUrl" 
+    :title="$pageTitle" 
+    :breadcrumb="$breadcrumbs" 
+/>
 
-    <div class="banner">
-
-        <img src="{{ optional($current_category->bannerImage())->url() ?? '' }}" alt="{{$current_category->name}}">
-
-    </div>
-
-    <div class="container py-5">
-
-        <h2 class="custom-section-title">{{$current_category->name}}</h2>
-
-        <div class="fieldList">
-
-            <div class="row">
-
-            @forelse($fields as $field)
-
-                <div class="col-6 col-md-4">
-
-                    <div class="fieldItem">
-
-                        <a href="{{route("frontend.slug.handle",$field->slugValue)}}">
-
-                            {{$field->name}}
-
-                        </a>
-
-                        <p class="field-meta">
-
-                            <span><i class="fa-solid fa-calendar"></i> {{ $field->updated_at->format('d/m/Y') }}</span>
-
-                        </p>
-
-                        <div class="field-description">
-
-                            {{$field->description}}
-
-                        </div>
-
-                        <div class="field-image">
-
-                            <a href="{{route("frontend.slug.handle",$field->slugValue)}}">
-
-                                <img src="{{ optional($field->mainImage())->url() }}" alt="{{$field->name}}">
-
-                            </a>
-
-                        </div>
-
-                    </div>     
-
-                </div>
-                @empty
-                <div class="col-12">
-                     <div class="alert alert-light text-center py-5">
-                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-muted"></i>
-                        <p class="text-muted">Danh mục đang được cập nhật...</p>
-                    </div>
-                </div>
-            @endforelse
-
-            </div>
-
-                             
-
+<div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
+    <div class="max-w-screen-xl mx-auto px-4">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-black uppercase text-gray-900 dark:text-white tracking-tighter">{{ $pageTitle }}</h2>
+            <div class="w-16 h-1 bg-brand-600 mx-auto mt-6 mb-6"></div>
+            @if(!empty($current_category->description))
+                <p class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ $current_category->description }}</p>
+            @endif
         </div>
 
-    </div>
+        @if(isset($fields) && $fields->isNotEmpty())
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                @foreach($fields as $field)
+                    <x-frontend.card 
+                        :href="$field->slug_url"
+                        :image="$field->image ? $field->image->path : null"
+                        :title="$field->name"
+                        :description="$field->summary ?? ''"
+                    />
+                @endforeach
+            </div>
+            
+            @if($fields->hasPages())
+            <div class="mt-8 flex justify-center">
+                {{ $fields->links() }}
+            </div>
+            @endif
+        @else
+            <div class="bg-white dark:bg-gray-800 rounded-sm p-12 text-center border border-dashed border-gray-200 dark:border-gray-700 shadow-sm">
+                <i class="fas fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nội dung đang cập nhật</h3>
+                <p class="text-gray-500 dark:text-gray-400">Chưa có bài viết lĩnh vực nào trong mục này.</p>
+            </div>
+        @endif
 
+    </div>
+</div>
 @endsection

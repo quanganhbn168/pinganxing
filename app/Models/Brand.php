@@ -2,17 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Traits\HasImages;
+use Illuminate\Database\Eloquent\Model;
+
 class Brand extends Model
 {
-    use HasFactory, HasImages;
+    use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'image', 'link', 'status'];
+    protected $fillable = [
+        'name',
+        'image_id',
+        'link',
+        'status',
+    ];
+
+    protected $casts = [
+        'gallery' => 'array',
+    ];
 
     public function products()
     {
-        return $this->hasMany(Product::class); 
+        return $this->hasMany(Product::class);
+    }
+
+    public function image()
+    {
+        return $this->belongsTo(Media::class, 'image_id');
     }
 }

@@ -18,13 +18,13 @@
   "dateModified": "{{ $field->updated_at->toIso8601String() }}",
   "author": {
     "@type": "Organization",
-    "name": "{{ $setting->name ?? config('app.name') }}",
+    "name": "{{ $setting->site_name ?? config('app.name') }}",
     "url": "{{ url('/') }}",
     "image": "{{ asset($setting->logo) }}"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "{{ $setting->name ?? config('app.name') }}",
+    "name": "{{ $setting->site_name ?? config('app.name') }}",
     "logo": {
       "@type": "ImageObject",
       "url": "{{ asset($setting->logo ?? '') }}"

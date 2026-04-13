@@ -47,7 +47,7 @@
 
                 {{-- Mục lục tự động (TOC) --}}
                 <div class="toc-container" id="toc-wrapper">
-                    <h3>📚 Nội dung</h3>
+                    <h3>Nội dung</h3>
                     <div id="table-of-contents"></div>
                 </div>
 

@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductVariant extends Model
 {
@@ -17,12 +17,18 @@ class ProductVariant extends Model
         'price',
         'compare_at_price',
         'stock',
-        'image',
+        'image_id',
         'is_default',
-        
+        'options',
     ];
 
-    // -- Accessors cho Giá --
+    protected $casts = [
+        'options'    => 'array',
+        'is_default' => 'boolean',
+    ];
+
+    // ─── Accessors ───
+
     public function getIsOnSaleAttribute(): bool
     {
         return $this->compare_at_price > $this->price;
@@ -36,17 +42,15 @@ class ProductVariant extends Model
         return 0;
     }
 
-    // -- Các mối quan hệ (Relationships) --
+    // ─── Relationships ───
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Các giá trị thuộc tính định nghĩa nên biến thể này (VD: Đỏ, Size L).
-     */
-    public function attributeValues(): BelongsToMany
+    public function image(): BelongsTo
     {
-        return $this->belongsToMany(AttributeValue::class, 'product_variant_attribute_value');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 }

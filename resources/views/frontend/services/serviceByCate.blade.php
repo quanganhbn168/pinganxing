@@ -92,53 +92,10 @@
 					</div>
 
 				</div>
-				@include('partials.frontend.aside')
+				<x-frontend.aside />
 			</div>
 		</div>
 	</div>			
 @endsection
 @push('js')
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-        <script>
-    // Custom rule kiểm tra số điện thoại Việt Nam
-            $.validator.addMethod("phoneVN", function (value, element) {
-                return this.optional(element) || /^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/.test(value);
-            }, "Số điện thoại không hợp lệ");
-
-            $(document).ready(function () {
-                $('#contact-form').validate({
-                    rules: {
-                        name: {
-                            required: true,
-                            minlength: 2
-                        },
-                        phone: {
-                            required: true,
-                            phoneVN: true
-                        },
-                    },
-                    messages: {
-                        name: {
-                            required: "Vui lòng nhập họ và tên",
-                            minlength: "Tên quá ngắn"
-                        },
-                        phone: {
-                            required: "Vui lòng nhập số điện thoại",
-                            phoneVN: "Số điện thoại không hợp lệ (ví dụ: 098xxxxxxx)"
-                        },
-                        message: {
-                            maxlength: "Ý kiến không vượt quá 1000 ký tự"
-                        }
-                    },
-                    errorElement: 'small',
-                    errorClass: 'text-danger',
-                    highlight: function (element) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function (element) {
-                        $(element).removeClass('is-invalid');
-                    }
-                });
-            });
-        </script>
 @endpush

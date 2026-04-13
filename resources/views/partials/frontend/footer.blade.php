@@ -1,87 +1,116 @@
-<footer class="footer-new">
-    <div class="main-footer">
-        <div class="container">
-            <div class="row gy-4"> {{-- gy-4 để tạo khoảng cách giữa các cột trên mobile --}}
-
-                {{-- Cột 1: Thông tin công ty (3/12) --}}
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="footer-widget">
-                        <div class="logo-footer mb-3">
-                            <a href="/" title="{{ $setting->name }}">
-                                <img src="{{ asset($setting->logo) }}" alt="{{ $setting->name }}">
-                            </a>
-                        </div>
-                        <p class="footer-description">
-                            CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.
-                        </p>
-                        <div class="info-address">
-                            <p><i class="fas fa-map-marker-alt me-2"></i> {{ $setting->address }}</p>
-                            <p><i class="fas fa-phone-alt me-2"></i> <a href="tel:{{ $setting->phone }}">{{ $setting->phone }}</a></p>
-                            <p><i class="fas fa-envelope me-2"></i> <a href="mailto:{{ $setting->email }}">{{ $setting->email }}</a></p>
-                        </div>
+<footer class="text-gray-300 py-12 mt-10 relative bg-gray-900 bg-cover bg-center bg-no-repeat" 
+        @if(!empty($setting->footer_background)) style="background-image: linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.85)), url('{{ asset($setting->footer_background) }}');" @endif>
+    <div class="max-w-screen-xl mx-auto px-4 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+            {{-- Cột 1: Thông tin công ty --}}
+            <div>
+                <a href="/" class="block mb-6">
+                    <img src="{{ asset($setting->logo ?? 'images/logo-white.png') }}" class="h-10 filter brightness-0 invert" alt="{{ $setting->site_name ?? 'Logo' }}">
+                </a>
+                <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                    {{ $setting->description ?? 'CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.' }}
+                </p>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-map-marker-alt mt-1 me-3 text-blue-500 w-4"></i>
+                        <span>{{ $setting->address ?? 'Tầng 3...' }}</span>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-phone-alt mt-1 me-3 text-blue-500 w-4"></i>
+                        <a href="tel:{{ $setting->phone ?? '' }}" class="hover:text-white transition-colors">{{ $setting->phone ?? '' }}</a>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-envelope mt-1 me-3 text-blue-500 w-4"></i>
+                        <a href="mailto:{{ $setting->email ?? '' }}" class="hover:text-white transition-colors">{{ $setting->email ?? '' }}</a>
                     </div>
                 </div>
-
-                {{-- Cột 2: Về Cnetpos (Fix cứng) --}}
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="footer-widget">
-                        <h4 class="widget-title">Về Cnetpos</h4>
-                        <ul class="menu-list">
-                            <li><a href="/">Trang chủ</a></li>
-                            <li><a href="{{ route('frontend.intro.index') }}">Giới thiệu chung</a></li>
-                            <li><a href="/du-an">Dự án đã thực hiện</a></li>
-                            <li><a href="/lien-he">Liên hệ</a></li>
-                        </ul>
-                    </div>
+                
+                @if(!empty($setting->bct_link))
+                <div class="mt-6">
+                    <a href="{{ $setting->bct_link }}" target="_blank" rel="nofollow">
+                        <img src="https://theme.hstatic.net/1000026602/1001190558/14/logo-bct.png?v=210" alt="Đã thông báo Bộ Công Thương" class="h-12 object-contain filter drop-shadow-sm">
+                    </a>
                 </div>
+                @endif
+            </div>
 
-                {{-- Cột 3: Chính sách và hướng dẫn (Động từ danh mục) --}}
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="footer-widget">
-                        <h4 class="widget-title">Chính sách và hướng dẫn</h4>
-                        @if(isset($footerPolicies) && $footerPolicies->count() > 0)
-                        <ul class="menu-list">
-                            @foreach($footerPolicies as $policy)
+            {{-- Cột 2: Liên kết (Ưu tiên Menu System → fallback Settings Repeater) --}}
+            <div>
+                <h4 class="text-white text-lg font-semibold mb-6">{{ $setting->footer_col_2_title ?? 'Về Cnetpos' }}</h4>
+                <ul class="space-y-3 text-sm">
+                    @if(isset($footerCol2Menu) && $footerCol2Menu->count() > 0)
+                        @foreach($footerCol2Menu as $menuItem)
                             <li>
-                                <a href="{{ route('frontend.slug.handle', ['slug' => $policy->slug]) }}">
-                                    {{ $policy->title }}
+                                <a href="{{ $menuItem->link }}" target="{{ $menuItem->link_target }}" class="hover:text-blue-400 transition-colors flex items-center gap-2">
+                                    @if($menuItem->icon)<i class="{{ $menuItem->icon }} text-xs text-gray-500"></i>@endif
+                                    {{ $menuItem->title }}
                                 </a>
                             </li>
-                            @endforeach
-                        </ul>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Cột 4: Đăng ký nhận tin & Mạng xã hội (3/12) --}}
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="footer-widget">
-                        <h4 class="widget-title">Kết nối với chúng tôi</h4>
-                        <p>Nhận thông tin mới nhất về sản phẩm và khuyến mãi.</p>
-                        
-                        <form class="subscribe-form mt-3">
-                            <div class="input-group">
-                                <input type="email" class="form-control" placeholder="Email nhận tin..." aria-label="Email">
-                                <button type="submit" class="btn btn-primary" id="button-subscribe">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </form>
-
-                        <div class="social-list mt-4">
-                            <a href="{{ $setting->youtube ?? '#' }}" target="_blank" title="Youtube"><i class="fab fa-youtube"></i></a>
-                            <a href="{{ $setting->facebook ?? '#' }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="{{ $setting->zalo ?? '#' }}" target="_blank" title="Zalo"><i class="fas fa-paper-plane"></i></a>
-                        </div>
-                    </div>
-                </div>
-
+                        @endforeach
+                    @elseif(!empty($setting->footer_col_2_links) && is_array($setting->footer_col_2_links))
+                        @foreach($setting->footer_col_2_links as $link)
+                            <li><a href="{{ $link['url'] ?? '#' }}" class="hover:text-blue-400 transition-colors">{{ $link['label'] ?? '' }}</a></li>
+                        @endforeach
+                    @else
+                        <li><a href="/" class="hover:text-blue-400 transition-colors">Trang chủ</a></li>
+                        <li><a href="{{ route('frontend.intro.index') }}" class="hover:text-blue-400 transition-colors">Về chúng tôi</a></li>
+                        <li><a href="/du-an" class="hover:text-blue-400 transition-colors">Dự án đã thực hiện</a></li>
+                        <li><a href="/lien-he" class="hover:text-blue-400 transition-colors">Liên hệ</a></li>
+                    @endif
+                </ul>
             </div>
+
+            {{-- Cột 3: Chính sách (Ưu tiên Menu System → fallback Settings Repeater) --}}
+            <div>
+                <h4 class="text-white text-lg font-semibold mb-6">{{ $setting->footer_col_3_title ?? 'Chính sách & Hướng dẫn' }}</h4>
+                <ul class="space-y-3 text-sm">
+                    @if(isset($footerCol3Menu) && $footerCol3Menu->count() > 0)
+                        @foreach($footerCol3Menu as $menuItem)
+                            <li>
+                                <a href="{{ $menuItem->link }}" target="{{ $menuItem->link_target }}" class="hover:text-blue-400 transition-colors flex items-center gap-2">
+                                    @if($menuItem->icon)<i class="{{ $menuItem->icon }} text-xs text-gray-500"></i>@endif
+                                    {{ $menuItem->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    @elseif(!empty($setting->footer_col_3_links) && is_array($setting->footer_col_3_links))
+                        @foreach($setting->footer_col_3_links as $link)
+                            <li><a href="{{ $link['url'] ?? '#' }}" class="hover:text-blue-400 transition-colors">{{ $link['label'] ?? '' }}</a></li>
+                        @endforeach
+                    @else
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition-colors">Điều khoản sử dụng</a></li>
+                    @endif
+                </ul>
+            </div>
+
+            {{-- Cột 4: Đăng ký & Social --}}
+            <div>
+                <h4 class="text-white text-lg font-semibold mb-6">Kết nối với chúng tôi</h4>
+                <p class="text-sm text-gray-400 mb-4">Đăng ký để nhận thông tin mới nhất về sản phẩm và khuyến mãi.</p>
+                <form class="flex mb-6">
+                    <input type="email" placeholder="Email của bạn..." class="bg-gray-800 text-sm border-0 text-white rounded-l-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5" required>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-r-lg px-4 py-2.5 transition-colors">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="flex space-x-4">
+                    <a href="{{ $setting->facebook ?? '#' }}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-blue-600 transition-colors text-white">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="{{ $setting->youtube ?? '#' }}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-red-600 transition-colors text-white">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="{{ $setting->zalo ?? '#' }}" target="_blank" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-blue-500 transition-colors text-white">
+                        <i class="fas fa-comment-dots"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
-    <div class="copyright">
-        <div class="container">
-            <span>© Bản quyền thuộc về <b>{{$setting->name}}</b> | Cung cấp bởi <a href="https://webappbacninh.vn/" rel="nofollow" target="_blank">Web App Bắc Ninh</a></span>
-        </div>
+    <div class="border-t border-gray-800 mt-12 pt-6 text-center text-sm text-gray-500">
+        <p>© Bản quyền thuộc về <b class="text-white">{{ $setting->site_name ?? 'CnetPOS' }}</b> | Thiết kế bởi <a href="https://webappbacninh.vn/" target="_blank" class="hover:text-blue-400">Web App Bắc Ninh</a></p>
     </div>
 </footer>

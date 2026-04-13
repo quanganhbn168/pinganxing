@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('service_category_id');
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image');
-            $table->string('banner')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->json('gallery')->nullable();
+            $table->unsignedBigInteger('banner_id')->nullable();
             $table->text('description')->nullable();
             $table->text('content')->nullable();
             $table->boolean('status')->default(1);
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->unsignedInteger('price')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();   
-            $table->string('meta_image')->nullable();   
+            $table->unsignedBigInteger('meta_image_id')->nullable();   
             $table->timestamps();
 
             $table->foreign('service_category_id')

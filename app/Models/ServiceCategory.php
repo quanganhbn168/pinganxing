@@ -1,43 +1,48 @@
 <?php
 
-// app/Models/ServiceCategory.php
-
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasImages;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 use App\Traits\HasSlug;
+
 class ServiceCategory extends Model
 {
-    use HasFactory, HasSlug, HasImages;
+    use HasFactory, HasSlug, \App\Traits\HasCategoryTree;
+
     protected $table = 'service_categories';
+
     protected $fillable = [
-        'name','slug', 'image', 'banner', 'parent_id', 'status','is_home','is_menu','is_footer', 'description', 'content'
+        'name',
+        'image_id',
+        'banner_id',
+        'parent_id',
+        'status',
+        'is_home',
+        'is_menu',
+        'is_footer',
+        'description',
+        'content',
     ];
 
-    public function parent()
-    {
-        return $this->belongsTo(ServiceCategory::class, 'parent_id');
-    }
+    // ─── Relationships riêng ───
 
-    public function children()
-    {
-        return $this->hasMany(ServiceCategory::class, 'parent_id');
-    }
-
-    public function services()
+    public function services(): HasMany
     {
         return $this->hasMany(Service::class);
     }
-    
-    public function slug()
+
+    public function image(): BelongsTo
     {
-        return $this->morphOne(Slug::class, 'sluggable');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 
-    public function getSlugUrlAttribute()
+    public function banner(): BelongsTo
     {
-        return url($this->slug->slug ?? '#');
+        return $this->belongsTo(Media::class, 'banner_id');
     }
 }

@@ -12,9 +12,20 @@ class Team extends Model
     protected $fillable = [
         'name',
         'position',
-        'image',
+        'image_id',
         'hsk_level',
         'experience',
         'bio',
     ];
+
+    public function image()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'image_id');
+    }
+
+    public function banner()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'banner_id');
+    }
+
 }

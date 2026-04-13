@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image')->nullable();        
+            $table->unsignedBigInteger('image_id')->nullable();        
             $table->string('issued_by')->nullable();    
             $table->date('issued_at')->nullable();      
             $table->date('expired_at')->nullable();     

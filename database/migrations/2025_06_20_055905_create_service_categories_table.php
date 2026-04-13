@@ -15,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('parent_id')->default(0);
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image');
-            $table->string('banner')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->unsignedBigInteger('banner_id')->nullable();
             $table->text('description')->nullable();
             $table->text('content')->nullable();
             $table->boolean('status')->default(1);
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_footer')->default(1);
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();   
-            $table->string('meta_image')->nullable();   
+            $table->unsignedBigInteger('meta_image_id')->nullable();   
             $table->timestamps();
         });
     }

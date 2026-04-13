@@ -2,26 +2,21 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Traits\HasImages;
+
 use App\Traits\HasSlug;
 use App\Traits\HasComments;
 
 class Field extends Model
 {
-    use HasFactory, HasImages, HasSlug, HasComments;
+    use HasFactory, HasSlug, HasComments;
 
-    /**
-     * Các thuộc tính có thể được gán hàng loạt.
-     *
-     * @var array
-     */
     protected $fillable = [
         'field_category_id',
         'name',
-        'slug',
         'summary',
         'content',
         'status',
@@ -31,48 +26,33 @@ class Field extends Model
         'meta_keywords',
     ];
 
-    /**
-     * Chuyển đổi kiểu dữ liệu cho các thuộc tính.
-     *
-     * @var array
-     */
     protected $casts = [
-        'status' => 'boolean',
+        'gallery'     => 'array',
+        'status'      => 'boolean',
         'is_featured' => 'boolean',
     ];
 
-    /**
-     * Lấy danh mục của lĩnh vực này.
-     */
+    // ─── Relationships ───
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(FieldCategory::class, 'field_category_id');
     }
 
-    /**
-     * Scope a query to only include active fields.
-     */
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'image_id');
+    }
+
+    // ─── Scopes ───
+
     public function scopeActive($query)
     {
         return $query->where('status', true);
     }
 
-    /**
-     * Scope a query to only include featured fields.
-     */
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
     }
-
-    /**
-     * Lấy khóa route cho model.
-     *
-     * @return string
-     */
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
-    
 }

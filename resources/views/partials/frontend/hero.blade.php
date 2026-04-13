@@ -1,6 +1,6 @@
 {{-- <section id="hero" class="hero">
 	<div class="box-name">
-		{{$setting->name}}
+		{{$setting->site_name}}
 	</div>
 	<div class="box-banner">
 		{{$setting->banner}}

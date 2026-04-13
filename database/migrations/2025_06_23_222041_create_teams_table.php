@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('position')->nullable(); // ví dụ: Giảng viên tiếng Trung
-            $table->string('image')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->string('level')->nullable(); // HSK 6, HSK 5,...
             $table->integer('experience')->nullable(); // số năm kinh nghiệm
             $table->text('bio')->nullable(); // mô tả chi tiết về giảng viên

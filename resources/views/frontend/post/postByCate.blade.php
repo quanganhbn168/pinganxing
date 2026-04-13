@@ -1,257 +1,155 @@
 @extends('layouts.master')
 @section('title', $category->name ?? 'Tin tức')
 
-@push('css')
-<style>
-    /* --- 1. Cấu hình Card bài viết --- */
-    .post-item {
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        height: 100%; /* Để các card cao bằng nhau */
-        display: flex;
-        flex-direction: column;
-    }
-
-    .post-item:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    /* --- 2. Xử lý ảnh 16:9 --- */
-    .post-item .post-item_image {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16 / 9; /* Tỷ lệ vàng 16:9 */
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-
-    .post-item .post-item_image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-
-    .post-item:hover .post-item_image img {
-        transform: scale(1.05);
-    }
-
-    /* --- 3. Nội dung bài viết --- */
-    .post-item_info {
-        padding: 15px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .post-item_title a {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #333;
-        text-decoration: none;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Giới hạn 2 dòng tiêu đề */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .info_description {
-        font-size: 0.9rem;
-        color: #666;
-        margin: 10px 0;
-        flex-grow: 1;
-    }
-
-    .read-more-link {
-        color: #007bff;
-        font-weight: 600;
-        text-decoration: none;
-        margin-top: auto;
-    }
-
-    /* --- 4. Nút chuyển đổi giao diện --- */
-    .view-switcher {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-view {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        padding: 8px 12px;
-        cursor: pointer;
-        border-radius: 4px;
-        color: #555;
-        transition: all 0.2s;
-    }
-
-    .btn-view.active, .btn-view:hover {
-        background: #007bff;
-        color: #fff;
-        border-color: #007bff;
-    }
-
-    /* --- 5. Styles cho chế độ LIST (Logic chính) --- */
-    /* Khi container cha có class 'layout-list' */
-    .post-container.layout-list .col-lg-4,
-    .post-container.layout-list .col-md-6 {
-        width: 100%; 
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .post-container.layout-list .post-item {
-        flex-direction: row; /* Xếp ngang */
-        align-items: center;
-    }
-
-    .post-container.layout-list .post-item_image {
-        width: 35%; /* Ảnh 35% */
-        aspect-ratio: 16 / 9;
-    }
-
-    .post-container.layout-list .post-item_info {
-        width: 65%; /* Chữ 65% */
-        padding: 20px;
-    }
-
-    .post-container.layout-list .post-item_title a {
-        font-size: 1.3rem;
-    }
-
-    /* --- 6. Mobile First Override --- */
-    /* Trên mobile, luôn hiển thị dạng Grid dọc dù đang chọn List */
-    @media (max-width: 768px) {
-        .post-container.layout-list .post-item {
-            flex-direction: column;
-        }
-        .post-container.layout-list .post-item_image {
-            width: 100%;
-        }
-        .post-container.layout-list .post-item_info {
-            width: 100%;
-        }
-        /* Ẩn nút chuyển đổi trên mobile cho gọn (tuỳ chọn) */
-        .view-switcher {
-            display: none;
-        }
-    }
-</style>
-@endpush
-
 @section('content')
-<div class="post-wrapper">
-    <div class="collection-banner">
-        {{-- Banner Image --}}
-        <img
-            src="{{ optional($category->bannerImage())->url() ?: ($category->banner ? asset($category->banner) : asset($setting->banner)) }}"
-            alt="{{ $category->name }}"
-            style="width: 100%; object-fit: cover;"
-            loading="lazy">
-    </div>
-
-    <div class="container py-5">
-        <div class="category-section mb-5">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="custom-section-title m-0">
-                    <a href="{{ route('frontend.slug.handle', $category->slug) }}" class="text-dark text-decoration-none">
-                        {{ $category->name }}
+{{-- Hero Banner --}}
+<div class="relative w-full h-[25vh] md:h-[35vh] overflow-hidden">
+    <img src="{{ optional($category->bannerImage())->url() ?: ($category->banner ? asset($category->banner) : asset($setting->banner)) }}" 
+         alt="{{ $category->name }}" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gray-900/60 flex flex-col items-center justify-center">
+        <h1 class="text-3xl md:text-5xl font-bold text-white uppercase tracking-wider mb-4 text-center px-4">{{ $category->name }}</h1>
+        <nav class="flex" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="inline-flex items-center text-sm font-medium text-gray-200 hover:text-white transition-colors">
+                        <i class="fas fa-home mr-2"></i> Trang chủ
                     </a>
-                </h2>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2 text-sm"></i>
+                        <span class="text-sm font-medium text-gray-100">{{ $category->name }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
 
-                <div class="view-switcher">
-                    <button class="btn-view active" onclick="setView('grid')" title="Dạng lưới">
-                        <i class="fa-solid fa-border-all"></i>
-                    </button>
-                    <button class="btn-view" onclick="setView('list')" title="Dạng danh sách">
-                        <i class="fa-solid fa-list"></i>
-                    </button>
-                </div>
+<div class="bg-white dark:bg-gray-900 py-12">
+    <div class="max-w-screen-xl mx-auto px-4">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-10 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
+                Cập nhật mới nhất
+            </h2>
+            
+            {{-- View Switcher --}}
+            <div class="flex space-x-2">
+                <button class="btn-view grid-view active w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onclick="setView('grid')" title="Dạng lưới">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button class="btn-view list-view w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onclick="setView('list')" title="Dạng danh sách">
+                    <i class="fas fa-list"></i>
+                </button>
             </div>
+        </div>
 
-            <div class="postByCateList post-container">
-                <div class="row">
+        {{-- Post Container --}}
+        <div class="post-container" data-layout="grid">
+            @if($posts->isEmpty())
+                <div class="text-center py-12">
+                    <i class="fas fa-folder-open text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Chưa có bài viết nào trong danh mục này.</p>
+                </div>
+            @else
+                <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 list-cols">
                     @foreach($posts as $post)
-                        <div class="col-12 col-md-6 col-lg-4 mb-4">
-                            <div class="post-item">
-                                <div class="post-item_image">
-                                    <a href="{{ route('frontend.slug.handle', $post->slug) }}">
-                                        <img
-                                            src="{{ optional($post->mainImage())->url()
-                                                ?? optional($post->bannerImage())->url()
-                                                ?? ($post->image ? asset($post->image) : asset('images/no-image.png')) }}"
-                                            alt="{{ $post->title }}"
-                                            loading="lazy">
+                        <article class="post-card group flex flex-col bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl overflow-hidden transition-all duration-300">
+                            <a href="{{ $post->slug_url }}" class="block post-img-wrapper overflow-hidden relative aspect-[16/9]">
+                                <img src="{{ optional($post->mainImage())->url() ?? optional($post->bannerImage())->url() ?? ($post->image ? asset($post->image) : asset('images/setting/no-image.png')) }}"
+                                     alt="{{ $post->title }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </a>
+                            <div class="p-5 sm:p-6 flex flex-col flex-1 post-content">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center">
+                                    <i class="far fa-calendar-alt mr-1.5"></i>
+                                    {{ $post->created_at ? $post->created_at->format('d/m/Y') : '' }}
+                                </p>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
+                                    <a href="{{ $post->slug_url }}">
+                                        {{ $post->title }}
                                     </a>
-                                </div>
-                                <div class="post-item_info">
-                                    <h3 class="post-item_title">
-                                        <a href="{{ route('frontend.slug.handle', $post->slug) }}">
-                                            {{ $post->title }}
-                                        </a>
-                                    </h3>
-                                    <div class="info_description">
-                                        {{ Str::limit($post->description, 120, '...') }}
-                                    </div>
-                                    <a class="read-more-link" href="{{ route('frontend.slug.handle', $post->slug) }}">
-                                        Xem thêm <i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                </div>
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 mb-4 flex-1 post-desc">
+                                    {{ strip_tags($post->description) }}
+                                </p>
+                                <a href="{{ $post->slug_url }}" class="inline-flex items-center text-sm font-bold text-blue-600 dark:text-blue-400 group-hover:underline mt-auto w-max">
+                                    Đọc tiếp <i class="fas fa-arrow-right ml-1.5 text-xs group-hover:translate-x-1 transition-transform"></i>
+                                </a>
                             </div>
-                        </div>
+                        </article>
                     @endforeach
                 </div>
-                
-                {{-- Nếu có phân trang thì hiển thị ở đây --}}
-                @if(method_exists($posts, 'links'))
-                    <div class="mt-4">
-                        {{ $posts->links() }}
-                    </div>
-                @endif
-            </div>
-
+            @endif
         </div>
+
+        {{-- Pagination --}}
+        @if(method_exists($posts, 'links') && $posts->hasPages())
+            <div class="mt-12 flex justify-center">
+                {{ $posts->links('vendor.pagination.tailwind') }}
+            </div>
+        @endif
+
     </div>
 </div>
 @endsection
 
 @push('js')
+<style>
+    .btn-view.active {
+        @apply bg-blue-600 text-white border-blue-600 dark:bg-blue-600 dark:border-blue-600 dark:text-white;
+    }
+    
+    @media (min-width: 768px) {
+        .post-container[data-layout="list"] .list-cols {
+            @apply grid-cols-1;
+        }
+        .post-container[data-layout="list"] .post-card {
+            @apply flex-row h-56;
+        }
+        .post-container[data-layout="list"] .post-img-wrapper {
+            @apply w-2/5 aspect-auto h-full border-r border-gray-100 dark:border-gray-700;
+        }
+        .post-container[data-layout="list"] .post-content {
+            @apply w-3/5 p-6 sm:p-8;
+        }
+        .post-container[data-layout="list"] .post-card h3 {
+            @apply text-xl sm:text-2xl mb-4;
+        }
+        .post-container[data-layout="list"] .post-desc {
+            @apply line-clamp-3 text-base;
+        }
+    }
+</style>
+
 <script>
     function setView(mode) {
         const container = document.querySelector('.post-container');
-        const buttons = document.querySelectorAll('.btn-view');
+        const btnGrid = document.querySelector('.btn-view.grid-view');
+        const btnList = document.querySelector('.btn-view.list-view');
 
-        // 1. Update Button UI
-        buttons.forEach(btn => btn.classList.remove('active'));
-        if (mode === 'grid') {
-            document.querySelector('button[onclick="setView(\'grid\')"]').classList.add('active');
+        if(mode === 'grid') {
+            if(btnGrid) btnGrid.classList.add('active');
+            if(btnList) btnList.classList.remove('active');
         } else {
-            document.querySelector('button[onclick="setView(\'list\')"]').classList.add('active');
+            if(btnList) btnList.classList.add('active');
+            if(btnGrid) btnGrid.classList.remove('active');
         }
 
-        // 2. Update Layout
-        if (container) {
-            if (mode === 'list') {
-                container.classList.add('layout-list');
-            } else {
-                container.classList.remove('layout-list');
-            }
+        if(container) {
+            container.setAttribute('data-layout', mode);
         }
 
-        // 3. Save Preference
         localStorage.setItem('cateViewMode', mode);
     }
 
-    // Load trạng thái cũ khi vào trang
     document.addEventListener('DOMContentLoaded', () => {
-        const savedMode = localStorage.getItem('cateViewMode');
-        if (savedMode) {
-            setView(savedMode);
-        }
+        const savedMode = localStorage.getItem('cateViewMode') || 'grid';
+        setView(savedMode);
     });
 </script>
 @endpush

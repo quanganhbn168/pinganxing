@@ -4,9 +4,43 @@ namespace App\Traits;
 
 use App\Models\Slug;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Product;
+use App\Models\Project;
+use App\Models\Service;
+use App\Models\Post;
+use App\Models\Field;
+use App\Models\Intro;
+use App\Models\Career;
+use App\Models\Category;
+use App\Models\ProjectCategory;
+use App\Models\ServiceCategory;
+use App\Models\PostCategory;
+use App\Models\FieldCategory;
 
 trait HasSlug
 {
+    /**
+     * Map tập trung: Model class → URL prefix.
+     * Dùng morph type từ bảng slugs, không cần thêm method vào từng model.
+     */
+    public static function slugPrefixMap(): array
+    {
+        return [
+            Product::class => 'san-pham',
+            Category::class => 'san-pham',
+            Project::class => 'du-an',
+            ProjectCategory::class => 'du-an',
+            Service::class => 'dich-vu',
+            ServiceCategory::class => 'dich-vu',
+            Post::class => 'tin-tuc',
+            PostCategory::class => 'tin-tuc',
+            Field::class => 'linh-vuc',
+            FieldCategory::class => 'linh-vuc',
+            Intro::class => 'gioi-thieu',
+            Career::class => 'tuyen-dung',
+        ];
+    }
+
     /**
      * Định nghĩa quan hệ với bảng Slugs
      * Đặt tên là slugData để không trùng với cột 'slug' trong bảng chính (nếu có)
@@ -25,40 +59,51 @@ trait HasSlug
     }
 
     /**
-     * Accessor: Lấy URL chuẩn
-     * Gọi: $item->slug_url
+     * Lấy prefix URL của model hiện tại.
+     * Gọi: $item->slug_prefix  →  'san-pham', 'du-an', ...
+     */
+    public function getSlugPrefixAttribute(): ?string
+    {
+        return static::slugPrefixMap()[static::class] ?? null;
+    }
+
+    /**
+     * Accessor: Lấy URL chuẩn SEO (có prefix).
+     * Gọi: $item->slug_url  →  https://domain.com/san-pham/may-bom-abc
      */
     public function getSlugUrlAttribute()
     {
-        // 1. Ưu tiên lấy từ bảng 'slugs' (Quan hệ slugData)
-        // Check relationLoaded để tận dụng Eager Loading nếu có
-        if ($this->relationLoaded('slugData')) {
-            if ($this->slugData) {
-                return url($this->slugData->slug);
-            }
-        } else {
-            // Nếu chưa load thì query thử (chấp nhận query thêm 1 cái nếu chưa eager load)
-            if ($this->slugData()->exists()) {
-                return url($this->slugData->slug);
-            }
+        $slugString = $this->slugValue;
+        $prefix = $this->slug_prefix;
+
+        if ($slugString && $prefix) {
+            return url("{$prefix}/{$slugString}");
         }
 
-        // 2. Fallback: Nếu bảng 'slugs' chưa có, thử lấy cột 'slug' trong chính bảng đó (cho dữ liệu cũ)
-        // Check xem trong attributes có key 'slug' không
-        if (array_key_exists('slug', $this->attributes) && !empty($this->attributes['slug'])) {
-            return url($this->attributes['slug']);
+        // Fallback: URL không prefix (cho dữ liệu chưa map)
+        if ($slugString) {
+            return url($slugString);
         }
 
-        // 3. Đường cùng
         return url('#');
     }
-    
+
     /**
-     * Helper: Lấy slug string (không phải url)
-     * Gọi: $item->slug_value
+     * Helper: Lấy slug string (không phải url).
+     * Gọi: $item->slugValue hoặc $item->slug_value
      */
     public function getSlugValueAttribute()
     {
-        return $this->slugData ? $this->slugData->slug : ($this->attributes['slug'] ?? null);
+        // 1. Ưu tiên bảng slugs (relation)
+        if ($this->relationLoaded('slugData')) {
+            return $this->slugData?->slug;
+        }
+
+        if ($this->slugData) {
+            return $this->slugData->slug;
+        }
+
+        // 2. Fallback: cột slug trên bảng chính (dữ liệu cũ)
+        return $this->attributes['slug'] ?? null;
     }
 }

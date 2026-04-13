@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use App\Traits\HasImages;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 use App\Traits\HasSlug;
+
 class ProjectCategory extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostCategoryFactory> */
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug, \App\Traits\HasCategoryTree;
 
     protected $fillable = [
         'parent_id',
         'name',
-        'slug',
         'description',
         'content',
         'status',
@@ -28,42 +29,28 @@ class ProjectCategory extends Model
     ];
 
     protected $casts = [
-        'status'     => 'boolean',
-        'is_home'    => 'boolean',
-        'is_menu'    => 'boolean',
-        'is_footer'  => 'boolean',
-        'parent_id'  => 'integer',
-        'position'   => 'integer',
+        'status'    => 'boolean',
+        'is_home'   => 'boolean',
+        'is_menu'   => 'boolean',
+        'is_footer' => 'boolean',
+        'parent_id' => 'integer',
+        'position'  => 'integer',
     ];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name) . '-' . Str::random(5);
-            }
-        });
-    }
+    // ─── Relationships riêng ───
 
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    public function childrenRecursive()
-    {
-        return $this->children()->with('childrenRecursive');
-    }
-
-    public function projects()
+    public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
-    
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'image_id');
+    }
+
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'banner_id');
+    }
 }

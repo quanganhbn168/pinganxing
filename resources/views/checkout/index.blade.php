@@ -72,124 +72,147 @@
 </div>
 @endsection
 @push('js')
-<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     const isGuest = {{ Auth::guard('web')->check() ? 'false' : 'true' }};
     const STORAGE_KEY = 'guest_cart';
-    const cartContainer = $('#order-summary-list'); 
+    const cartContainer = document.getElementById('order-summary-list'); 
+    const submitBtn = document.querySelector('#checkout-form button[type="submit"]');
+    const form = document.getElementById('checkout-form');
+    
     const formatCurrency = (number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+    
     function updateSummaryTotal() {
         let total = 0;
-        cartContainer.find('.item-total').each(function() {
-            total += parseFloat($(this).data('total')) || 0;
+        const itemTotals = cartContainer.querySelectorAll('.item-total');
+        itemTotals.forEach(item => {
+            total += parseFloat(item.getAttribute('data-total')) || 0;
         });
-        $('#summary-subtotal').text(formatCurrency(total));
-        $('#summary-total').text(formatCurrency(total));
+        document.getElementById('summary-subtotal').textContent = formatCurrency(total);
+        document.getElementById('summary-total').textContent = formatCurrency(total);
     }
+    
     function renderAuthSummary() {
-  const authCartItems = {!! json_encode($cartItems ?? []) !!};
-  cartContainer.empty();
+        const authCartItems = {!! json_encode($cartItems ?? []) !!};
+        cartContainer.innerHTML = '';
 
-  if (!authCartItems.length) {
-    cartContainer.html('<li class="list-group-item">Giỏ hàng trống</li>');
-    $('#checkout-form button[type="submit"]').prop('disabled', true).addClass('disabled');
-    return;
-  }
+        if (!authCartItems.length) {
+            cartContainer.innerHTML = '<li class="list-group-item">Giỏ hàng trống</li>';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled');
+            return;
+        }
 
-  authCartItems.forEach(item => {
-    // Lấy giá ưu tiên theo variant (nếu có), rồi đến price_discount, rồi price
-    const unitPrice = Number(
-      (item.variant && item.variant.price) ??
-      (item.product && (item.product.price_discount ?? item.product.price)) ??
-      0
-    );
-    const qty = Number(item.quantity) || 1;
-    const subtotal = unitPrice * qty;
+        authCartItems.forEach(item => {
+            const unitPrice = Number(
+                (item.variant && item.variant.price) ??
+                (item.product && (item.product.price_discount ?? item.product.price)) ??
+                0
+            );
+            const qty = Number(item.quantity) || 1;
+            const subtotal = unitPrice * qty;
 
-    // Lấy text biến thể: ưu tiên server, nếu không có thì cố gắng ráp từ attribute_values
-    let variantText =
-      item.variant_text ||
-      item.variantText ||
-      '';
+            let variantText = item.variant_text || item.variantText || '';
 
-    if (!variantText && item.variant && (item.variant.attribute_values || item.variant.attributeValues)) {
-      const av = item.variant.attribute_values || item.variant.attributeValues;
-      if (Array.isArray(av) && av.length) {
-        variantText = av.map(v => (v.value ?? v.name ?? v)).join(' / ');
-      }
+            if (!variantText && item.variant && (item.variant.attribute_values || item.variant.attributeValues)) {
+                const av = item.variant.attribute_values || item.variant.attributeValues;
+                if (Array.isArray(av) && av.length) {
+                    variantText = av.map(v => (v.value ?? v.name ?? v)).join(' / ');
+                }
+            }
+
+            const itemHtml = `
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <div>
+                        ${item.product?.name ?? 'Sản phẩm'}
+                        ${variantText ? `<small class="d-block text-muted">${variantText}</small>` : ''}
+                        <small class="d-block text-muted">SL: ${qty}</small>
+                    </div>
+                    <span class="item-total" data-total="${subtotal}">${formatCurrency(subtotal)}</span>
+                </li>`;
+            cartContainer.insertAdjacentHTML('beforeend', itemHtml);
+        });
+
+        updateSummaryTotal();
     }
 
-    const itemHtml = `
-      <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-        <div>
-          ${item.product?.name ?? 'Sản phẩm'}
-          ${variantText ? `<small class="d-block text-muted">${variantText}</small>` : ``}
-          <small class="d-block text-muted">SL: ${qty}</small>
-        </div>
-        <span class="item-total" data-total="${subtotal}">${formatCurrency(subtotal)}</span>
-      </li>`;
-    cartContainer.append(itemHtml);
-  });
+    function renderGuestSummary() {
+        const cart = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        cartContainer.innerHTML = '';
 
-  updateSummaryTotal();
-}
+        if (!cart.length) {
+            cartContainer.innerHTML = '<li class="list-group-item">Giỏ hàng trống</li>';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled');
+            return;
+        }
 
-function renderGuestSummary() {
-  const cart = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  cartContainer.empty();
+        cart.forEach(item => {
+            const unitPrice = Number(item.price) || 0;
+            const qty = Number(item.quantity) || 1;
+            const subtotal = unitPrice * qty;
+            const variantText = item.variantText || item.variant_text || '';
 
-  if (!cart.length) {
-    cartContainer.html('<li class="list-group-item">Giỏ hàng trống</li>');
-    $('#checkout-form button[type="submit"]').prop('disabled', true).addClass('disabled');
-    return;
-  }
+            const itemHtml = `
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <div>
+                        ${item.name}
+                        ${variantText ? `<small class="d-block text-muted">${variantText}</small>` : ''}
+                        <small class="d-block text-muted">SL: ${qty}</small>
+                    </div>
+                    <span class="item-total" data-total="${subtotal}">${formatCurrency(subtotal)}</span>
+                </li>`;
+            cartContainer.insertAdjacentHTML('beforeend', itemHtml);
+        });
 
-  cart.forEach(item => {
-    const unitPrice = Number(item.price) || 0;
-    const qty = Number(item.quantity) || 1;
-    const subtotal = unitPrice * qty;
-    const variantText = item.variantText || item.variant_text || '';
-
-    const itemHtml = `
-      <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-        <div>
-          ${item.name}
-          ${variantText ? `<small class="d-block text-muted">${variantText}</small>` : ``}
-          <small class="d-block text-muted">SL: ${qty}</small>
-        </div>
-        <span class="item-total" data-total="${subtotal}">${formatCurrency(subtotal)}</span>
-      </li>`;
-    cartContainer.append(itemHtml);
-  });
-
-  updateSummaryTotal();
-}
+        updateSummaryTotal();
+    }
 
     if (isGuest) {
         renderGuestSummary();
     } else {
         renderAuthSummary();
     }
-    $.validator.addMethod("phoneVN", (value, element) => /^(0[3|5|7|8|9])[0-9]{8}$/.test(value), "Số điện thoại không hợp lệ.");
-    $('#checkout-form').validate({
-        rules: {
-            customer_name: { required: true, minlength: 2 },
-            customer_phone: { required: true, phoneVN: true },
-            customer_address: { required: true, minlength: 10 }
-        },
-        messages: {
-            customer_name: { required: "Vui lòng nhập họ tên.", minlength: "Họ tên quá ngắn." },
-            customer_phone: { required: "Vui lòng nhập số điện thoại hợp lệ." },
-            customer_address: { required: "Vui lòng nhập địa chỉ.", minlength: "Địa chỉ quá ngắn." }
-        },
-        errorElement: 'small',
-        errorClass: 'text-danger',
-        highlight: (element) => $(element).addClass('is-invalid'),
-        unhighlight: (element) => $(element).removeClass('is-invalid'),
-        submitHandler: function(form) {
+
+    // Native HTML5 Validation setup
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Custom phone validation logic
+        const phoneInput = document.getElementById('customer_phone');
+        const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/;
+        
+        let isValid = true;
+        
+        form.querySelectorAll('.text-danger.validation-err').forEach(el => el.remove());
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        
+        const showError = (input, message) => {
+            isValid = false;
+            input.classList.add('is-invalid');
+            const err = document.createElement('small');
+            err.className = 'text-danger validation-err d-block mt-1';
+            err.innerText = message;
+            input.parentNode.appendChild(err);
+        };
+
+        const nameInput = document.getElementById('customer_name');
+        if(!nameInput.value || nameInput.value.length < 2) {
+            showError(nameInput, 'Vui lòng nhập họ tên hợp lệ.');
+        }
+
+        if(!phoneInput.value || !phoneRegex.test(phoneInput.value)) {
+            showError(phoneInput, 'Số điện thoại không hợp lệ (ví dụ: 098xxxxxxx)');
+        }
+
+        const addrInput = document.getElementById('customer_address');
+        if(!addrInput.value || addrInput.value.length < 10) {
+            showError(addrInput, 'Vui lòng nhập địa chỉ cụ thể.');
+        }
+
+        if (isValid) {
             if (isGuest) {
-                $('#cart_data_input').val(localStorage.getItem(STORAGE_KEY));
+                document.getElementById('cart_data_input').value = localStorage.getItem(STORAGE_KEY);
             }
             form.submit();
         }

@@ -12,8 +12,7 @@ return new class extends Migration
         Schema::create('careers', function (Blueprint $table) {
             $table->id();
             $table->string('name');                 // Tên vị trí (vd: Nhân viên kinh doanh)
-            $table->string('slug')->index();        // Slug SEO
-            $table->string('image')->nullable();    // Ảnh đại diện tin
+            $table->unsignedBigInteger('image_id')->nullable(); // Ảnh đại diện tin (Curator)
             
             // Các thông tin chi tiết
             $table->string('salary')->nullable();   // Mức lương (text để nhập: 10-15tr hoặc Thỏa thuận)

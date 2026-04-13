@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('title')->nullable();
             $table->string('link')->nullable();
-            $table->text('image')->nullable();
-            $table->integer('type')->default(1);
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->string('type')->default('home');
             $table->unsignedInteger('position')->default(0);
             $table->boolean('status')->default(true);
             $table->boolean('is_home')->default(true);

@@ -2,21 +2,31 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasImages;
-use App\Traits\HasSlug;
 
+use App\Traits\HasSlug;
 
 class Career extends Model
 {
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug;
 
     protected $fillable = [
-        'name', 'slug', 'image', 'salary', 'quantity', 
-        'education', 'location', 'type', 'deadline',
-        'description', 'requirement', 'benefit',
-        'status', 'is_home', 'position'
+        'name',
+        'image_id',
+        'salary',
+        'quantity',
+        'education',
+        'location',
+        'type',
+        'deadline',
+        'description',
+        'requirement',
+        'benefit',
+        'status',
+        'is_home',
+        'position',
     ];
 
     protected $casts = [
@@ -25,16 +35,8 @@ class Career extends Model
         'is_home'  => 'boolean',
     ];
 
-    // NẾU BẠN DÙNG BẢNG SLUGS RIÊNG (Polymorphic)
-    public function slug()
+    public function image()
     {
-        return $this->morphOne(Slug::class, 'sluggable');
-    }
-
-    // Helper lấy URL
-    public function getUrlAttribute()
-    {
-        // Nếu dùng bảng slugs riêng
-        return url($this->slug->slug ?? '#');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 }

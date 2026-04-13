@@ -7,62 +7,50 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Frontend\PostController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\ProjectController;
-use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Frontend\ServiceController;
 use App\Http\Controllers\Frontend\FieldController;
-use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Frontend\SlugController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\WishlistController;
-use App\Http\Controllers\PageContentController;
 use App\Http\Controllers\Frontend\CareerController;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\CustomerWelcomeEmail;
-use App\Http\Controllers\MediaLibraryController;
+use App\Http\Controllers\Frontend\ConsultingController;
+use App\Http\Controllers\Frontend\AgencyController;
+use App\Http\Controllers\Frontend\CommentController;
 
-Route::middleware(['web'])->group(function () {
-    Route::get('/media-lib', [MediaLibraryController::class, 'index'])->name('media.lib.index');
-    Route::post('/media-lib/upload', [MediaLibraryController::class, 'upload'])->name('media.lib.upload');
-    Route::delete('/media-lib/delete', [MediaLibraryController::class, 'destroy'])->name('media.lib.delete');
-    Route::post('/media-lib/sync', [MediaLibraryController::class, 'sync'])->name('media.lib.sync');
-});
+Route::get("/", [HomeController::class, "index"])->name("home");
 
-Route::get("/", [HomeController::class,"index"])->name("home");
-Route::middleware('throttle:30,1')->group(function () {
-    Route::get('/o/{code}', [TrackingController::class, 'showByCode'])->name('warranty.code');
-    Route::get('/qr/o/{code}.png', [TrackingController::class, 'qrByCode'])->name('warranty.code.qr');
-});
-
-Route::get('/tra-cuu-bao-hanh', \App\Livewire\Public\WarrantySearch::class)->name('warranty.search');
-
-Route::group(['prefix'=>'san-pham'], function(){
+Route::group(['prefix' => 'san-pham'], function () {
     Route::get('/', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/category/{category:slug}', [ProductController::class, 'byCategory'])->name('products.byCategory');
     Route::get('/tim-kiem', [ProductController::class, 'search'])->name('frontend.products.search');
+    Route::get('/{slug}', [ProductController::class, 'resolveBySlug'])->name('frontend.product.bySlug');
 });
 
 Route::get('/tin-tuc', [PostController::class, 'index'])->name('frontend.posts.index');
+Route::get('/tin-tuc/{slug}', [PostController::class, 'resolveBySlug'])->name('frontend.post.bySlug');
+
 Route::get('/dich-vu', [ServiceController::class, 'index'])->name('frontend.services.index');
+Route::get('/dich-vu/{slug}', [ServiceController::class, 'resolveBySlug'])->name('frontend.service.bySlug');
+
 Route::get('/linh-vuc', [FieldController::class, 'index'])->name('frontend.fields.index');
+Route::get('/linh-vuc/{slug}', [FieldController::class, 'resolveBySlug'])->name('frontend.field.bySlug');
+
 Route::get('/du-an', [ProjectController::class, 'index'])->name('frontend.projects.index');
+Route::get('/du-an/{slug}', [ProjectController::class, 'resolveBySlug'])->name('frontend.project.bySlug');
 
 Route::get('/tim-kiem', [HomeController::class, 'search'])->name('frontend.search');
 
-Route::get('/gioi-thieu', [IntroController::class,'index'])->name('frontend.intro.index');
-Route::get('/gioi-thieu/{intro:slug}', [IntroController::class,'getBySlug'])->name('frontend.intro.getBySlug');
-Route::get('lien-he',[ContactController::class,'show'])->name('contact.show');
-Route::post('lien-he',[ContactController::class,'store'])->name('contact.store');
+Route::get('/ve-chung-toi', [IntroController::class, 'index'])->name('frontend.intro.index');
+Route::get('lien-he', [ContactController::class, 'show'])->name('contact.show');
+Route::post('lien-he', [ContactController::class, 'store'])->name('contact.store');
 
 // Tư vấn triển khai
-Route::get('tu-van-trien-khai', [App\Http\Controllers\Frontend\ConsultingController::class, 'index'])->name('consulting.index');
-Route::post('tu-van-trien-khai', [App\Http\Controllers\Frontend\ConsultingController::class, 'store'])->name('consulting.store');
+Route::get('tu-van-trien-khai', [ConsultingController::class, 'index'])->name('consulting.index');
+Route::post('tu-van-trien-khai', [ConsultingController::class, 'store'])->name('consulting.store');
 
 // Đại lý
-Route::get('dai-ly', [App\Http\Controllers\Frontend\AgencyController::class, 'index'])->name('agency.index');
-Route::post('dai-ly', [App\Http\Controllers\Frontend\AgencyController::class, 'store'])->name('agency.store');
+Route::get('dai-ly', [AgencyController::class, 'index'])->name('agency.index');
+Route::post('dai-ly', [AgencyController::class, 'store'])->name('agency.store');
 Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add', [CartController::class, 'add'])->name('add');
@@ -75,16 +63,16 @@ Route::get('/tuyen-dung/{career:slug}', [CareerController::class, 'show'])->name
 Route::post('/tuyen-dung/{id}/nop-don', [CareerController::class, 'apply'])->name('frontend.careers.apply');
 
 // Bình luận (Comments)
-Route::post('/binh-luan', [App\Http\Controllers\Frontend\CommentController::class, 'store'])->name('comments.store');
+Route::post('/binh-luan', [CommentController::class, 'store'])->name('comments.store');
 
-Route::get('/cart', [CartController::class, 'showCartPage'])->name('cart.page');
-Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buy_now');
-Route::post('/cart/merge', [CartController::class, 'merge']);
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'placeOrder'])->name('checkout.place');
+Route::get('/gio-hang', [CartController::class, 'showCartPage'])->name('cart.page');
+Route::post('/gio-hang/buy-now', [CartController::class, 'buyNow'])->name('cart.buy_now');
+Route::post('/gio-hang/merge', [CartController::class, 'merge']);
+Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/thanh-toan', [CheckoutController::class, 'placeOrder'])->name('checkout.place');
 Route::get('/order-success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-Route::get('thank-you',function(){
+Route::get('thank-you', function () {
     return view('page/thank-you');
 })->name('thank-you');
 Route::middleware(['auth:web'])->prefix('user')->name('user.')->group(function () {
@@ -97,14 +85,9 @@ Route::middleware(['auth:web'])->prefix('user')->name('user.')->group(function (
 
     Route::get('/wishlist', [UserController::class, 'wishlist'])->name('wishlist');
 });
-Route::middleware(['auth'])->group(function () {
-    Route::post('/page-content/update', [PageContentController::class, 'update'])->name('page-content.update');
-});
 // Route cho hành động thêm/xóa wishlist (có thể đặt ngoài group trên)
-Route::post('/wishlist/add/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
-Route::post('/wishlist/remove/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+// Route::post('/wishlist/add/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
+// Route::post('/wishlist/remove/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 
-require __DIR__.'/admin.php';
-require __DIR__.'/worker.php';
-require __DIR__.'/auth.php';
+// ===================== CATCH-ALL (301 redirect cho URL cũ) =====================
 Route::get('/{slug}', [SlugController::class, 'handle'])->where('slug', '.*')->name('frontend.slug.handle');

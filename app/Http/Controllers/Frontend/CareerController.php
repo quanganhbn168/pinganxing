@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Career;
-use App\Models\Page;
+use App\Settings\PageSettings;
 use App\Models\CareerApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,14 +13,13 @@ class CareerController extends Controller
 {
     public function index()
     {
-        $page = Page::where('slug','tuyen-dung')->first();
-        $thongdiep = Page::where('slug','thong-diep')->first();
+        $pageSettings = app(PageSettings::class);
         $careers = Career::where('status', true)
             ->where(fn($q) => $q->whereNull('deadline')->orWhere('deadline', '>=', now()))
             ->latest('id')
             ->paginate(10);
             
-        return view('frontend.careers.index', compact('careers','page','thongdiep'));
+        return view('frontend.careers.index', compact('careers','pageSettings'));
     }
 
     public function show(Career $career)

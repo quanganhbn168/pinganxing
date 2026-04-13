@@ -14,9 +14,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('parent_id')->default(0);
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image');
-            $table->string('banner')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->unsignedBigInteger('banner_id')->nullable();
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
             $table->boolean('status')->default(1);
@@ -24,9 +23,10 @@ return new class extends Migration
             $table->boolean('is_menu')->default(1);
             $table->boolean('is_footer')->default(1);
             $table->unsignedInteger('position')->default(0)->index();
+            $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();   
-            $table->string('meta_image')->nullable();   
+            $table->unsignedBigInteger('meta_image_id')->nullable();   
             $table->timestamps();
         });
     }

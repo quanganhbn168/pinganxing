@@ -13,7 +13,8 @@ return new class extends Migration {
             $table->decimal('compare_at_price', 12, 2)->nullable()->comment('Giá gốc để gạch đi (phải lớn hơn giá bán)');
             $table->boolean('is_default')->default(1);
             $table->unsignedInteger('stock');
-            $table->string('image')->nullable();
+            $table->json('options')->nullable()->comment('JSON lưu các lựa chọn biến thể');
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->timestamps();
         });
     }

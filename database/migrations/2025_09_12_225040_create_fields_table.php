@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('field_category_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('image')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
+            $table->json('gallery')->nullable();
             $table->text('summary')->nullable();
             $table->longText('content')->nullable();
             $table->boolean('status')->default(1);

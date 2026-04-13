@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use App\Traits\HasImages;
+
 use App\Traits\HasSlug;
 use App\Traits\HasComments;
 
 class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostFactory> */
-    use HasFactory, HasImages, HasSlug, HasComments;
+    use HasFactory, HasSlug, HasComments;
+
     protected $fillable = [
         'post_category_id',
         'title',
-        'slug',
-        'image',
-        'banner',
+        'image_id',
+        'banner_id',
         'description',
         'content',
         'is_featured',
@@ -27,22 +26,29 @@ class Post extends Model
     ];
 
     protected $casts = [
+        'gallery'     => 'array',
         'is_featured' => 'boolean',
-        'status' => 'boolean',
-        'is_home' => 'boolean',
+        'status'      => 'boolean',
+        'is_home'     => 'boolean',
     ];
-
-    protected static function booted(): void
-    {
-        static::creating(function ($post) {
-            if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
-            }
-        });
-    }
 
     public function category()
     {
         return $this->belongsTo(PostCategory::class, 'post_category_id');
+    }
+
+    public function image()
+    {
+        return $this->belongsTo(Media::class, 'image_id');
+    }
+
+    public function banner()
+    {
+        return $this->belongsTo(Media::class, 'banner_id');
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class);
     }
 }

@@ -6,8 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\Slug;
+
 class ServiceController extends Controller
 {
+    /**
+     * Resolve slug cho prefix /dich-vu/{slug}.
+     */
+    public function resolveBySlug(string $slug)
+    {
+        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $model = $slugData->sluggable;
+
+        return match (true) {
+            $model instanceof ServiceCategory => $this->byCategory($model),
+            $model instanceof Service         => $this->detail($model),
+            default => abort(404),
+        };
+    }
+
     /**
      * Nhiệm vụ 1: Hiển thị trang DỊCH VỤ TỔNG.
      * Lấy tất cả danh mục và các dịch vụ con tương ứng.
@@ -63,12 +80,36 @@ class ServiceController extends Controller
 
     public function detail(Service $service)
     {
+        // Danh sách dịch vụ cùng cấp
         $relatedServices = Service::where("status", 1)
         ->where("id", '!=', $service->id)
+        ->where('service_category_id', $service->service_category_id)
         ->orderBy("updated_at", "DESC")
-        ->limit(6)
+        ->limit(3)
         ->get();
 
-        return view("frontend.services.detail", compact("service", "relatedServices"));
+        // Nạp data Landing Page (Dự án, Sản phẩm, Bài viết)
+        $service->load(['projects.image', 'posts.image', 'products.image']);
+
+        // Khởi tạo Breadcrumb
+        $breadcrumbItems = [
+            ['label' => 'Dịch vụ', 'url' => route('frontend.services.index')]
+        ];
+        if ($service->category) {
+            $breadcrumbItems[] = ['label' => $service->category->name, 'url' => $service->category->slug_url];
+        }
+        $breadcrumbItems[] = ['label' => $service->name, 'url' => ''];
+
+        // Banner Image
+        $setting = app(\App\Settings\GeneralSettings::class);
+        $bannerUrl = !empty($service->banner) ? $service->banner : (!empty($setting->banner) ? $setting->banner : asset('images/setting/no-banner.png'));
+
+        return view("frontend.services.detail", compact(
+            "service", 
+            "relatedServices",
+            "breadcrumbItems",
+            "bannerUrl",
+            "setting"
+        ));
     }
 }

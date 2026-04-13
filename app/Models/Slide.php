@@ -5,22 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use App\Traits\HasImages;
+
 use App\Enums\SliderType;
 
 class Slide extends Model
 {
-    use HasFactory, HasImages;
+    use HasFactory;
 
     protected $fillable = [
         'title',
+        'subtitle',
+        'description',
         'link',
-        'image',
+        'button_text',
+        'image_id',
         'type',
         'position',
         'status',
         'is_home',
     ];
+
     protected $casts = [
         'type' => SliderType::class,
         'status' => 'boolean',
@@ -52,6 +56,17 @@ class Slide extends Model
     {
         $img = is_array($this->image) ? $this->image : json_decode($this->image, true);
         return $img['after'] ?? null;
+    }
+
+
+    public function image()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'image_id');
+    }
+
+    public function banner()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'banner_id');
     }
 
 }

@@ -1,32 +1,20 @@
 @extends('layouts.master')
-@section('title', 'Giới thiệu')
-@section('meta_image',$setting->share_image)
+@section('title', ($pageSetting->intro_title ?? 'Về Chúng Tôi') . ' - ' . ($setting->site_name ?? config('app.name')))
+@section('meta_description', strip_tags(Str::limit($pageSetting->intro_description ?? $pageSetting->intro_content ?? '', 160)))
+@section('meta_image', !empty($pageSetting->intro_banner) ? asset($pageSetting->intro_banner) : (!empty($setting->share_image) ? asset($setting->share_image) : ''))
+@section('og_type', 'website')
 @section('content')
-<section class="section py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h1 class="section-title text-uppercase">Về {{$setting->name}}</h1>
-        </div>
-        <div class="content">
-            <div class="row">
-                <div class="col-12 col-md-9">
-                    {!!$intro->content!!}
-                    <h2 class="contact">Liên hệ ngay cho {{$setting->name}}</h2>
-                    {{-- <ul>
-                        <li><strong>Địa điểm: </strong>{{$setting->address}}</li>
-                        <li><strong>Email: </strong> <a href="mailto:{{$setting->email}}">{{$setting->email}}</a></li>
-                        <li><strong>Số điện thoại: </strong> <a href="tel:{{$setting->phone}}">{{$setting->phone}}</a></li>
-                        <li><strong>Website: </strong><a href="/">https://maynenkhi-saman.vn</a></li>
-                    </ul> --}}
-                </div>
-                <div class="col-12 col-md-3">
-                    @include('partials.frontend.contact_register')
-                </div>
-            </div>
-        </div>
+
+<x-frontend.page-hero 
+    title="{{ $pageSetting->intro_title ?? 'Về Chúng Tôi' }}" 
+    :breadcrumb="[['label' => 'Về Chúng Tôi']]" 
+/>
+
+<section class="w-full bg-white dark:bg-gray-900 border-b border-gray-100 min-h-screen">
+    {{-- Khung làm việc (Canvas) cho trình soạn thảo WYSIWYG có thiết kế bằng Tailwind --}}
+    <div class="cnetpos-wysiwyg-content w-full">
+        {!! $pageSetting->intro_content ?? '<div class="text-center py-20 text-gray-500">Nội dung đang được cập nhật...</div>' !!}
     </div>
 </section>
-@endsection
-@push('js')
 
-@endpush
+@endsection

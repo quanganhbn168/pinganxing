@@ -10,12 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Tag extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
-        'name', 
-        'slug', 
-        'type', 
-        'color', 
+        'name',
+        'type',
+        'color',
         'description',
         'sort_order',
     ];
@@ -24,28 +23,18 @@ class Tag extends Model
         'type' => TagType::class,
     ];
 
-    // --- Relationships ---
+    // ─── Relationships ───
 
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_tag');
     }
 
-    public function workOrders(): BelongsToMany
-    {
-        return $this->belongsToMany(WorkOrder::class, 'work_order_tag');
-    }
-
-    // --- Scopes ---
+    // ─── Scopes ───
 
     public function scopeForProducts($query)
     {
         return $query->where('type', TagType::PRODUCT);
-    }
-
-    public function scopeForWorkOrders($query)
-    {
-        return $query->where('type', TagType::WORK_ORDER);
     }
 
     public function scopeForPosts($query)
@@ -58,27 +47,20 @@ class Tag extends Model
         return $query->orderBy('sort_order')->orderBy('name');
     }
 
-    // --- Helpers ---
+    // ─── Helpers ───
 
-    /**
-     * Get contrasting text color (white or black) based on background color
-     */
     public function getTextColorAttribute(): string
     {
         $hex = ltrim($this->color, '#');
         $r = hexdec(substr($hex, 0, 2));
         $g = hexdec(substr($hex, 2, 2));
         $b = hexdec(substr($hex, 4, 2));
-        
-        // Calculate luminance
+
         $luminance = (0.299 * $r + 0.587 * $g + 0.114 * $b) / 255;
-        
+
         return $luminance > 0.5 ? '#000000' : '#ffffff';
     }
 
-    /**
-     * Get badge HTML for display
-     */
     public function getBadgeHtmlAttribute(): string
     {
         return sprintf(

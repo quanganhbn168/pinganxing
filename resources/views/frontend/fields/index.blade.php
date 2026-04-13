@@ -1,69 +1,45 @@
 @extends('layouts.master')
 @section('title', $pageTitle)
-@section('meta_description', $page->description ?? '')
-@section('meta_image', optional($page->mainImage())->url() ?? '')
-@push('css')
-<link rel="stylesheet" href="{{ asset('css/product.css') }}">
-@endpush
 @section('content')
-{{-- Phần Banner --}}
-<div class="banner">
-    @isset($category)
-        <img src="{{ optional($category->bannerImage()->url() ?? '') }}" alt="{{ $category->name }}">
-    @else
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-5">
-                    <img src="{{ optional($page->mainImage())->url() }}" alt="{{ $page->title }}">
-                </div>
-                <div class="col-md-7">
-                    <h3 class="">
-                        {{ $page->title }}
-                    </h3>
-                    <div>
-                        {{ $page->description }}
-                    </div>
-                    <a href="tel:{{ $setting->phone }}" class="btn btn-primary rounded-pill btn-crossover">
-                        <span class="btn-crossover-text">Gọi ngay</span>
-                        <span class="btn-crossover-icon">
-                            <i class="fa-solid fa-arrow-right-long"></i>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    @endisset
-</div>
-{{-- Phần Lĩnh vực hoạt động --}}
-<section class="section section-field">
-    @isset($category)
-        <h2 class="section-title"><a href="{{ route('frontend.slug.handle', $category->slugValue) }}">{{ $category->name }}</a></h2>
-    @else
-        <h2 class="section-title"><a href="{{ route('frontend.fields.index') }}">Lĩnh vực hoạt động</a></h2>
-    @endisset
-    <div class="container py-5">
-        <div class="row">
-            @if(!empty($field_categories))
-                @foreach($field_categories as $field_category)
-                <div class="col-6 col-md-4 mb-3">
-                    <div class="field-category-item">
-                        <div class="field-category-item__image">
-                            <a href="{{ route('frontend.slug.handle', $field_category->slugValue) }}">
-                                <img src="{{ optional($field_category->mainImage())->url() }}" alt="{{ $field_category->name }}">
-                            </a>
-                        </div>
-                        <div class="field-category-item__name">
-                            <a href="{{ route('frontend.slug.handle', $field_category->slugValue) }}">
-                                {{ $field_category->name }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            @else
-                <div class="alert alert-warning">Thông tin đang được cập nhật...</div>
+
+
+
+<x-frontend.page-hero 
+    :image="$bannerUrl" 
+    :title="$pageTitle" 
+    :breadcrumb="$breadcrumbs" 
+/>
+
+<div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
+    <div class="max-w-screen-xl mx-auto px-4">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-black uppercase text-gray-900 dark:text-white tracking-tighter">{{ $pageTitle }}</h2>
+            <div class="w-16 h-1 bg-brand-600 mx-auto mt-6 mb-6"></div>
+            @if(!empty($setting->fields_description))
+                <p class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ $setting->fields_description }}</p>
             @endif
         </div>
+
+        @if(isset($field_categories) && $field_categories->isNotEmpty())
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($field_categories as $field_category)
+                    <x-frontend.card 
+                        :href="$field_category->slug_url"
+                        :image="$field_category->image ? $field_category->image->path : null"
+                        :title="$field_category->name"
+                        :description="$field_category->description"
+                    />
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white dark:bg-gray-800 rounded-sm p-12 text-center border border-dashed border-gray-200 dark:border-gray-700 shadow-sm">
+                <i class="fas fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nội dung đang cập nhật</h3>
+                <p class="text-gray-500 dark:text-gray-400">Các lĩnh vực hoạt động đang được chúng tôi biên soạn và cập nhật.</p>
+            </div>
+        @endif
+
     </div>
-</section>
+</div>
 @endsection

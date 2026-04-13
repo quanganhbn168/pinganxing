@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum SliderType: string
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Contracts\HasColor;
+
+enum SliderType: string implements HasLabel, HasColor
 {
     // Các giá trị này sẽ được lưu vào cột 'type' trong database
     case HOME = 'home';                 // Slide trang chủ
@@ -11,7 +14,7 @@ enum SliderType: string
     case PARTNER = 'partner';           // Đối tác/Logo footer
 
     // Hàm trả về tên hiển thị tiếng Việt (dùng cho Admin)
-    public function label(): string
+    public function getLabel(): ?string
     {
         return match($this) {
             self::HOME => 'Slide Chính (Home)',
@@ -22,13 +25,13 @@ enum SliderType: string
     }
     
     // Hàm lấy màu sắc cho badge (tùy chọn - giúp giao diện đẹp hơn)
-    public function color(): string
+    public function getColor(): string | array | null
     {
         return match($this) {
             self::HOME => 'primary',   // Màu xanh dương
             self::BANNER_AD => 'danger', // Màu đỏ
             self::SIDEBAR => 'info',   // Màu xanh nhạt
-            self::PARTNER => 'secondary', // Màu xám
+            self::PARTNER => 'gray', // Màu xám
         };
     }
 }

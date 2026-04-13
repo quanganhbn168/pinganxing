@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasImages;
+
 use App\Traits\HasSlug;
 
 class Intro extends Model
 {
-    /** @use HasFactory<\Database\Factories\IntroFactory> */
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug;
+
     protected $fillable = [
         'title',
-        'slug',
         'description',
         'content',
         'status',
@@ -22,18 +22,22 @@ class Intro extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
-    public function slug()
-    {
-        return $this->morphOne(\App\Models\Slug::class, 'sluggable');
-    }
+
     public static function getSubMenuItems()
     {
-    
-        $allItems = self::where('status', 1)
-        ->orderBy('id', 'asc')
-        ->get();
+        return self::where('status', 1)
+            ->orderBy('id', 'asc')
+            ->get()
+            ->slice(1);
+    }
 
-    
-        return $allItems->slice(1);
+    public function image()
+    {
+        return $this->belongsTo(Media::class, 'image_id');
+    }
+
+    public function banner()
+    {
+        return $this->belongsTo(Media::class, 'banner_id');
     }
 }

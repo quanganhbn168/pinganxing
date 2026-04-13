@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasImages;
+
 class Testimonial extends Model
 {
     /** @use HasFactory<\Database\Factories\TestimonialFactory> */
-    use HasFactory, HasImages;
+    use HasFactory;
     protected $fillable = [
         'name',
         'position',
@@ -19,4 +19,15 @@ class Testimonial extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    public function image()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'image_id');
+    }
+
+    public function banner()
+    {
+        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'banner_id');
+    }
+
 }

@@ -1,12 +1,4 @@
 <?php
-spl_autoload_register(function ($class) {
-    if ($class === 'App\Http\Livewire\Admin\ProductForm') {
-        echo "<h1>[DEBUG] Attempting to load ProductForm...</h1>";
-        echo "<pre>";
-        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        echo "</pre>";
-    }
-}, true, true);
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));

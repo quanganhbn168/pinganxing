@@ -6,7 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'slug', 'status'];
+    protected $fillable = [
+        'name',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
 
     public function services()
     {

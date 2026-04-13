@@ -1,7 +1,7 @@
 @extends('layouts.master')
 @section('title', $pageTitle)
-@section('meta_description', $project->description ?? '')
-@section('meta_image', optional($project->mainImage())->url() ?: ($project->image ? asset($project->image) : ''))
+@section('meta_description', Str::limit(strip_tags($project->description ?? ''), 155))
+@section('meta_image', $project->banner ? asset($project->banner->path) : ($project->image ? asset($project->image->path) : ''))
 
 @push('jsonld')
 <script type="application/ld+json">
@@ -13,12 +13,12 @@
     "@id": "{{ url()->current() }}"
   },
   "name": "{{ $project->name }}",
-  "image": "{{ optional($project->mainImage())->url() ?: ($project->image ? asset($project->image) : '') }}",
+  "image": "{{ $project->banner ? asset($project->banner->path) : ($project->image ? asset($project->image->path) : '') }}",
   "dateCreated": "{{ $project->created_at->toIso8601String() }}",
   "dateModified": "{{ $project->updated_at->toIso8601String() }}",
   "creator": {
     "@type": "Organization",
-    "name": "{{ $setting->name ?? config('app.name') }}",
+    "name": "{{ $setting->site_name ?? config('app.name') }}",
     "url": "{{ url('/') }}",
     "image": "{{ asset($setting->logo) }}"
   },
@@ -31,420 +31,262 @@
 @endpush
 
 @push('css')
-    @push('css')
-    {{-- 1. Link CSS của Swiper (Bắt buộc) --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-
-    {{-- 2. Custom CSS cho trang dự án --}}
-    <style>
-        /* --- CẤU HÌNH CHUNG --- */
-        :root {
-            --primary-color: #0d6efd; /* Màu chủ đạo, đổi theo brand của bạn */
-            --text-color: #333;
-            --bg-light: #f8f9fa;
-        }
-
-        #project-wrapper {
-            padding-bottom: 50px;
-        }
-
-        /* --- BANNER DỰ ÁN --- */
-        .project-banner {
-            position: relative;
-            width: 100%;
-            height: 300px; /* Chiều cao cố định banner */
-            overflow: hidden;
-        }
-
-        .project-banner img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
-
-        .project-banner_overlay {
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: rgba(0, 0, 0, 0.2); /* Lớp phủ tối nhẹ để ảnh có chiều sâu */
-        }
-
-        /* --- THÔNG TIN DỰ ÁN (CỘT TRÁI) --- */
-        .project-info h1.project-name {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            line-height: 1.3;
-        }
-
-        .project-description {
-            margin-bottom: 1.5rem;
-            color: #555;
-            text-align: justify;
-        }
-
-        .project-info ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .project-info ul li {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.95rem;
-            display: flex;
-            justify-content: space-between; /* Tên bên trái, Giá trị bên phải */
-        }
-
-        .project-info ul li:last-child {
-            border-bottom: none;
-        }
-
-        .project-info ul li strong {
-            color: #000;
-            min-width: 130px; /* Cố định độ rộng nhãn */
-        }
-
-        /* --- ẢNH ĐẠI DIỆN (CỘT PHẢI) --- */
-        .project-image img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            object-fit: cover;
-            max-height: 400px; /* Giới hạn chiều cao ảnh đại diện */
-        }
-
-        /* --- GALLERY SLIDER (SWIPER) --- */
-        .project-gallery {
-            margin-top: 3rem;
-        }
-
-        /* Slider lớn ở trên */
-        .gallery-top {
-            height: 450px; /* Chiều cao cố định cho khung ảnh lớn */
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 10px;
-            background: #000; /* Nền đen để ảnh nổi bật */
-        }
-
-        .gallery-top .swiper-slide {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .gallery-top .swiper-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Hiển thị trọn ảnh, không bị cắt */
-        }
-
-        /* Nút điều hướng gallery */
-        .gallery-top .swiper-button-next,
-        .gallery-top .swiper-button-prev {
-            color: #fff;
-            background: rgba(0,0,0,0.3);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-        .gallery-top .swiper-button-next:after,
-        .gallery-top .swiper-button-prev:after {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        /* Slider thumbnails ở dưới */
-        .gallery-thumbs {
-            height: 100px;
-            box-sizing: border-box;
-            padding: 10px 0;
-        }
-
-        .gallery-thumbs .swiper-slide {
-            width: 25%;
-            height: 100%;
-            opacity: 0.4;
-            cursor: pointer;
-            border-radius: 4px;
-            overflow: hidden;
-            transition: opacity 0.3s;
-        }
-
-        .gallery-thumbs .swiper-slide-thumb-active {
-            opacity: 1;
-            border: 2px solid var(--primary-color); /* Viền màu active */
-        }
-
-        .gallery-thumbs .swiper-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* --- NỘI DUNG CHI TIẾT --- */
-        .project-content {
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-            line-height: 1.8;
-            font-size: 1rem;
-            color: #333;
-        }
-        /* CSS cho ảnh trong bài viết tự responsive */
-        .project-content img {
-            max-width: 100%;
-            height: auto !important;
-            display: block;
-            margin: 15px auto;
-            border-radius: 4px;
-        }
-
-        /* --- DỰ ÁN KHÁC --- */
-        .otherProject {
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-        }
-
-        .project-card {
-            display: block;
-            text-decoration: none;
-            color: #333;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-            background: #fff;
-        }
-
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-            color: var(--primary-color);
-        }
-
-        .project-card img {
-            width: 100%;
-            aspect-ratio: 4/3; /* Tỷ lệ ảnh dự án liên quan */
-            object-fit: cover;
-        }
-
-        .project-card .project-name {
-            display: block;
-            padding: 15px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* --- RESPONSIVE MOBILE --- */
-        @media (max-width: 768px) {
-            .project-banner {
-                height: 200px; /* Banner thấp hơn trên mobile */
-            }
-            
-            .project-info h1.project-name {
-                font-size: 1.5rem;
-                margin-top: 20px;
-            }
-
-            .project-info ul li {
-                flex-direction: column; /* Nhãn trên, giá trị dưới */
-                gap: 5px;
-            }
-
-            .project-image {
-                margin-top: 20px;
-            }
-
-            .gallery-top {
-                height: 300px; /* Gallery thấp hơn trên mobile */
-            }
-        }
-    </style>
-@endpush
+<style>
+    /* Custom styles cho Swiper Thumbs */
+    .gallery-top {
+        background: #000;
+        border-radius: 0.5rem;
+    }
+    .gallery-thumbs .swiper-slide {
+        opacity: 0.4;
+        transition: opacity 0.3s;
+        border-radius: 0.25rem;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+    .gallery-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+        border-color: #2563eb; /* blue-600 */
+    }
+    /* Formatto nội dung bài viết WYSIWYG */
+    .prose-custom img {
+        max-width: 100%;
+        height: auto !important;
+        border-radius: 0.5rem;
+        margin: 1.5rem auto;
+    }
+</style>
 @endpush
 
 @section('content')
-<div id="project-wrapper">
-    <div class="project-banner mb-4">
-        <img src="{{ !empty($project->banner) ? asset($project->banner) : (optional($project->bannerImage())->url() ?: asset('images/setting/cover01.jpg')) }}"
-             alt="{{ $project->name }}" width="1920" height="300" loading="eager">
-        <div class="project-banner_overlay"></div>
-    </div>
 
-    <div class="container my-5">
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <div class="project-info">
-                    <h1 class="project-name">{{$project->name}}</h1>
-                    <div class="project-description">{!! $project->description !!}</div>
-                    <ul>
-                        <li><strong>Tên dự án:</strong> {{$project->name}}</li>
-                        <li><strong>Chủ đầu tư:</strong> {{$project->investor}}</li>
-                        <li><strong>Địa chỉ:</strong> {{$project->address}}</li>
-                        <li><strong>Năm thực hiện:</strong> {{$project->year}}</li>
-                        <li><strong>Giá trị gói thầu:</strong> {{number_format($project->value,0,',','.')}}</li>
-                    </ul>
+<x-frontend.page-hero 
+    :image="$bannerUrl" 
+    :title="$pageTitle" 
+    :breadcrumb="$breadcrumbs" 
+/>
+
+<div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
+    <div class="max-w-screen-xl mx-auto px-4">
+        {{-- HEADER INFO --}}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-white dark:bg-gray-800 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700 p-8 md:p-12 mb-16">
+            {{-- Chi tiết --}}
+            <div class="flex flex-col justify-center order-2 lg:order-1">
+                <h1 class="text-3xl md:text-4xl font-black text-brand-700 dark:text-brand-500 mb-6 uppercase tracking-tight">
+                    {{$project->name}}
+                </h1>
+                <div class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed font-medium">
+                    {!! $project->description !!}
                 </div>
-            </div>
-            <div class="col-12 col-md-6">
-                <div class="project-image">
-                    <img src="{{ !empty($project->image) ? asset($project->image) : (optional($project->mainImage())->url() ?: asset('images/setting/no-image.png')) }}" alt="{{$project->name}}">
-                </div>
-            </div>
-        </div>
-
-        {{-- ============ GALLERY (Chuẩn HasImages + Blade thuần) ============ --}}
-        @if($project->gallery && $project->gallery->isNotEmpty())
-        <section class="project-gallery mt-5" aria-label="Thư viện hình ảnh dự án">
-            <h2 class="custom-section-title">Hình ảnh dự án</h2>
-
-            <!-- Slider lớn -->
-            <div class="swiper gallery-top">
-                <div class="swiper-wrapper">
-                    @foreach($project->gallery as $img)
-                        <div class="swiper-slide">
-                            <img
-                                class="swiper-lazy"
-                                src="{{ optional($img)->url() }}"
-                                data-src="{{ optional($img)->url() }}"
-                                alt="{{ $img->alt ?? $project->name }}"
-                                loading="lazy"
-                            >
-                            <div class="swiper-lazy-preloader"></div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <button class="swiper-button-prev"></button>
-                <button class="swiper-button-next"></button>
-            </div>
-
-            <!-- Thumbnails -->
-            <div class="swiper gallery-thumbs mt-2">
-                <div class="swiper-wrapper">
-                    @foreach($project->gallery as $img)
-                        <div class="swiper-slide">
-                            <img
-                                src="{{ optional($img)->url() }}"
-                                alt="Thumbnail {{ $project->name }}"
-                                loading="lazy"
-                            >
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-        @endif
-
-
-        {{-- ====================================================== --}}
-        {{-- PHẦN NỘI DUNG CHI TIẾT --}}
-        {{-- ====================================================== --}}
-        <div class="project-content">
-            @if(empty($project->content) || trim(strip_tags($project->content)) == '')
-                <div class="alert alert-light text-center py-5">
-                    <i class="fa-solid fa-file-pen fa-3x mb-3 text-muted"></i>
-                    <p class="text-muted">Nội dung đang được cập nhật...</p>
-                </div>
-            @else
-                {!!$project->content!!}
-            @endif
-        </div>
-
-        {{-- ====================================================== --}}
-        {{-- PHẦN DỰ ÁN TIÊU BIỂU KHÁC --}}
-        {{-- ====================================================== --}}
-        @if($relatedProjects && $relatedProjects->count() > 0)
-        <div class="otherProject">
-            <h2 class="custom-section-title">Dự án tiêu biểu khác</h2>
-            <div class="swiper other-projects-slider">
-                <div class="swiper-wrapper">
-                    @foreach($relatedProjects as $other)
-                    <div class="swiper-slide">
-                        <a href="{{ route('frontend.slug.handle', $other->slug) }}" class="project-card">
-                            <img src="{{ !empty($other->image) ? asset($other->image) : (optional($other->mainImage())->url() ?: asset('images/setting/no-image.png')) }}" alt="{{ $other->name }}">
-                            <span class="project-name">{{ $other->name }}</span>
-                        </a>
+                
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-sm border border-gray-100 dark:border-gray-600 overflow-hidden text-sm">
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
+                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Tên dự án:</strong>
+                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->name}}</span>
                     </div>
-                    @endforeach
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
+                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Chủ đầu tư:</strong>
+                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->investor}}</span>
+                    </div>
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
+                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Địa chỉ:</strong>
+                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->address}}</span>
+                    </div>
+                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
+                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Năm thực hiện:</strong>
+                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->year}}</span>
+                    </div>
+                    <div class="px-6 py-4 flex flex-col md:flex-row md:items-center gap-2">
+                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Giá trị gói thầu:</strong>
+                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{number_format((float)$project->value,0,',','.')}} VNĐ</span>
+                    </div>
                 </div>
-                 <div class="swiper-pagination"></div>
+            </div>
+            
+            {{-- Ảnh nổi bật --}}
+            <div class="flex items-center justify-center order-1 lg:order-2">
+                <img src="{{ !empty($project->image) ? asset($project->image->path) : asset('images/setting/no-image.png') }}" 
+                     alt="{{$project->name}}" 
+                     class="w-full h-auto max-h-[500px] object-cover rounded-sm shadow-md">
+            </div>
+        </div>
+
+        {{-- GALLERY THƯ VIỆN ẢNH --}}
+        @php
+            $hasGallery = false;
+            $images = collect();
+            if ($project->gallery && is_array($project->gallery)) {
+                foreach ($project->gallery as $galImg) {
+                    $url = is_string($galImg) ? $galImg : ($galImg['url'] ?? null);
+                    if ($url) {
+                        $images->push($url);
+                    }
+                }
+            }
+            $images = $images->filter()->values();
+        @endphp
+
+        @if($images->count() > 0)
+        <div class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                    Hình ảnh thi công chi tiết
+                </h2>
+                <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
+            </div>
+
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-sm p-4 md:p-8 border border-gray-200 dark:border-gray-700 w-full mx-auto max-w-4xl">
+                <div class="swiper gallery-top w-full h-[300px] md:h-[500px] mb-4">
+                    <div class="swiper-wrapper">
+                        @foreach($images as $img)
+                            <div class="swiper-slide flex items-center justify-center">
+                                <img src="{{ asset($img) }}" alt="{{ $project->name }}" loading="lazy" class="max-w-full max-h-full object-contain rounded-sm mix-blend-multiply dark:mix-blend-normal">
+                                <div class="swiper-lazy-preloader swiper-lazy-preloader-brand"></div>
+                            </div>
+                        @endforeach
+                    <div class="gallery-custom-next absolute top-1/2 -translate-y-1/2 right-4 z-10 w-10 h-10 bg-white/80 border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-gray-600 transition-colors flex items-center justify-center cursor-pointer">
+                        <i class="fas fa-chevron-right text-sm"></i>
+                    </div>
+                    <div class="gallery-custom-prev absolute top-1/2 -translate-y-1/2 left-4 z-10 w-10 h-10 bg-white/80 border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-gray-600 transition-colors flex items-center justify-center cursor-pointer">
+                        <i class="fas fa-chevron-left text-sm"></i>
+                    </div>
+                </div>
+
+                @if($images->count() > 1)
+                <div class="swiper gallery-thumbs h-20 md:h-24 w-full relative">
+                    <div class="swiper-wrapper">
+                        @foreach($images as $img)
+                            <div class="swiper-slide bg-white dark:bg-gray-900 p-2 border-2 border-transparent hover:border-brand-500 rounded-sm overflow-hidden cursor-pointer">
+                                <img src="{{ asset($img) }}" alt="Thumb" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         @endif
 
-        {{-- Bình luận & Đánh giá --}}
-        <x-comment-list :comments="$project->approvedComments" />
-        <x-comment-form :commentable="$project" type="project" />
+        {{-- NỘI DUNG CHI TIẾT --}}
+        <div class="mb-16">
+            <div class="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                        Thông tin chi tiết
+                    </h2>
+                    <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
+                </div>
+                <div class="prose prose-lg max-w-none prose-blue dark:prose-invert prose-custom font-sans">
+                    @if(empty($project->content) || trim(strip_tags($project->content)) == '')
+                        <div class="flex flex-col items-center justify-center py-16 bg-gray-50 dark:bg-gray-700/50 rounded-sm border border-dashed border-gray-200 dark:border-gray-600">
+                            <i class="fa-solid fa-file-pen text-6xl mb-4 text-gray-300 dark:text-gray-500"></i>
+                            <p class="text-gray-500 dark:text-gray-400 font-medium">Nội dung đang được cập nhật...</p>
+                        </div>
+                    @else
+                        {!! $project->content !!}
+                    @endif
+                </div>
+
+                {{-- Nút Share --}}
+                <div class="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700">
+                    <x-social-share :title="$project->name" />
+                </div>
+            </div>
+        </div>
+
+        {{-- BÌNH LUẬN --}}
+        <div class="mb-16 bg-white dark:bg-gray-800 p-8 md:p-12 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700">
+            <x-comment-list :comments="$project->approvedComments" />
+            <x-comment-form :commentable="$project" type="project" />
+        </div>
+
+        {{-- DỰ ÁN LIÊN QUAN --}}
+        @if($relatedProjects && $relatedProjects->count() > 0)
+        <div class="mb-16">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                    Dự án tiêu biểu khác
+                </h2>
+                <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
+            </div>
+            <div class="relative px-0 md:px-10">
+                <div class="swiper related-project-slider py-4 -my-4 overflow-hidden">
+                    <div class="swiper-wrapper">
+                        @foreach($relatedProjects as $other)
+                            <div class="swiper-slide h-auto">
+                                <x-frontend.card 
+                                    :href="$other->slug_url"
+                                    :image="$other->image ? asset($other->image->path) : asset('images/setting/no-image.png')"
+                                    :title="$other->name"
+                                    :description="$other->investor ? 'Chủ đầu tư: ' . $other->investor : ''"
+                                />
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="related-custom-prev absolute top-1/2 -translate-y-1/2 -left-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-brand-600 transition-colors hidden md:flex items-center justify-center cursor-pointer">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </div>
+                <div class="related-custom-next absolute top-1/2 -translate-y-1/2 -right-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-brand-600 transition-colors hidden md:flex items-center justify-center cursor-pointer">
+                    <i class="fas fa-chevron-right text-sm"></i>
+                </div>
+            </div>
+        </div>
+        @endif
+
     </div>
 </div>
 @endsection
 
 @push('js')
-    {{-- Link JS của Swiper Slider (BẮT BUỘC) --}}
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Khởi tạo Gallery Swiper nếu có
+    if (document.querySelector('.gallery-thumbs') && document.querySelector('.gallery-top')) {
+        const galleryThumbs = new Swiper('.gallery-thumbs', {
+            spaceBetween: 10,
+            slidesPerView: 4,
+            freeMode: true,
+            watchSlidesProgress: true,
+            breakpoints: {
+                640: { slidesPerView: 5 },
+                1024: { slidesPerView: 6 },
+            }
+        });
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // --- KHỞI TẠO SLIDER THƯ VIỆN ẢNH ---
-        // Kiểm tra xem element có tồn tại không trước khi khởi tạo
-        if (document.querySelector('.gallery-thumbs') && document.querySelector('.gallery-top')) {
-            const galleryThumbs = new Swiper('.gallery-thumbs', {
-                spaceBetween: 10,
-                slidesPerView: 4,
-                freeMode: true,
-                watchSlidesProgress: true,
-            });
+        const galleryTop = new Swiper('.gallery-top', {
+            spaceBetween: 10,
+            navigation: {
+                nextEl: '.gallery-custom-next',
+                prevEl: '.gallery-custom-prev',
+            },
+            lazy: { loadPrevNext: true, loadOnTransitionStart: true },
+            preloadImages: false,
+            watchSlidesProgress: true,
+            thumbs: {
+                swiper: galleryThumbs,
+            },
+            observer: true,
+            observeParents: true,
+        });
+    }
 
-            const galleryTop = new Swiper('.gallery-top', {
-                spaceBetween: 10,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                lazy: { loadPrevNext: true, loadOnTransitionStart: true },
-                preloadImages: false,
-                watchSlidesProgress: true,
-                thumbs: {
-                    swiper: galleryThumbs,
-                },
-                observer: true,
-                observeParents: true,
-            });
-        }
-        
-        // --- KHỞI TẠO SLIDER DỰ ÁN KHÁC ---
-        // Kiểm tra xem element có tồn tại không trước khi khởi tạo
-        if (document.querySelector('.other-projects-slider')) {
-            const otherProjectsSlider = new Swiper('.other-projects-slider', {
-                loop: true,
-                spaceBetween: 30,
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                breakpoints: {
-                    576: { slidesPerView: 1 },
-                    768: { slidesPerView: 2 },
-                    992: { slidesPerView: 3 },
-                }
-            });
-        }
-    });
-    </script>
+    // Khởi tạo Related Project Swiper
+    if (document.querySelector('.related-project-slider')) {
+        const relatedEl = document.querySelector('.related-project-slider');
+        new Swiper(relatedEl, {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            navigation: {
+                nextEl: relatedEl.parentElement.querySelector('.related-custom-next'),
+                prevEl: relatedEl.parentElement.querySelector('.related-custom-prev'),
+            },
+            breakpoints: {
+                640:  { slidesPerView: 2, spaceBetween: 20 },
+                1024: { slidesPerView: 3, spaceBetween: 30 }
+            }
+        });
+    }
+});
+</script>
 @endpush

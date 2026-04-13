@@ -12,11 +12,10 @@ return new class extends Migration
         Schema::create('field_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
             $table->unsignedBigInteger('parent_id')->nullable(); 
             $table->string('description')->nullable();
             $table->string('content')->nullable();
-            $table->string('image')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->boolean('status')->default(1);
             $table->integer('order')->default(0);
             $table->timestamps();

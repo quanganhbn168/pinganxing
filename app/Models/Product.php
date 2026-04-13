@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Traits\HasImages;
+
 use App\Traits\HasSlug;
+use App\Traits\HasSeo;
 
 class Product extends Model
 {
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug, HasSeo;
 
     protected $fillable = [
         'type',
@@ -20,8 +21,9 @@ class Product extends Model
         'brand_id',
         'name',
         'code',
-        'slug',
-        'image',
+'image_id',
+        'gallery',
+        'banner_id',
         'description',
         'content',
         'specifications',
@@ -30,25 +32,30 @@ class Product extends Model
         'stock',
         'status',
         'has_variants',
-        'is_on_sale',
         'is_featured',
+        'is_home',
+        'is_on_sale',
+        'product_type',
         'meta_title',
         'meta_description',
-        'meta_image',
+        'meta_image_id',
         'meta_keywords',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
-        'is_on_sale' => 'boolean',
-        'is_featured' => 'boolean',
+        'gallery'      => 'array',
+        'status'       => 'boolean',
+        'is_on_sale'   => 'boolean',
+        'is_featured'  => 'boolean',
+        'is_home'      => 'boolean',
         'has_variants' => 'boolean',
     ];
-    const TYPE_PHYSICS         = 'physics';
-    const TYPE_SERVICE        = 'services';
 
+    const TYPE_PHYSICS  = 'physics';
+    const TYPE_SERVICE  = 'services';
 
-    // -- Các mối quan hệ (Relationships) --
+    // ─── Relationships ───
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
@@ -59,56 +66,33 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    /**
-     * Quan hệ cho các Biến thể (SKUs).
-     */
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
     }
 
-    /**
-     * Quan hệ cho các Thuộc tính Lọc/Thông số kỹ thuật.
-     */
-    public function specifications(): BelongsToMany
+    public function image(): BelongsTo
     {
-        return $this->belongsToMany(AttributeValue::class, 'attribute_value_product');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 
-    /**
-     * Accessor để tính toán và lấy phần trăm giảm giá.
-     * Tự động tạo ra thuộc tính "ảo" $product->discount_percent
-     *
-     * @return int
-     */
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'banner_id');
+    }
+
+    public function services()
+    {
+        return $this->belongsToMany(Service::class);
+    }
+
+    // ─── Accessors ───
+
     public function getDiscountPercentAttribute(): int
     {
-        // Kiểm tra để tránh lỗi chia cho 0 nếu giá gốc bằng 0
         if ($this->price <= 0 || $this->price_discount <= 0 || $this->price_discount >= $this->price) {
             return 0;
         }
-
-        // Công thức: ((giá gốc - giá giảm) / giá gốc) * 100
-        $discount = (($this->price - $this->price_discount) / $this->price) * 100;
-
-        // Làm tròn số để có một con số nguyên đẹp (ví dụ: 15% thay vì 15.245%)
-        return round($discount);
-    }
-
-    public function variantsWithValues()
-    {
-        $this->loadMissing('variants.attributeValues');
-
-        return $this->variants->map(function ($variant) {
-            return [
-                'id'               => $variant->id,
-                'sku'              => $variant->sku,
-                'price'            => (float) $variant->price,
-                'compare_at_price' => (float) $variant->compare_at_price,
-                'stock'            => (int) $variant->stock,
-                'is_default'       => (bool) $variant->is_default,
-                'values'           => $variant->attributeValues->pluck('id')->toArray(),
-            ];
-        });
+        return round((($this->price - $this->price_discount) / $this->price) * 100);
     }
 }

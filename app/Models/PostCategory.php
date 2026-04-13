@@ -2,104 +2,47 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use App\Traits\HasImages;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 use App\Traits\HasSlug;
-use Illuminate\Support\Facades\Cache;
 
 class PostCategory extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostCategoryFactory> */
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug, \App\Traits\HasCategoryTree;
+
     protected $fillable = [
         'parent_id',
         'name',
-        'slug',
-        'image',
-        'banner',
+        'image_id',
+        'banner_id',
         'status',
         'is_home',
     ];
 
     protected $casts = [
-        'status' => 'boolean',
-        'is_home' => 'boolean',
+        'status'    => 'boolean',
+        'is_home'   => 'boolean',
         'parent_id' => 'integer',
     ];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name) . '-' . Str::random(5);
-            }
-        });
-    }
+    // ─── Relationships riêng ───
 
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-    public function childrenRecursive()
-    {
-        return $this->children()->with('childrenRecursive');
-    }
-    public function posts()
+    public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
-    
-    public function descendantIds(): array
+
+    public function image(): BelongsTo
     {
-        $ids = [];
-        foreach ($this->children as $child) {
-            $ids[] = $child->id;
-            // nối mảng con cháu
-            $ids = array_merge($ids, $child->descendantIds());
-        }
-        return $ids;
+        return $this->belongsTo(Media::class, 'image_id');
     }
 
-    /**
-     * Lấy mảng ID của danh mục hiện tại và tất cả danh mục con cháu
-     * Có sử dụng Cache để tối ưu hiệu năng
-     */
-    public static function getTreeIds($rootId)
+    public function banner(): BelongsTo
     {
-        // Tạo Cache Key duy nhất cho mỗi ID
-        $cacheKey = "post_category_tree_{$rootId}";
-
-        // Cache trong 1 ngày (86400 giây) hoặc lâu hơn tùy bạn
-        return Cache::remember($cacheKey, 86400, function () use ($rootId) {
-            
-            // Logic lấy dữ liệu (giữ nguyên code cũ của bạn)
-            $rootCategory = self::with('childrenRecursive')->find($rootId);
-
-            if (!$rootCategory) {
-                return [];
-            }
-
-            $ids = [$rootCategory->id];
-
-            $traverse = function ($categories) use (&$ids, &$traverse) {
-                foreach ($categories as $category) {
-                    $ids[] = $category->id;
-                    if ($category->childrenRecursive->isNotEmpty()) {
-                        $traverse($category->childrenRecursive);
-                    }
-                }
-            };
-
-            $traverse($rootCategory->childrenRecursive);
-
-            return $ids;
-        });
+        return $this->belongsTo(Media::class, 'banner_id');
     }
 }

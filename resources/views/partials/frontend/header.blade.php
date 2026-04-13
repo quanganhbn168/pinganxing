@@ -1,308 +1,152 @@
-<header class="header">
-    <div class="main-header">
-        <div class="container-fluid">
-            <div class="main-header-inner">
-                <div class="header-col-left">
-                    <div class="mobile-menu-toggle d-lg-none">
-                        <a href="#" aria-label="Toggle Menu"><i class="fa fa-bars"></i></a>
-                    </div>
-                    <div class="logo d-none d-lg-block">
-                        <a href="{{ url('/') }}">
-                            <img src="{{asset($setting->logo)}}" alt="Logo">
-                        </a>
-                    </div>
-                </div>
-                <div class="header-col-center">
-                    <div class="logo d-lg-none">
-                        <a href="{{ url('/') }}">
-                            <img src="{{asset($setting->logo)}}" alt="Logo">
-                        </a>
-                    </div>
-                    {{-- Trong file header.blade.php --}}
-                    <ul class="main-menu-desktop d-none d-lg-flex" id="main-menu-desktop-source">
-    @foreach($headerMenu as $menuItem)
-        <li class="{{ $menuItem->children->count() > 0 ? 'menu-item-has-children' : '' }}">
-            
-            {{-- CHỖ NÀY DÙNG LOGIC MODEL ĐỂ LẤY LINK CHUẨN --}}
-            <a href="{{ $menuItem->link }}">
-                {{ $menuItem->title }}
+<!-- Topbar -->
+<div class="bg-gray-900 text-white w-full py-2 hidden lg:block border-b border-gray-800 relative z-[101]">
+    <div class="max-w-screen-xl mx-auto px-4 flex justify-between items-center text-xs font-semibold tracking-wide h-6">
+        <div class="flex items-center gap-6">
+            @if(!empty($setting->email))
+            <a href="mailto:{{ $setting->email }}" class="flex items-center gap-2 hover:text-blue-400 transition-colors">
+                <i class="fas fa-envelope text-gray-400"></i> {{ $setting->email }}
             </a>
-
-            {{-- MENU CẤP 2 --}}
-            @if($menuItem->children->count() > 0)
-                <span class="submenu-toggle"><i class="fa fa-angle-down"></i></span>
-                <ul class="sub-menu">
-                    @foreach($menuItem->children as $childItem)
-                        <li class="{{ $childItem->children->count() > 0 ? 'menu-item-has-children' : '' }}">
-                            <a href="{{ $childItem->link }}">{{ $childItem->title }}</a>
-
-                            {{-- MENU CẤP 3 --}}
-                            @if($childItem->children->count() > 0)
-                                <span class="submenu-toggle"><i class="fa fa-angle-right"></i></span>
-                                <ul class="sub-menu">
-                                    @foreach($childItem->children as $grandChild)
-                                        <li><a href="{{ $grandChild->link }}">{{ $grandChild->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </li>
-                    @endforeach
-                </ul>
             @endif
-        </li>
-    @endforeach
-</ul>
-                </div>
-                <div class="header-col-right">
-                    <div class="d-lg-none">
-                        {{-- Custom Dropdown linked to GTranslate --}}
-                        <div class="dropdown">
-                            <button class="btn btn-light rounded-circle shadow-sm dropdown-toggle p-0 d-flex align-items-center justify-content-center" type="button" data-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px; border: 1px solid #eee;">
-                                <img src="{{ asset('images/flags/vn.png') }}" class="current-flag-img rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right shadow-lg border-0" style="min-width: 180px; border-radius: 16px; padding: 8px; margin-top: 10px;">
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|vi'); updateFlag('{{ asset('images/flags/vn.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/vn.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">Tiếng Việt</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|en'); updateFlag('{{ asset('images/flags/us.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/us.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">English</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|zh-CN'); updateFlag('{{ asset('images/flags/cn.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/cn.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">中文 (Chinese)</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded" href="#" onclick="doGTranslate('vi|ko'); updateFlag('{{ asset('images/flags/kr.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/kr.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">한국어 (Korean)</span>
-                                </a>
-                            </div>
-                        </div>
-                        {{-- Hidden GTranslate Widget --}}
-                        <div class="gtranslate_wrapper" style="display:none;"></div>
-                    </div>
-                    <div class="d-none d-lg-flex align-items-center">
-                        {{-- Desktop Language Switcher --}}
-                        <div class="dropdown mr-3">
-                            <button class="btn btn-light rounded-circle shadow-sm dropdown-toggle p-0 d-flex align-items-center justify-content-center" type="button" data-toggle="dropdown" aria-expanded="false" style="width: 40px; height: 40px; border: 1px solid #eee;">
-                                <img src="{{ asset('images/flags/vn.png') }}" class="current-flag-img rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right shadow-lg border-0" style="min-width: 180px; border-radius: 16px; padding: 8px; margin-top: 10px;">
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|vi'); updateFlag('{{ asset('images/flags/vn.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/vn.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">Tiếng Việt</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|en'); updateFlag('{{ asset('images/flags/us.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/us.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">English</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded mb-1" href="#" onclick="doGTranslate('vi|zh-CN'); updateFlag('{{ asset('images/flags/cn.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/cn.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">中文 (Chinese)</span>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center px-3 py-2 rounded" href="#" onclick="doGTranslate('vi|ko'); updateFlag('{{ asset('images/flags/kr.png') }}'); return false;" style="transition: all 0.2s;">
-                                    <img src="{{ asset('images/flags/kr.png') }}" class="me-3 mr-3 rounded-circle shadow-sm" style="width: 24px; height: 24px; object-fit: cover;"> 
-                                    <span style="font-weight: 600; font-size: 14px; color: #333;">한국어 (Korean)</span>
-                                </a>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary rounded-pill">
-                            <span class="d-inline-flex align-items-center justify-content-center bg-white rounded-circle me-2" style="width: 32px; height: 32px;">
-        
-        {{-- Icon nằm bên trong, có màu của nút --}}
-        <i class="fa-solid fa-phone text-primary"></i>
-
-    </span>
-                            <a href="tel:{{$setting->phone}}">
-                                {{$setting->phone}}
-                            </a>
-                        </button>
-                    </div>
-                </div>
+            <div class="flex items-center gap-2 text-gray-300">
+                <i class="fas fa-clock text-gray-400"></i> T2 - T7: 08:00 - 17:30
             </div>
         </div>
-    </div>
-    {{-- HIDDEN: Old Mobile Search --}}
-    <div class="mobile-search-container d-lg-none d-none">
-        <div class="search-box">
-            <form action="/search" method="get">
-                <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm...">
-                <button type="submit"><i class="fa fa-search"></i></button>
-            </form>
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-2">
+                <i class="fas fa-headset text-blue-400"></i> Hỗ trợ 24/7: 
+                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '') }}" class="text-blue-400 hover:text-white transition-colors">{{ $setting->phone ?? '' }}</a>
+            </span>
+            <div class="h-4 w-px bg-gray-700"></div>
+            @if(!empty($setting->zalo))
+            <a href="{{ $setting->zalo }}" target="_blank" class="hover:text-blue-400 transition-colors" title="Zalo">
+                <i class="fab fa-neos text-lg"></i>
+            </a>
+            @endif
         </div>
     </div>
-    <nav class="main-nav-container d-none"></nav>
-</header>
-<div class="offcanvas-menu-wrapper">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title">MENU</h5>
-        <a href="#" class="offcanvas-close"><i class="fa fa-times"></i></a>
-    </div>
-    <div class="offcanvas-menu-content">
-        {{-- ADDED: Mobile Search in Offcanvas (Styled) --}}
-        <div class="offcanvas-search p-3 border-bottom">
-            <form action="/search" method="get">
-                <div class="position-relative">
-                    <input type="text" class="form-control rounded-pill bg-light border-0 pl-4 pr-5" name="keyword" placeholder="Tìm kiếm sản phẩm..." style="height: 45px; padding-left: 20px; font-size: 14px;">
-                    <button class="btn position-absolute text-muted" type="submit" style="right: 5px; top: 2px; height: 40px; border: none; background: transparent;">
-                        <i class="fa fa-search" style="font-size: 18px;"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-        {{-- Menu items will be appended here by JS --}}
-        </div>
 </div>
-<div class="cart-offcanvas-wrapper">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Giỏ Hàng Của Bạn</h5>
-        <a href="#" class="offcanvas-close js-close-cart"><i class="fa fa-times"></i></a>
-    </div>
-    @auth('web')
-        <div class="offcanvas-body">
-            @forelse($cartItems as $item)
-            <div class="cart-item cart-item-auth">
-                <div class="cart-item_image">
-                    <img src="{{ asset($item->product->image ?? 'https://placehold.co/100x100') }}" alt="{{ $item->product->name }}">
-                </div>
-                <div class="cart-item_info">
-                    <a href="{{ route('frontend.product.show', $item->product->slug) }}" class="item-name">{{ $item->product->name }}</a>
-                    <div class="item-meta">
-                        <span class="item-price">{{ number_format($item->product->price) }}đ</span>
-                        <span class="item-quantity">x {{ $item->quantity }}</span>
-                    </div>
-                </div>
-                <a href="#" class="item-remove" title="Xóa sản phẩm" data-item-id="{{ $item->id }}">
-                    <i class="fa fa-trash"></i>
-                </a>
-            </div>
-            @empty
-            <p class="text-center p-4">Giỏ hàng của bạn đang trống.</p>
-            @endforelse
-        </div>
-        <div class="offcanvas-footer">
-            <div class="cart-summary">
-                <span>Tổng cộng:</span>
-                <span class="total-price">{{ number_format($cartTotal ?? 0) }}đ</span>
-            </div>
-            <a href="/cart" class="btn btn-dark w-100">Xem Giỏ Hàng</a>
-            <a href="/checkout" class="btn btn-primary w-100 mt-2">Thanh Toán</a>
-        </div>
-    @else
-        <div id="guest-cart-body" class="offcanvas-body">
-            <p class="text-center p-4">Giỏ hàng của bạn đang trống.</p>
-        </div>
-        <div id="guest-cart-footer" class="offcanvas-footer" style="display: none;">
-            <div class="cart-summary">
-                <span>Tổng cộng:</span>
-                <span id="guest-cart-total" class="total-price">0đ</span>
-            </div>
-            <a href="/cart" class="btn btn-dark w-100">Xem Giỏ Hàng</a>
-            <a href="/checkout" class="btn bg-main w-100 mt-2">Thanh Toán</a>
-        </div>
-    @endauth   
-</div>
-<template id="guest-cart-item-template">
-    <div class="cart-item">
-        <div class="cart-item_image">
-            <img src="__IMAGE__" alt="__NAME__">
-        </div>
-        <div class="cart-item_info">
-            <a href="__URL__" class="item-name">__NAME__</a>
-            <div class="item-variant text-muted small">__VARIANT__</div>
-            <div class="item-meta">
-                <span class="item-price">__PRICE__đ</span>
-                <span class="item-quantity">x __QUANTITY__</span>
-            </div>
-        </div>
-        <a href="#" class="item-remove" title="Xóa sản phẩm" data-item-id="__ID__">
-            <i class="fa fa-trash"></i>
+
+<header class="bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 w-full transition-all duration-300 sticky top-0 z-[100] shadow-sm" id="main-header">
+    <nav class="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between p-4">
+        <!-- Logo -->
+        <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
+            <img src="{{ asset($setting->logo ?? 'images/logo.png') }}" class="h-10" alt="{{ $setting->site_name ?? 'Logo' }}" />
         </a>
-    </div>
-</template>
-<div class="offcanvas-overlay"></div>
+        
+        <!-- Mobile Toggle & Actions -->
+        <div class="flex md:order-2 space-x-3 md:space-x-4 rtl:space-x-reverse items-center">
+            
+            <!-- Language Switcher -->
+            <x-frontend.language-switcher type="desktop" />
+
+            <!-- Hotline Button (Removed per user request) -->
+
+            <!-- Hamburger Button (Triggers Drawer) -->
+            <button type="button" data-drawer-target="drawer-navigation" data-drawer-show="drawer-navigation" aria-controls="drawer-navigation" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-600 rounded-xl md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-800 dark:focus:ring-gray-700 transition-colors">
+                <span class="sr-only">Mở menu chính</span>
+                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Desktop Menu -->
+        <div class="hidden w-full md:block md:w-auto md:order-1" id="navbar-desktop">
+            <ul class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-xl bg-gray-50 md:space-x-4 lg:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+                @if(isset($headerMenu) && count($headerMenu) > 0)
+                    @foreach($headerMenu as $menuItem)
+                        @if($menuItem->children && $menuItem->children->count() > 0)
+                            <li>
+                                <button id="dropdownNavbarLink-{{ $loop->index }}" data-dropdown-toggle="dropdownNavbar-{{ $loop->index }}" class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-600 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent font-semibold uppercase tracking-wide text-sm transition-colors">
+                                    {{ $menuItem->title }}
+                                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                    </svg>
+                                </button>
+                                <!-- Dropdown menu -->
+                                <div id="dropdownNavbar-{{ $loop->index }}" class="z-50 hidden font-normal bg-white divide-y divide-gray-100 rounded-xl shadow-xl w-48 dark:bg-gray-800 dark:divide-gray-700 border border-gray-100 dark:border-gray-700">
+                                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-300" aria-labelledby="dropdownNavbarLink-{{ $loop->index }}">
+                                        @foreach($menuItem->children as $childItem)
+                                        <li>
+                                            <a href="{{ $childItem->link }}" target="{{ $childItem->link_target }}" class="block px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/40 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                                                @if($childItem->icon)<i class="{{ $childItem->icon }} text-gray-400 text-xs mr-2"></i>@else<i class="fas fa-angle-right text-gray-400 text-xs mr-2"></i>@endif {{ $childItem->title }}
+                                            </a>
+                                        </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </li>
+                        @else
+                            <li>
+                                <a href="{{ $menuItem->link }}" target="{{ $menuItem->link_target }}" class="block py-2 px-3 rounded md:hover:bg-transparent md:border-0 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent font-semibold uppercase tracking-wide text-sm transition-colors {{ $menuItem->is_active_route ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:bg-gray-100 md:hover:text-blue-600' }}">
+                                    @if($menuItem->icon)<i class="{{ $menuItem->icon }} mr-1"></i>@endif {{ $menuItem->title }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+                @else
+                    <li><a href="/" class="block py-2 px-3 rounded md:border-0 md:p-0 font-semibold uppercase tracking-wide text-sm transition-colors {{ request()->is('/') ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:text-blue-600 dark:text-white md:dark:hover:text-blue-500' }}">Trang chủ</a></li>
+                    <li><a href="/dich-vu" class="block py-2 px-3 rounded md:border-0 md:p-0 font-semibold uppercase tracking-wide text-sm transition-colors {{ request()->is('dich-vu*') ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:text-blue-600 dark:text-white md:dark:hover:text-blue-500' }}">Dịch vụ</a></li>
+                    <li><a href="/linh-vuc" class="block py-2 px-3 rounded md:border-0 md:p-0 font-semibold uppercase tracking-wide text-sm transition-colors {{ request()->is('linh-vuc*') ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:text-blue-600 dark:text-white md:dark:hover:text-blue-500' }}">Lĩnh vực</a></li>
+                    <li><a href="/du-an" class="block py-2 px-3 rounded md:border-0 md:p-0 font-semibold uppercase tracking-wide text-sm transition-colors {{ request()->is('du-an*') ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:text-blue-600 dark:text-white md:dark:hover:text-blue-500' }}">Dự án</a></li>
+                    <li><a href="/san-pham" class="block py-2 px-3 rounded md:border-0 md:p-0 font-semibold uppercase tracking-wide text-sm transition-colors {{ request()->is('san-pham*') ? 'text-blue-600 border-b-2 border-blue-600 md:pb-1' : 'text-gray-900 hover:text-blue-600 dark:text-white md:dark:hover:text-blue-500' }}">Sản phẩm</a></li>
+                @endif
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<x-frontend.mobile-drawer :headerMenu="$headerMenu ?? []" :setting="$setting" />
+
+<div id="google_translate_element2"></div>
+<style type="text/css">
+#goog-gt-tt {display:none !important;}
+.goog-te-banner-frame {display:none !important;}
+.goog-te-menu-value:hover {text-decoration:none !important;}
+body {top:0 !important;}
+#google_translate_element2 {display:none!important;}
+</style>
+
 @push('js')
-<script>
-    $(document).ready(function() {
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('.header');
-            const scrollPosition = window.scrollY;
-            if (scrollPosition > 50) { 
-                header.classList.add('header-scrolled');
-                header.classList.remove('is-unsticking'); 
-            } else {
-                if (header.classList.contains('header-scrolled')) {
-                    header.classList.remove('header-scrolled');
-                    header.classList.add('is-unsticking');
-                    setTimeout(function() {
-                        header.classList.remove('is-unsticking');
-                    }, 20);
-                }
-            }
-        });
-        if ($('.offcanvas-menu-content #main-menu-desktop-source').length === 0) {
-    // Chỉ clone menu gốc có ID là "main-menu-desktop-source"
-                $('#main-menu-desktop-source').clone()
-            .removeAttr('id') // Xóa ID để tránh bị trùng lặp
-            .removeClass('d-none d-lg-flex') // Xóa class ẩn/hiện của desktop
-            .appendTo('.offcanvas-menu-content');
-        }
-        $('.mobile-menu-toggle a').on('click', function(e) {
-            e.preventDefault();
-            $('body').addClass('show-offcanvas');
-        });
-        $('.offcanvas-menu-content').on('click', '.submenu-toggle', function(e) {
-            e.preventDefault();
-            $(this).parent('.menu-item-has-children').toggleClass('open');
-            $(this).siblings('.sub-menu').slideToggle(300);
-        });
-        $('.cart-action > a').on('click', function(e) {
-            e.preventDefault(); 
-            $('body').addClass('show-cart-offcanvas');
-        });
-        $('.offcanvas-menu-wrapper .offcanvas-close').on('click', function(e) {
-            e.preventDefault();
-            $('body').removeClass('show-offcanvas');
-        });
-        $('.cart-offcanvas-wrapper .js-close-cart').on('click', function(e) {
-            e.preventDefault();
-            $('body').removeClass('show-cart-offcanvas');
-        });
-        $('.offcanvas-overlay').on('click', function(e) {
-            e.preventDefault();
-            $('body').removeClass('show-offcanvas show-cart-offcanvas');
-        });
-    });
-    $('.header-actions .frame-fix').on('click', function(event) {
-    // Ngăn sự kiện click lan ra ngoài, tránh việc tự đóng ngay lập tức
-        event.stopPropagation(); 
-    // Thêm/xóa class 'active' trên chính nó để bật/tắt menu
-        $(this).toggleClass('active'); 
-    });
-// Bấm ra ngoài khu vực menu thì sẽ đóng menu lại
-    $(document).on('click', function() {
-        $('.header-actions .frame-fix').removeClass('active');
-    });
-    function updateFlag(flagSrc) {
-        $('.current-flag-img').attr('src', flagSrc);
+<script type="text/javascript">
+function googleTranslateElementInit2() {new google.translate.TranslateElement({pageLanguage: 'vi',autoDisplay: false}, 'google_translate_element2');}
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2"></script>
+<script type="text/javascript">
+function doGTranslate(langPair) {
+    if (!langPair || langPair === '') return;
+    var lang = langPair.split('|')[1];
+    var selectField = document.querySelector('.goog-te-combo');
+    
+    if (!selectField || !selectField.options || selectField.options.length === 0) {
+        setTimeout(function() { doGTranslate(langPair); }, 500);
+        return;
     }
-    // Set active flag on load based on GTranslate cookie
+    
+    selectField.value = lang;
+    selectField.dispatchEvent(new Event('change', { bubbles: true }));
+}
+</script>
+
+<script>
+    // Auto update flag img based on cookie
+    function updateFlag(flagSrc) {
+        document.querySelectorAll('.current-flag-img').forEach(img => {
+            img.src = flagSrc;
+        });
+    }
     function getCookie(name) {
         var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return v ? v[2] : null;
     }
-    var langCookie = getCookie('googtrans'); // Format: /vi/en
+    var langCookie = getCookie('googtrans'); 
     if (langCookie) {
         var lang = langCookie.split('|').pop().split('/').pop(); 
-        // Logic might need adjustment based on exact cookie value from GTranslate Widget
-        // Usually /vi/en
-        var flag = '{{ asset('images/flags/vn.png') }}';
-        if (lang == 'en') flag = '{{ asset('images/flags/us.png') }}';
-        else if (lang == 'zh-CN') flag = '{{ asset('images/flags/cn.png') }}';
-        else if (lang == 'ko') flag = '{{ asset('images/flags/kr.png') }}';
-        $('.current-flag-img').attr('src', flag);
+        var flag = '{{ asset("images/flags/vn.png") }}';
+        if (lang == 'en') flag = '{{ asset("images/flags/us.png") }}';
+        else if (lang == 'zh-CN') flag = '{{ asset("images/flags/cn.png") }}';
+        else if (lang == 'ko') flag = '{{ asset("images/flags/kr.png") }}';
+        updateFlag(flag);
     }
 </script>
 @endpush

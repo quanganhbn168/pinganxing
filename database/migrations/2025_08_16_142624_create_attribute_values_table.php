@@ -10,7 +10,7 @@ return new class extends Migration {
             $table->foreignId('attribute_id')->constrained()->onDelete('cascade');
             $table->string('value');
             $table->string('color_code')->nullable()->comment('Mã màu HEX cho type=color_swatch');
-            $table->string('image')->nullable()->comment('Đường dẫn ảnh cho type=image_swatch');
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->timestamps();
         });
     }

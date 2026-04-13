@@ -1,120 +1,45 @@
 @extends('layouts.master')
-
 @section('title', $pageTitle)
-
-
-
-@push('css')
-
-<link rel="stylesheet" href="{{ asset('css/product.css') }}">
-
-@endpush
-
-
-
 @section('content')
 
 
 
-{{-- 
+<x-frontend.page-hero 
+    :image="$bannerUrl" 
+    :title="$pageTitle" 
+    :breadcrumb="$breadcrumbs" 
+/>
 
-    Phần Banner: 
-
-    - Lấy thông tin từ biến $current_category (danh mục cha, là một đối tượng đơn lẻ).
-
-    - Em giả sử cột chứa ảnh banner của anh tên là 'banner', anh hãy đổi lại cho đúng nhé.
-
-    - Lỗi 'prent' đã được sửa.
-
---}}
-
-<div class="banner">
-
-    {{-- Giả sử bạn có một cột 'banner' trong bảng field_categories để lưu ảnh banner --}}
-
-    <img src="{{  optional($current_category->bannerImage())->url() ?? '' }}" alt="{{ $current_category->name }}">
-
-</div>
-
-
-
-{{-- Phần Lĩnh vực hoạt động --}}
-
-<section class="section section-field">
-
-    {{-- 
-
-        Phần Tiêu đề:
-
-        - Cũng lấy thông tin từ $current_category.
-
-    --}}
-
-    <h2 class="section-title">
-
-        <a href="#">{{ $current_category->name }}</a>
-
-    </h2>
-
-    
-
-    <div class="container py-5">
-
-        <div class="row">
-
-            @forelse($field_categories as $field_category)
-
-                <div class="col-6 col-md-4">
-
-                    <div class="field-category-item">
-
-                        <div class="field-category-item__image">
-
-                            {{-- Sử dụng slug của mục con --}}
-
-                            <a href="{{ route('frontend.slug.handle', $field_category->slugValue) }}">
-
-                                <img src="{{ optional($field_category->mainImage())->url() }}" alt="{{ $field_category->name }}">
-
-                            </a>
-
-                        </div>
-
-                        <div class="field-category-item__name">
-
-                            {{-- Sử dụng tên của mục con --}}
-
-                            <a href="{{ route('frontend.slug.handle', $field_category->slugValue) }}">
-
-                                {{ $field_category->name }}
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            @empty
-
-                {{-- Thêm phần này để thông báo nếu danh mục không có mục con nào --}}
-
-                <div class="col-12">
-                     <div class="alert alert-light text-center py-5">
-                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-muted"></i>
-                        <p class="text-muted">Danh mục đang được cập nhật...</p>
-                    </div>
-                </div>
-
-            @endforelse
-
+<div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
+    <div class="max-w-screen-xl mx-auto px-4">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-2xl md:text-4xl lg:text-5xl font-black uppercase text-gray-900 dark:text-white tracking-tighter">{{ $pageTitle }}</h2>
+            <div class="w-16 h-1 bg-brand-600 mx-auto mt-6 mb-6"></div>
+            @if(!empty($current_category->description))
+                <p class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ $current_category->description }}</p>
+            @endif
         </div>
 
+        @if(isset($field_categories) && $field_categories->isNotEmpty())
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($field_categories as $field_category)
+                    <x-frontend.card 
+                        :href="$field_category->slug_url"
+                        :image="$field_category->image ? $field_category->image->path : null"
+                        :title="$field_category->name"
+                        :description="$field_category->description"
+                    />
+                @endforeach
+            </div>
+        @else
+            <div class="bg-white dark:bg-gray-800 rounded-sm p-12 text-center border border-dashed border-gray-200 dark:border-gray-700 shadow-sm">
+                <i class="fas fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nội dung đang cập nhật</h3>
+                <p class="text-gray-500 dark:text-gray-400">Danh mục này hiện chưa có danh mục con.</p>
+            </div>
+        @endif
+
     </div>
-
-</section>
-
-
-
+</div>
 @endsection

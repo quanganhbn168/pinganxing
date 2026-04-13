@@ -8,14 +8,8 @@ use App\Models\Intro;
 
 class IntroController extends Controller
 {
-    public function index()
+    public function index(\App\Settings\PageSettings $pageSetting)
     {
-        $intro = Intro::findOrFail(1);
-        return view('frontend.intro',compact('intro'));
-    }
-
-    public function getBySlug($intro)
-    {
-        return view('frontend.intro.introDetail', compact('intro'));
+        return view('frontend.intro', compact('pageSetting'));
     }
 }

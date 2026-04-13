@@ -4,20 +4,31 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Slug;
 use Illuminate\Http\Request;
-use App\Services\PostService;
 use App\Models\PostCategory;
-use App\Models\Page;
+use App\Settings\PageSettings;
 
 class PostController extends Controller
 {
-    public function __construct(
-        protected PostService $postService
-    ) {}
+    /**
+     * Resolve slug cho prefix /tin-tuc/{slug}.
+     */
+    public function resolveBySlug(string $slug)
+    {
+        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $model = $slugData->sluggable;
+
+        return match (true) {
+            $model instanceof PostCategory => $this->postByCate($model),
+            $model instanceof Post         => $this->detail($model),
+            default => abort(404),
+        };
+    }
 
     public function index()
     {
-        $page = Page::where('slug','tin-tuc')->first();
+        $pageSettings = app(PageSettings::class);
         // 1. Lấy các danh mục Root (parent_id = 0)
         $postCategories = PostCategory::whereNull("parent_id")
             ->where("status", 1)
@@ -39,7 +50,11 @@ class PostController extends Controller
             // Để bên View bạn vẫn gọi $category->posts như bình thường mà không cần sửa View
             $category->setRelation('posts', $posts);
         }
-        return view('frontend.post.index', compact('postCategories','page'));
+        $posts = Post::where('status', 1)
+            ->latest()
+            ->paginate(12);
+
+        return view('frontend.post.index', compact('postCategories', 'pageSettings', 'posts'));
     }
 
     public function detail(Post $post)

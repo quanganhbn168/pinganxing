@@ -2,43 +2,46 @@
 
 namespace App\Models;
 
+use Awcodes\Curator\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
-use App\Traits\HasImages;
+
 use App\Traits\HasSlug;
-use App\Models\Product;
-use App\Models\Attribute;
-use App\Models\Slug;
+use App\Traits\HasSeo;
 
 class Category extends Model
 {
-    /** @use HasFactory<\Database\Factories\CategoryFactory> */
-    use HasFactory, HasImages, HasSlug;
+    use HasFactory, HasSlug, HasSeo, \App\Traits\HasCategoryTree;
 
     protected $fillable = [
         'parent_id',
         'name',
-        'slug',
+        'image_id',
+        'banner_id',
+        'description',
+        'content',
         'status',
         'is_home',
         'is_menu',
         'is_footer',
         'position',
+        'meta_title',
         'meta_description',
         'meta_keywords',
-        'meta_image'
+        'meta_image_id',
     ];
 
     protected $casts = [
-        'status'     => 'boolean',
-        'is_home'    => 'boolean',
-        'is_menu'    => 'boolean',
-        'is_footer'  => 'boolean',
-        'parent_id'  => 'integer',
-        'position'   => 'integer',
+        'status'    => 'boolean',
+        'is_home'   => 'boolean',
+        'is_menu'   => 'boolean',
+        'is_footer' => 'boolean',
+        'parent_id' => 'integer',
+        'position'  => 'integer',
     ];
 
     const TYPE_PHYSICS = 'physics';
@@ -52,7 +55,6 @@ class Category extends Model
             }
         });
 
-        // clear cached tree when category changes
         static::saved(function () {
             Cache::forget('category_tree_map');
         });
@@ -62,7 +64,9 @@ class Category extends Model
         });
     }
 
-    public function products()
+    // ─── Relationships riêng ───
+
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
@@ -72,67 +76,23 @@ class Category extends Model
         return $this->belongsToMany(Attribute::class, 'category_attribute');
     }
 
-    public function parent()
-    {
-        return $this->belongsTo(self::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(self::class, 'parent_id');
-    }
-
-    /**
-     * Lấy tất cả ID của các danh mục con (cháu, chắt...) một cách đệ quy.
-     * Dùng khi đã eager-load children để tránh N+1.
-     *
-     * @return array
-     */
-    public function getAllDescendantIds(): array
-    {
-        $descendantIds = [];
-        foreach ($this->children as $child) {
-            $descendantIds[] = $child->id;
-            $descendantIds = array_merge($descendantIds, $child->getAllDescendantIds());
-        }
-        return $descendantIds;
-    }
-
-    public function latestProducts()
+    public function latestProducts(): HasMany
     {
         return $this->hasMany(Product::class)->where('status', 1)->latest()->limit(10);
     }
 
-    public function childrenRecursive()
+    public function image(): BelongsTo
     {
-        return $this->children()->with('childrenRecursive');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 
-    /**
-     * Alternative recursive collector (same as getAllDescendantIds)
-     *
-     * @return array
-     */
-    public function descendantIds(): array
+    public function banner(): BelongsTo
     {
-        $ids = [];
-        foreach ($this->children as $child) {
-            $ids[] = $child->id;
-            $ids = array_merge($ids, $child->descendantIds());
-        }
-        return $ids;
+        return $this->belongsTo(Media::class, 'banner_id');
     }
 
-    // -------------------------
-    // Static helpers with cache
-    // -------------------------
+    // ─── Static Helpers with Cache ───
 
-    /**
-     * Build children map (parent_id => [childId,...]) and cache it.
-     * Cache key should be cleared when admin changes categories (we clear on save/delete above).
-     *
-     * @return array
-     */
     public static function buildChildrenMap(): array
     {
         return Cache::remember('category_tree_map', 3600, function () {
@@ -146,12 +106,6 @@ class Category extends Model
         });
     }
 
-    /**
-     * Lấy danh sách id descendants (include self) dựa trên childrenMap
-     *
-     * @param int $startId
-     * @return array
-     */
     public static function getDescendantIds(int $startId): array
     {
         $childrenMap = self::buildChildrenMap();

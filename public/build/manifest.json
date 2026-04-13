@@ -1,18 +1,35 @@
 {
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2": {
+    "file": "assets/fa-brands-400-BP5tdqmh.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2": {
+    "file": "assets/fa-regular-400-nyy7hhHF.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": {
+    "file": "assets/fa-solid-900-DRAAbZTg.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+  },
+  "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2": {
+    "file": "assets/fa-v4compatibility-DD84SGiu.woff2",
+    "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
+  },
   "resources/css/app.css": {
     "file": "assets/app-l0sNRNKZ.js",
     "name": "app",
     "src": "resources/css/app.css",
     "isEntry": true
   },
-  "resources/css/frontend.css": {
-    "file": "assets/frontend-Bh-BJm1Z.css",
-    "src": "resources/css/frontend.css",
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-GKsCTJid.css",
+    "src": "resources/css/filament/admin/theme.css",
     "isEntry": true
   },
-  "resources/css/frontend/fonts/Lexend/Lexend-VariableFont_wght.woff2": {
-    "file": "assets/Lexend-VariableFont_wght-CXpDOWlP.woff2",
-    "src": "resources/css/frontend/fonts/Lexend/Lexend-VariableFont_wght.woff2"
+  "resources/css/frontend.css": {
+    "file": "assets/frontend-Qsha25h-.css",
+    "src": "resources/css/frontend.css",
+    "isEntry": true
   },
   "resources/js/app.js": {
     "file": "assets/app-CAiCLEjY.js",
@@ -21,9 +38,18 @@
     "isEntry": true
   },
   "resources/js/frontend.js": {
-    "file": "assets/frontend-DTPvD0X5.js",
+    "file": "assets/frontend-BIqVONTV.js",
     "name": "frontend",
     "src": "resources/js/frontend.js",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "assets/frontend-B4ExCK_U.css"
+    ],
+    "assets": [
+      "assets/fa-brands-400-BP5tdqmh.woff2",
+      "assets/fa-regular-400-nyy7hhHF.woff2",
+      "assets/fa-solid-900-DRAAbZTg.woff2",
+      "assets/fa-v4compatibility-DD84SGiu.woff2"
+    ]
   }
 }

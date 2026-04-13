@@ -8,7 +8,7 @@
     <div class="container">
         {{-- Breadcrumb --}}
         <x-frontend.breadcrumb :items="[
-            ['label' => 'Bài viết', 'url' => route('frontend.slug.handle', $category->slug)],
+            ['label' => 'Bài viết', 'url' => $category->slug_url],
             ['label' => $category->name]
         ]" />
 
@@ -19,12 +19,12 @@
                 @foreach($posts as $post)
                 <div class="mb-4 border-bottom pb-3 row">
                     <div class="col-md-4">
-                        <a href="{{ route('frontend.slug.handle', $post->slug) }}">
+                        <a href="{{ $post->slug_url }}">
                             <img src="{{ asset($post->image ?? 'images/setting/no-image.png') }}" alt="{{ $post->title }}" class="img-fluid w-100" style="object-fit: cover; max-height: 180px;">
                         </a>
                     </div>
                     <div class="col-md-8">
-                        <a href="{{ route('frontend.slug.handle', $post->slug) }}" class="d-block mb-2">
+                        <a href="{{ $post->slug_url }}" class="d-block mb-2">
                             <h4 class="mb-1">{{ $post->title }}</h4>
                         </a>
                         <div class="small text-muted mb-2">
@@ -42,7 +42,7 @@
             </div>
 
             {{-- Cột phải: Sidebar --}}
-            @include('partials.frontend.aside')
+            <x-frontend.aside />
         </div>
     </div>
 </section>

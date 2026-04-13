@@ -1,43 +1,22 @@
-@props(['url' => url()->current(), 'title' => ''])
+@props(['title' => ''])
 
-<div class="social-share-box mb-3">
-    <span class="text-muted mr-2" style="font-size: 14px;">Chia sẻ:</span>
-    
-    {{-- 1. Facebook --}}
-    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($url) }}" 
-       target="_blank" class="btn-share btn-fb" title="Chia sẻ lên Facebook">
-        <i class="fa-brands fa-facebook-f"></i>
+<div class="flex items-center gap-3">
+    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="w-9 h-9 rounded-sm bg-gray-100 hover:bg-[#1877F2] text-gray-600 hover:text-white flex items-center justify-center transition-all border border-gray-200">
+        <i class="fab fa-facebook-f text-sm"></i>
     </a>
-
-    {{-- 2. X (Twitter) --}}
-    <a href="https://twitter.com/intent/tweet?url={{ urlencode($url) }}&text={{ urlencode($title) }}" 
-       target="_blank" class="btn-share btn-x" title="Chia sẻ lên X">
-        <i class="fa-brands fa-x-twitter"></i>
+    <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($title) }}" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="w-9 h-9 rounded-sm bg-gray-100 hover:bg-[#1DA1F2] text-gray-600 hover:text-white flex items-center justify-center transition-all border border-gray-200">
+        <i class="fab fa-twitter text-sm"></i>
     </a>
-
-    {{-- 3. Zalo (Dùng Link Copy hoặc Redirect qua Zalo Web) --}}
-    {{-- Zalo Web Share API --}}
-    <a href="https://zalo.me/share/?url={{ urlencode($url) }}" 
-       target="_blank" class="btn-share btn-zalo" title="Chia sẻ qua Zalo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" alt="Zalo" style="width: 18px; height: 18px; margin-top: -3px;">
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(request()->url()) }}&title={{ urlencode($title) }}" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="w-9 h-9 rounded-sm bg-gray-100 hover:bg-[#0A66C2] text-gray-600 hover:text-white flex items-center justify-center transition-all border border-gray-200">
+        <i class="fab fa-linkedin-in text-sm"></i>
     </a>
-
-    {{-- 4. Copy Link --}}
-    <button type="button" class="btn-share btn-copy" onclick="copyToClipboard('{{ $url }}')" title="Sao chép liên kết">
-        <i class="fa-solid fa-link"></i>
-    </button>
 </div>
-
-
-
-@push('js')
-<script>
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            alert('Đã sao chép liên kết vào bộ nhớ tạm!');
-        }, function(err) {
-            console.error('Lỗi sao chép: ', err);
-        });
-    }
-</script>
-@endpush

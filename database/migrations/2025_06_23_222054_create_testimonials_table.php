@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('testimonials', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('image')->nullable();
+            $table->unsignedBigInteger('image_id')->nullable();
             $table->string('position')->nullable(); // công việc / ngành
             $table->text('content'); // nội dung cảm nhận
             $table->boolean('status')->default(true); // dùng để bật/tắt hiển thị
