@@ -1,12 +1,12 @@
 <footer class="text-gray-300 py-12 mt-10 relative bg-gray-900 bg-cover bg-center bg-no-repeat" 
-        @if(!empty($setting->footer_background)) style="background-image: linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.85)), url('{{ asset($setting->footer_background) }}');" @endif>
+        @if(!empty($globalFooterBackgroundUrl)) style="background-image: linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(17, 24, 39, 0.85)), url('{{ $globalFooterBackgroundUrl }}');" @endif>
     <div class="max-w-screen-xl mx-auto px-4 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             
             {{-- Cột 1: Thông tin công ty --}}
             <div>
                 <a href="/" class="block mb-6">
-                    <img src="{{ asset($setting->logo ?? 'images/logo-white.png') }}" class="h-10 filter brightness-0 invert" alt="{{ $setting->site_name ?? 'Logo' }}">
+                    <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/logo-white.png') }}" class="h-10 filter brightness-0 invert" alt="{{ $setting->site_name ?? 'Logo' }}">
                 </a>
                 <p class="text-sm text-gray-400 mb-6 leading-relaxed">
                     {{ $setting->description ?? 'CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.' }}
