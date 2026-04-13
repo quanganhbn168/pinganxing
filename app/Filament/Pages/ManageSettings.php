@@ -44,10 +44,12 @@ class ManageSettings extends SettingsPage
                                     ->columnSpanFull(),
                                 CuratorPicker::make('logo')
                                     ->label('Logo thương hiệu')
-                                    ->acceptedFileTypes(['image/*']),
+                                    ->acceptedFileTypes(['image/*'])
+                                    ->multiple(false),
                                 CuratorPicker::make('favicon')
                                     ->label('Favicon')
-                                    ->acceptedFileTypes(['image/*']),
+                                    ->acceptedFileTypes(['image/*'])
+                                    ->multiple(false),
                                 CuratorPicker::make('banner')
                                     ->label('Banner trang chủ')
                                     ->acceptedFileTypes(['image/*'])
@@ -281,7 +283,8 @@ class ManageSettings extends SettingsPage
                                         CuratorPicker::make('meta_image')
                                             ->label('Ảnh chia sẻ mặc định (OG Image)')
                                             ->acceptedFileTypes(['image/*'])
-                                            ->helperText('Ảnh hiển thị khi chia sẻ link trên Facebook, Zalo, Telegram... (khuyến nghị 1200x630px)'),
+                                            ->helperText('Ảnh hiển thị khi chia sẻ link trên Facebook, Zalo, Telegram... (khuyến nghị 1200x630px)')
+                                            ->multiple(false),
                                     ])
                                     ->columns(1),
                                 Section::make('Mã nhúng (Script)')
