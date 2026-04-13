@@ -20,7 +20,7 @@ class SlugInput extends TextInput
      */
     public static function autoSlug(string $slugField = 'slug'): \Closure
     {
-        return function (?string $state, $set) use ($slugField) {
+        return function (?string $state, \Filament\Forms\Set $set) use ($slugField) {
             if ($state) {
                 $set($slugField, Str::slug($state));
             }

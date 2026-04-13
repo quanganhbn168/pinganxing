@@ -40,7 +40,7 @@ class PostCategoryForm
                             ->label('Tên danh mục')
                             ->required()
                             ->maxLength(255)
-                            ->live(onBlur: true)
+                            ->live(debounce: 500)
                             ->afterStateUpdated(SlugInput::autoSlug()),
 
                         SlugInput::make('slug'),
