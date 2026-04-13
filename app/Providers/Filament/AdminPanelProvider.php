@@ -38,31 +38,6 @@ class AdminPanelProvider extends PanelProvider
                 ->format('webp')
                 ->quality(85),
         ]);
-
-        RichEditor::configureUsing(function (RichEditor $builder) {
-            $builder->plugins([
-                SourceCodePlugin::make(),
-                AttachCuratorMediaPlugin::make(),
-            ])->toolbarButtons([
-                [
-                    'attachCuratorMedia',
-                    'blockquote',
-                    'bold',
-                    'bulletList',
-                    'codeBlock',
-                    'h2',
-                    'h3',
-                    'italic',
-                    'link',
-                    'orderedList',
-                    'redo',
-                    'strike',
-                    'underline',
-                    'undo',
-                    'sourceCode',
-                ]
-            ]);
-        });
     }
 
     public function panel(Panel $panel): Panel
