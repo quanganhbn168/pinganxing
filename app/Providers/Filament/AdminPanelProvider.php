@@ -21,18 +21,46 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\NavigationGroup;
 use Awcodes\Curator\CuratorPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Forms\Components\RichEditor;
+use Awcodes\RicherEditor\Plugins\SourceCodePlugin;
+use Awcodes\Curator\Config\CurationManager;
+use Awcodes\Curator\Curations\CurationPreset;
+use Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function boot(): void
     {
-        \Awcodes\Curator\Config\CurationManager::configure()->presets([
-            \Awcodes\Curator\Curations\CurationPreset::make('Ảnh chuẩn SEO (1200x630)')
+        CurationManager::configure()->presets([
+            CurationPreset::make('Ảnh chuẩn SEO (1200x630)')
                 ->width(1200)
                 ->height(630)
                 ->format('webp')
                 ->quality(85),
         ]);
+
+        RichEditor::configureUsing(function (RichEditor $builder) {
+            $builder->plugins([
+                SourceCodePlugin::make(),
+                AttachCuratorMediaPlugin::make(),
+            ])->toolbarButtons([
+                'attachCuratorMedia',
+                'blockquote',
+                'bold',
+                'bulletList',
+                'codeBlock',
+                'h2',
+                'h3',
+                'italic',
+                'link',
+                'orderedList',
+                'redo',
+                'strike',
+                'underline',
+                'undo',
+                'sourceCode',
+            ]);
+        });
     }
 
     public function panel(Panel $panel): Panel

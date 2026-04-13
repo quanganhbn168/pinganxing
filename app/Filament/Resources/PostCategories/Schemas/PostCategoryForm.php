@@ -47,10 +47,12 @@ class PostCategoryForm
 
                         CuratorPicker::make('image_id')
                             ->label('Ảnh đại diện')
-                            ->directory('post-categories'),
+                            ->directory('post-categories')
+                            ->multiple(false),
                         CuratorPicker::make('banner_id')
                             ->label('Banner')
-                            ->directory('post-categories'),
+                            ->directory('post-categories')
+                            ->multiple(false),
 
                         Textarea::make('description')
                             ->label('Mô tả ngắn')
