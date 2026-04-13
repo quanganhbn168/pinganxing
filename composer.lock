@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d5c008ee8c77ebd4e2ee31ab75bb776",
+    "content-hash": "e5a5e6dff5cbeadb2813c511c2122f08",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -73,16 +73,16 @@
         },
         {
             "name": "awcodes/filament-curator",
-            "version": "v5.0.6",
+            "version": "v5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/awcodes/filament-curator.git",
-                "reference": "e2fe9b03e6c62977f5c0977828feda943122bb1c"
+                "reference": "714bd351b1afc2655d0c52b86cf8bf090888f137"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/awcodes/filament-curator/zipball/e2fe9b03e6c62977f5c0977828feda943122bb1c",
-                "reference": "e2fe9b03e6c62977f5c0977828feda943122bb1c",
+                "url": "https://api.github.com/repos/awcodes/filament-curator/zipball/714bd351b1afc2655d0c52b86cf8bf090888f137",
+                "reference": "714bd351b1afc2655d0c52b86cf8bf090888f137",
                 "shasum": ""
             },
             "require": {
@@ -94,9 +94,9 @@
             "require-dev": {
                 "laravel/pint": "^1.10",
                 "orchestra/testbench": "^9.0|^10.0",
-                "pestphp/pest": "^3.0|^4.0",
-                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
-                "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+                "pestphp/pest": "^4.3",
+                "pestphp/pest-plugin-laravel": "^4.0",
+                "pestphp/pest-plugin-livewire": "^4.0",
                 "rector/rector": "^2.0",
                 "spatie/laravel-ray": "^1.26"
             },
@@ -152,7 +152,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-26T18:17:22+00:00"
+            "time": "2026-01-19T17:51:17+00:00"
         },
         {
             "name": "awcodes/richer-editor",
