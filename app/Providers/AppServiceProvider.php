@@ -26,8 +26,9 @@ class AppServiceProvider extends ServiceProvider
         RichEditor::configureUsing(function (RichEditor $builder) {
             $builder->plugins([
                 SourceCodePlugin::make(),
+                \Awcodes\Curator\Components\Forms\RichEditor\AttachCuratorMediaPlugin::make(),
             ])->toolbarButtons([
-                        'attachFiles',
+                        'attachCuratorMedia',
                         'blockquote',
                         'bold',
                         'bulletList',
