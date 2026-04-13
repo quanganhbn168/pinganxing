@@ -30,8 +30,8 @@
     <meta name="twitter:description" content="@yield('meta_description', $setting->meta_description ?? '')" />
     <meta name="twitter:image"       content="@yield('meta_image', $globalMetaImageUrl)" />
     {{-- Fonts, Favicons --}}
-    <link rel="icon" href="{{ $globalFaviconUrl }}" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ $globalFaviconUrl }}" />
+    <link rel="icon" href="{{ $globalFaviconUrl }}?v={{ time() }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ $globalFaviconUrl }}?v={{ time() }}" />
     
     {{-- FontAwesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
