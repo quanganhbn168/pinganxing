@@ -29,23 +29,22 @@ class GlobalSettingsComposer
             return;
         }
 
-        // Cache the resolution of URLs to avoid DB hits
-        $urls = Cache::remember('global_settings_media_urls', 60 * 24, function () {
-            $favMedia = (!empty($this->setting->favicon) && is_numeric($this->setting->favicon)) 
-                ? Media::find($this->setting->favicon) : null;
-            
-            $metaMedia = (!empty($this->setting->meta_image) && is_numeric($this->setting->meta_image)) 
-                ? Media::find($this->setting->meta_image) : null;
-            
-            $logoMedia = (!empty($this->setting->logo) && is_numeric($this->setting->logo)) 
-                ? Media::find($this->setting->logo) : null;
+        $resolveMedia = function ($settingValue) {
+            if (empty($settingValue)) return null;
+            // Handle if Curator saved it as an array (e.g. ['45'])
+            $id = is_array($settingValue) ? ($settingValue[0] ?? null) : $settingValue;
+            return (is_numeric($id)) ? Media::find($id) : null;
+        };
 
-            return [
-                'globalFaviconUrl' => $favMedia ? url($favMedia->url) : asset('favicon.ico'),
-                'globalMetaImageUrl' => $metaMedia ? url($metaMedia->url) : '',
-                'globalLogoUrl' => $logoMedia ? url($logoMedia->url) : ''
-            ];
-        });
+        $favMedia = $resolveMedia($this->setting->favicon);
+        $metaMedia = $resolveMedia($this->setting->meta_image);
+        $logoMedia = $resolveMedia($this->setting->logo);
+
+        $urls = [
+            'globalFaviconUrl' => $favMedia ? url($favMedia->url) : asset('favicon.ico'),
+            'globalMetaImageUrl' => $metaMedia ? url($metaMedia->url) : '',
+            'globalLogoUrl' => $logoMedia ? url($logoMedia->url) : ''
+        ];
 
         foreach ($urls as $key => $url) {
             $view->with($key, $url);

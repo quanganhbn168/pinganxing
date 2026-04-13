@@ -78,6 +78,9 @@ class ManageSettings extends SettingsPage
                                 TextInput::make('email')
                                     ->label('Email liên hệ')
                                     ->email(),
+                                TextInput::make('working_hours')
+                                    ->label('Giờ làm việc')
+                                    ->helperText('Hiển thị trên Header gốc ngang màn hình'),
                                 TextInput::make('address')
                                     ->label('Địa chỉ công ty')
                                     ->columnSpanFull(),

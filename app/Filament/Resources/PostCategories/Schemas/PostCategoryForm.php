@@ -25,16 +25,9 @@ class PostCategoryForm
                         Select::make('parent_id')
                             ->label('Danh mục cha')
                             ->placeholder('-- Danh mục gốc --')
-                            ->options(function (?PostCategory $record) {
-                                $query = PostCategory::query()->where('status', 1);
-                                if ($record) {
-                                    $excludeIds = array_merge([$record->id], $record->descendantIds());
-                                    $query->whereNotIn('id', $excludeIds);
-                                }
-                                return $query->orderBy('name')->pluck('name', 'id');
-                            })
+                            ->options(fn (?PostCategory $record) => PostCategory::getTreeOptions($record?->id))
                             ->searchable()
-                            ->nullable(),
+                            ->default(0),
 
                         TextInput::make('name')
                             ->label('Tên danh mục')

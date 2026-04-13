@@ -8,7 +8,7 @@
             </a>
             @endif
             <div class="flex items-center gap-2 text-gray-300">
-                <i class="fas fa-clock text-gray-400"></i> T2 - T7: 08:00 - 17:30
+                <i class="fas fa-clock text-gray-400"></i> {{ $setting->working_hours ?? 'T2 - T7: 08:00 - 17:30' }}
             </div>
         </div>
         <div class="flex items-center gap-4">

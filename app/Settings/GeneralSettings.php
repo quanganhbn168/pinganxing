@@ -22,6 +22,7 @@ class GeneralSettings extends Settings
     public ?string $youtube;
     public ?string $tiktok;
     public ?string $bct_link;
+    public ?string $working_hours;
 
     // Tai do an tap tin
     public ?string $catalog_file;
