@@ -14,7 +14,7 @@
         <div class="flex items-center gap-4">
             <span class="flex items-center gap-2">
                 <i class="fas fa-headset text-blue-400"></i> Hỗ trợ 24/7: 
-                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '') }}" class="text-blue-400 hover:text-white transition-colors">{{ $setting->phone ?? '' }}</a>
+                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '') }}" class="text-blue-400 hover:text-white transition-colors">{{ $setting->phone_display ?? $setting->phone ?? '' }}</a>
             </span>
             <div class="h-4 w-px bg-gray-700"></div>
             @if(!empty($setting->zalo))

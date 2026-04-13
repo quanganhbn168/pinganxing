@@ -18,7 +18,7 @@
                     </div>
                     <div class="flex items-start">
                         <i class="fas fa-phone-alt mt-1 me-3 text-blue-500 w-4"></i>
-                        <a href="tel:{{ $setting->phone ?? '' }}" class="hover:text-white transition-colors">{{ $setting->phone ?? '' }}</a>
+                        <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '') }}" class="hover:text-white transition-colors">{{ $setting->phone_display ?? $setting->phone ?? '' }}</a>
                     </div>
                     <div class="flex items-start">
                         <i class="fas fa-envelope mt-1 me-3 text-blue-500 w-4"></i>
