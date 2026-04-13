@@ -18,11 +18,9 @@ class PostCategoryForm
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->columns(1)
             ->components([
 
                 Section::make('Thông tin danh mục')
-                    ->columns(1)
                     ->schema([
                         Select::make('parent_id')
                             ->label('Danh mục cha')
@@ -50,11 +48,13 @@ class PostCategoryForm
                         CuratorPicker::make('image_id')
                             ->label('Ảnh đại diện')
                             ->directory('post-categories')
-                            ->multiple(false),
+                            ->multiple(false)
+                            ->columnSpanFull(),
                         CuratorPicker::make('banner_id')
                             ->label('Banner')
                             ->directory('post-categories')
-                            ->multiple(false),
+                            ->multiple(false)
+                            ->columnSpanFull(),
 
                         Textarea::make('description')
                             ->label('Mô tả ngắn')
