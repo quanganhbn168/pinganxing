@@ -44,21 +44,23 @@ class AdminPanelProvider extends PanelProvider
                 SourceCodePlugin::make(),
                 AttachCuratorMediaPlugin::make(),
             ])->toolbarButtons([
-                'attachCuratorMedia',
-                'blockquote',
-                'bold',
-                'bulletList',
-                'codeBlock',
-                'h2',
-                'h3',
-                'italic',
-                'link',
-                'orderedList',
-                'redo',
-                'strike',
-                'underline',
-                'undo',
-                'sourceCode',
+                [
+                    'attachCuratorMedia',
+                    'blockquote',
+                    'bold',
+                    'bulletList',
+                    'codeBlock',
+                    'h2',
+                    'h3',
+                    'italic',
+                    'link',
+                    'orderedList',
+                    'redo',
+                    'strike',
+                    'underline',
+                    'undo',
+                    'sourceCode',
+                ]
             ]);
         });
     }
