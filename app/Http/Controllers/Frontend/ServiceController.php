@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Slug;
+use App\Settings\GeneralSettings;
+use App\Settings\PageSettings;
 
 class ServiceController extends Controller
 {
@@ -31,22 +33,22 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        // Lấy tất cả các danh mục cha, đồng thời tải sẵn các dịch vụ con của chúng
-        // để tránh lỗi N+1 query, giúp tối ưu tốc độ.
+        $pageSettings = app(PageSettings::class);
+        $setting      = app(GeneralSettings::class);
+
+        $pageTitle    = $pageSettings->services_title    ?: 'Dịch vụ';
+        $pageSubtitle = $pageSettings->services_headline ?: null;
+        $bannerUrl    = $setting->banner ?? asset('images/setting/no-banner.png');
+        $breadcrumbs  = [['label' => $pageTitle]];
+
         $serviceCategories = ServiceCategory::where('status', 1)
-            ->where('parent_id', 0) // Chỉ lấy danh mục cấp cao nhất
-            ->with('services') // Tải sẵn các dịch vụ liên quan
+            ->where('parent_id', 0)
+            ->with('services')
             ->get();
 
-        $pageTitle = 'Dịch vụ';
-        $breadcrumbItems = [
-            ['label' => 'Dịch vụ'],
-        ];
-
         return view('frontend.services.index', compact(
-            'serviceCategories',
-            'pageTitle',
-            'breadcrumbItems'
+            'serviceCategories', 'setting',
+            'pageTitle', 'pageSubtitle', 'bannerUrl', 'breadcrumbs'
         ));
     }
 

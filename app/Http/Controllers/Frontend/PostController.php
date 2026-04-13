@@ -30,37 +30,46 @@ class PostController extends Controller
     public function index()
     {
         $pageSettings = app(PageSettings::class);
-        // 1. Lấy các danh mục Root (parent_id = 0)
-        $postCategories = PostCategory::whereNull("parent_id")
-            ->where("status", 1)
+
+        // Lấy title/subtitle/breadcrumb từ PageSettings
+        $pageTitle    = $pageSettings->posts_title    ?: 'Tin tức';
+        $pageSubtitle = $pageSettings->posts_headline  ?: 'Cập nhật thông tin mới nhất về công nghệ và doanh nghiệp';
+        $breadcrumbs  = [['label' => $pageTitle]];
+
+        // 1. Danh mục Root
+        $postCategories = PostCategory::whereNull('parent_id')
+            ->where('status', 1)
             ->get();
 
-        // 2. Xử lý lấy bài viết bao gồm cả danh mục con (Recursive)
+        // 2. Gán bài viết theo cây danh mục
         foreach ($postCategories as $category) {
             $childIds = PostCategory::getTreeIds($category->id);
-            $posts = Post::whereIn('post_category_id', $childIds)
-                ->where("status", 1)
+            $catPosts = Post::whereIn('post_category_id', $childIds)
+                ->where('status', 1)
                 ->latest()
                 ->take(9)
                 ->get();
-            $category->setRelation('posts', $posts);
+            $category->setRelation('posts', $catPosts);
         }
 
-        // 3. Bài viết nổi bật (hiển thị hero riêng)
+        // 3. Bài nổi bật
         $featuredPost = Post::where('status', 1)
             ->where('is_featured', 1)
             ->with(['image', 'category'])
             ->latest('updated_at')
             ->first();
 
-        // 4. Danh sách bài viết (loại trừ bài nổi bật đã hiển thị riêng)
+        // 4. Danh sách bài (loại trừ bài nổi bật)
         $postsQuery = Post::where('status', 1)->with(['image', 'category'])->latest();
         if ($featuredPost) {
             $postsQuery->where('id', '!=', $featuredPost->id);
         }
         $posts = $postsQuery->paginate(12);
 
-        return view('frontend.post.index', compact('postCategories', 'pageSettings', 'posts', 'featuredPost'));
+        return view('frontend.post.index', compact(
+            'pageSettings', 'pageTitle', 'pageSubtitle', 'breadcrumbs',
+            'postCategories', 'posts', 'featuredPost'
+        ));
     }
 
     public function detail(Post $post)

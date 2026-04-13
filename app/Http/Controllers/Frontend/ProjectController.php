@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectCategory;
 use App\Models\Slug;
+use App\Settings\GeneralSettings;
+use App\Settings\PageSettings;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -59,26 +61,22 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projectFeature = Project::where("is_home",1)->where("status",1)->first();
-        if (!$projectFeature) { 
-            $projectFeature = Project::where("status", 1)->first();
-        }
+        $pageSettings = app(PageSettings::class);
+        $setting      = app(GeneralSettings::class);
+
+        $pageTitle    = $pageSettings->projects_title    ?: ($setting->projects_title ?? 'Dự án tiêu biểu');
+        $pageSubtitle = $pageSettings->projects_headline ?: null;
+        $bannerUrl    = $setting->banner ?? asset('images/setting/no-banner.png');
+        $breadcrumbs  = [['label' => $pageTitle]];
+
+        $projectFeature = Project::where('is_home', 1)->where('status', 1)->first()
+            ?? Project::where('status', 1)->first();
+
         $projects = Project::where('status', 1)->latest()->paginate(10);
 
-        $setting = app(\App\Settings\GeneralSettings::class);
-        $pageTitle = $setting->projects_title ?? 'Dự Án Tiêu Biểu';
-        $bannerUrl = $setting->banner ?? asset('images/setting/no-banner.png');
-        $breadcrumbs = [
-            ['label' => $pageTitle, 'url' => '']
-        ];
-
         return view('frontend.projects.index', compact(
-            'projectFeature',
-            'projects',
-            'setting',
-            'pageTitle',
-            'bannerUrl',
-            'breadcrumbs'
+            'projectFeature', 'projects', 'setting',
+            'pageTitle', 'pageSubtitle', 'bannerUrl', 'breadcrumbs'
         ));
     }
 

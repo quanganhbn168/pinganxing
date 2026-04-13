@@ -14,12 +14,20 @@ class CareerController extends Controller
     public function index()
     {
         $pageSettings = app(PageSettings::class);
+
+        $pageTitle    = $pageSettings->careers_title    ?: 'Tuyển dụng';
+        $pageSubtitle = $pageSettings->careers_headline ?: 'Cơ hội việc làm hấp dẫn tại CNETPos';
+        $breadcrumbs  = [['label' => $pageTitle]];
+
         $careers = Career::where('status', true)
             ->where(fn($q) => $q->whereNull('deadline')->orWhere('deadline', '>=', now()))
             ->latest('id')
             ->paginate(10);
-            
-        return view('frontend.careers.index', compact('careers','pageSettings'));
+
+        return view('frontend.careers.index', compact(
+            'careers', 'pageSettings',
+            'pageTitle', 'pageSubtitle', 'breadcrumbs'
+        ));
     }
 
     public function show(Career $career)

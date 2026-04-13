@@ -4,9 +4,9 @@
 @section('content')
 
 <x-frontend.page-hero
-    :title="$pageTitle ?? 'Tin tức'"
-    subtitle="Cập nhật thông tin mới nhất về công nghệ và doanh nghiệp"
-    :breadcrumb="$breadcrumbItems ?? [['label' => 'Tin tức']]"
+    :title="$pageTitle"
+    :subtitle="$pageSubtitle"
+    :breadcrumb="$breadcrumbs"
 />
 
 <section class="py-14 bg-white dark:bg-gray-900">
