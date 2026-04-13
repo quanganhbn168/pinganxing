@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use App\Models\Slug;
+use App\Helpers\TocHelper;
 use Illuminate\Http\Request;
 use App\Models\PostCategory;
 use App\Settings\PageSettings;
@@ -75,7 +76,7 @@ class PostController extends Controller
             ->take(6)
             ->get();
         
-        $processedData = \App\Helpers\TocHelper::process($post->content);
+        $processedData = TocHelper::process($post->content);
         $contentHtml = $processedData['html'];
         $tocList = $processedData['toc'];
         return view('frontend.post.detail', compact(

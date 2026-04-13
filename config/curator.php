@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'table_name' => 'curator',
     'curation_formats' => Awcodes\Curator\Enums\PreviewableExtensions::toArray(),
     'default_disk' => env('CURATOR_DEFAULT_DISK', 'public'),
     'default_directory' => null,

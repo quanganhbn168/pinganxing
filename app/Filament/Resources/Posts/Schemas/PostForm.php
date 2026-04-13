@@ -2,11 +2,17 @@
 
 namespace App\Filament\Resources\Posts\Schemas;
 
-use Filament\Forms\Components\FileUpload;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Awcodes\Richer\RicherEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use App\Models\PostCategory;
+use App\Traits\HasSeo;
 
 class PostForm
 {
@@ -14,39 +20,75 @@ class PostForm
     {
         return $schema
             ->components([
-                TextInput::make('post_category_id')
-                    ->required()
-                    ->numeric(),
-                TextInput::make('title')
-                    ->required(),
-                TextInput::make('slug')
-                    ->required(),
-                \Awcodes\Curator\Components\Forms\CuratorPicker::make('image_id')
-                    ->image()
-                    ->required(),
-                \Awcodes\Curator\Components\Forms\CuratorPicker::make('gallery')->label('Thư viện ảnh')->multiple(),
-                TextInput::make('banner'),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                Textarea::make('content')
-                    ->required()
-                    ->columnSpanFull(),
-                Toggle::make('is_featured')
-                    ->required(),
-                Toggle::make('status')
-                    ->required(),
-                Toggle::make('is_home')
-                    ->required(),
-                Toggle::make('is_menu')
-                    ->required(),
-                Toggle::make('is_footer')
-                    ->required(),
-                Textarea::make('meta_description')
-                    ->columnSpanFull(),
-                Textarea::make('meta_keywords')
-                    ->columnSpanFull(),
-                FileUpload::make('meta_image')
-                    ->image(),
+
+                // ── Thông tin chính ──────────────────────────────
+                Section::make('Thông tin bài viết')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('post_category_id')
+                            ->label('Danh mục')
+                            ->options(
+                                PostCategory::where('status', 1)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                            )
+                            ->searchable()
+                            ->required()
+                            ->columnSpanFull(),
+
+                        TextInput::make('title')
+                            ->label('Tiêu đề')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
+                        Textarea::make('description')
+                            ->label('Mô tả ngắn')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+
+                // ── Ảnh ─────────────────────────────────────────
+                Section::make('Hình ảnh')
+                    ->columns(2)
+                    ->schema([
+                        CuratorPicker::make('image_id')
+                            ->label('Ảnh đại diện')
+                            ->image(),
+
+                        CuratorPicker::make('banner_id')
+                            ->label('Ảnh Banner')
+                            ->image(),
+                    ]),
+
+                // ── Nội dung ─────────────────────────────────────
+                Section::make('Nội dung')
+                    ->schema([
+                        RicherEditor::make('content')
+                            ->label('Nội dung')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+
+                // ── Hiển thị ─────────────────────────────────────
+                Section::make('Cài đặt hiển thị')
+                    ->columns(2)
+                    ->schema([
+                        Toggle::make('status')
+                            ->label('Kích hoạt')
+                            ->default(true),
+                        Toggle::make('is_featured')
+                            ->label('Nổi bật'),
+                        Toggle::make('is_home')
+                            ->label('Hiển thị trang chủ'),
+                        Toggle::make('is_menu')
+                            ->label('Hiển thị menu'),
+                        Toggle::make('is_footer')
+                            ->label('Hiển thị footer'),
+                    ]),
+
+                // ── SEO ──────────────────────────────────────────
+                HasSeo::seoSection()->collapsed(),
             ]);
     }
 }
