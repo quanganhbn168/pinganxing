@@ -147,12 +147,17 @@ class MenuBuilder extends Widget implements HasForms, HasActions
                 ->required()
                 ->options([
                     'system_route' => 'Trang hệ thống',
+                    'page' => 'Trang đơn lẻ',
                     'category' => 'Danh mục Hàng hóa',
                     'product' => 'Sản phẩm',
                     'post_category' => 'Chuyên mục Tin tức',
                     'post' => 'Bài viết Đơn lẻ',
-                    'project_category' => 'Nhóm Dự án',
-                    'field_category' => 'Nhóm Lĩnh vực',
+                    'project_category' => 'Danh mục Dự án',
+                    'project' => 'Dự án Đơn lẻ',
+                    'field_category' => 'Danh mục Lĩnh vực',
+                    'field' => 'Lĩnh vực Đơn lẻ',
+                    'service_category' => 'Danh mục Dịch vụ',
+                    'service' => 'Dịch vụ Đơn lẻ',
                     'custom' => 'Link tự do',
                 ])
                 ->default('system_route')
@@ -169,12 +174,17 @@ class MenuBuilder extends Widget implements HasForms, HasActions
                 ->label('Liên kết chỉ định')
                 ->options(function (callable $get) {
                     return match ($get('type')) {
+                        'page' => \App\Models\Page::pluck('title', 'id'),
                         'category' => Category::pluck('name', 'id'),
                         'product' => Product::pluck('name', 'id'),
                         'post_category' => PostCategory::pluck('name', 'id'),
                         'post' => Post::pluck('title', 'id'),
                         'project_category' => ProjectCategory::pluck('name', 'id'),
+                        'project' => \App\Models\Project::pluck('name', 'id'),
                         'field_category' => FieldCategory::pluck('name', 'id'),
+                        'field' => \App\Models\Field::pluck('name', 'id'),
+                        'service_category' => \App\Models\ServiceCategory::pluck('name', 'id'),
+                        'service' => \App\Models\Service::pluck('name', 'id'),
                         default => [],
                     };
                 })
