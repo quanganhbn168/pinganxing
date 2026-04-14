@@ -14,10 +14,6 @@
 <section class="py-16 bg-white dark:bg-gray-900">
     <div class="max-w-screen-xl mx-auto px-4">
         <div class="text-center mb-16">
-            <h2 class="text-2xl md:text-4xl lg:text-5xl font-black uppercase text-gray-900 dark:text-white tracking-tighter">
-                {{ $pageTitle }}
-            </h2>
-            <div class="w-16 h-1 bg-brand-600 mx-auto mt-6 mb-6"></div>
             @if(isset($setting->projects_description) && !empty($setting->projects_description))
                 <p class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ $setting->projects_description }}</p>
             @endif
