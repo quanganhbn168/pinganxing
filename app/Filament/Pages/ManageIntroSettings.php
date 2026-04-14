@@ -110,6 +110,20 @@ class ManageIntroSettings extends SettingsPage
                                     CuratorPicker::make('story_image_id')
                                         ->label('Ảnh minh họa')
                                         ->acceptedFileTypes(['image/*']),
+                                    TextInput::make('founded_year')
+                                        ->label('Năm thành lập')
+                                        ->numeric()
+                                        ->minValue(1900)
+                                        ->maxValue((int) date('Y'))
+                                        ->placeholder('2014'),
+                                    TextInput::make('video_url')
+                                        ->label('Link Video (YouTube/Vimeo)')
+                                        ->placeholder('https://www.youtube.com/watch?v=...')
+                                        ->url(),
+                                    CuratorPicker::make('video_thumbnail_id')
+                                        ->label('Thumbnail Video')
+                                        ->description('Nếu để trống sẽ dùng ảnh minh họa câu chuyện')
+                                        ->acceptedFileTypes(['image/*']),
                                     RichEditor::make('story_description')
                                         ->label('Nội dung câu chuyện')
                                         ->columnSpanFull(),

@@ -15,6 +15,9 @@ class IntroSettings extends Settings
     public ?string $story_title;
     public ?string $story_description;   // Rich text / HTML
     public ?int    $story_image_id;
+    public ?int    $founded_year = null;
+    public ?string $video_url = null;
+    public ?int    $video_thumbnail_id = null;
 
     // ── Sứ mệnh & Tầm nhìn ─────────────────────────────────────
     public ?string $mission_title;
