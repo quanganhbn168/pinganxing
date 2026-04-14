@@ -183,6 +183,66 @@
 @endif
 
 {{-- ══════════════════════════════════════════════════════════ --}}
+{{-- SECTION 4.5: LỊCH SỬ PHÁT TRIỂN (TIMELINE)              --}}
+{{-- ══════════════════════════════════════════════════════════ --}}
+@php $timeline = $intro->timeline ?? []; @endphp
+@if(count($timeline))
+<section class="py-16 md:py-24 bg-white dark:bg-gray-900 overflow-hidden">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <div class="text-center mb-16">
+            <div class="text-xs font-black uppercase tracking-[0.3em] text-accent-500 mb-2">Hành trình của chúng tôi</div>
+            <h2 class="text-3xl md:text-4xl font-black text-brand-900 dark:text-white">Lịch sử phát triển</h2>
+        </div>
+
+        <div class="relative">
+            {{-- Trục giữa --}}
+            <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-100 dark:bg-gray-800 -translate-x-1/2 hidden md:block"></div>
+
+            <div class="space-y-12 md:space-y-0">
+                @foreach($timeline as $index => $item)
+                @php
+                    $isEven = $index % 2 === 0;
+                    $itemMedia = !empty($item['image_id']) ? \Awcodes\Curator\Models\Media::find($item['image_id']) : null;
+                @endphp
+                <div class="relative flex flex-col md:flex-row items-center justify-center md:mb-20 last:mb-0">
+                    {{-- Marker --}}
+                    <div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-accent-500 border-4 border-white dark:border-gray-900 -translate-x-1/2 z-10 hidden md:block"></div>
+
+                    {{-- Nội dung --}}
+                    <div class="w-full md:w-1/2 flex {{ $isEven ? 'md:justify-end md:pr-16' : 'md:justify-start md:pl-16 md:order-2' }}">
+                        <div class="bg-gray-50 dark:bg-gray-800/50 p-6 md:p-8 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow w-full max-w-xl">
+                            <div class="flex items-center gap-4 mb-4">
+                                <span class="text-2xl md:text-3xl font-black text-accent-500 leading-none">{{ $item['year'] ?? '' }}</span>
+                                <div class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+                            </div>
+                            <h3 class="text-xl font-bold text-brand-900 dark:text-white mb-3">{{ $item['title'] ?? '' }}</h3>
+                            @if(!empty($item['description']))
+                            <div class="prose prose-sm dark:prose-invert text-gray-600 dark:text-gray-400">
+                                {!! $item['description'] !!}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Ảnh minh họa (nếu có) --}}
+                    <div class="w-full md:w-1/2 mt-6 md:mt-0 flex {{ $isEven ? 'md:justify-start md:pl-16' : 'md:justify-end md:pr-16 md:order-1' }}">
+                        @if($itemMedia)
+                        <div class="relative w-full max-w-md rounded-2xl overflow-hidden shadow-lg aspect-video">
+                            <img src="{{ $itemMedia->url }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover">
+                        </div>
+                        @else
+                        <div class="hidden md:block w-full max-w-md h-1"></div>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ══════════════════════════════════════════════════════════ --}}
 {{-- SECTION 5: ĐỘI NGŨ                                       --}}
 {{-- ══════════════════════════════════════════════════════════ --}}
 @if($teams->isNotEmpty())
@@ -242,6 +302,70 @@
                 </a>
                 @endif
             </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ══════════════════════════════════════════════════════════ --}}
+{{-- SECTION 6.5: NỘI DUNG TÙY CHỈNH (BUILDER)                --}}
+{{-- ══════════════════════════════════════════════════════════ --}}
+@php $customBlocks = $intro->custom_blocks ?? []; @endphp
+@if(count($customBlocks))
+<section class="py-16 bg-white dark:bg-gray-900">
+    <div class="max-w-screen-xl mx-auto px-4">
+        <div class="space-y-20">
+            @foreach($customBlocks as $block)
+                @php
+                    $type = $block['type'] ?? 'text_block';
+                    $data = $block;
+                @endphp
+
+                @if($type === 'text_block')
+                    <div class="prose prose-lg dark:prose-invert max-w-4xl mx-auto">
+                        {!! $data['content'] ?? '' !!}
+                    </div>
+
+                @elseif($type === 'image_text_block')
+                    @php
+                        $blockMedia = !empty($data['image_id']) ? \Awcodes\Curator\Models\Media::find($data['image_id']) : null;
+                        $isRight = ($data['image_position'] ?? 'left') === 'right';
+                    @endphp
+                    <div class="flex flex-col {{ $isRight ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                        <div class="w-full lg:w-1/2">
+                            @if($blockMedia)
+                                <div class="rounded-2xl overflow-hidden shadow-xl">
+                                    <img src="{{ $blockMedia->url }}" alt="{{ $data['title'] ?? '' }}" class="w-full h-auto">
+                                </div>
+                            @endif
+                        </div>
+                        <div class="w-full lg:w-1/2">
+                            @if(!empty($data['title']))
+                                <h2 class="text-3xl font-black text-brand-900 dark:text-white mb-6 uppercase tracking-tight">{{ $data['title'] }}</h2>
+                            @endif
+                            <div class="prose prose-lg dark:prose-invert text-gray-600 dark:text-gray-300">
+                                {!! $data['content'] ?? '' !!}
+                            </div>
+                        </div>
+                    </div>
+
+                @elseif($type === 'video_block')
+                    <div class="max-w-4xl mx-auto">
+                        @if(!empty($data['title']))
+                            <h2 class="text-3xl font-black text-brand-900 dark:text-white text-center mb-6 uppercase tracking-tight">{{ $data['title'] }}</h2>
+                        @endif
+                        @if(!empty($data['description']))
+                            <p class="text-gray-600 dark:text-gray-400 text-center mb-8 text-lg leading-relaxed">{{ $data['description'] }}</p>
+                        @endif
+                        @php $blockVideoEmbed = (new \App\Http\Controllers\Frontend\IntroController)->toEmbedUrl($data['video_url'] ?? null); @endphp
+                        @if($blockVideoEmbed)
+                            <div class="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-black ring-8 ring-gray-100 dark:ring-gray-800">
+                                <iframe src="{{ $blockVideoEmbed }}" class="absolute inset-0 w-full h-full" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             @endforeach
         </div>
     </div>
