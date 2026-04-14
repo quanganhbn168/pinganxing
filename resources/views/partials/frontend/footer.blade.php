@@ -6,7 +6,7 @@
             {{-- Cột 1: Thông tin công ty --}}
             <div>
                 <a href="/" class="block mb-6">
-                    <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/logo-white.png') }}" class="h-12 md:h-14 object-contain filter brightness-0 invert" alt="{{ $setting->site_name ?? 'Logo' }}">
+                    <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/logo-white.png') }}" class="h-12 md:h-14 object-contain" alt="{{ $setting->site_name ?? 'Logo' }}">
                 </a>
                 <p class="text-sm text-gray-400 mb-6 leading-relaxed">
                     {{ $setting->description ?? 'CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.' }}
