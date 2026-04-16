@@ -6,7 +6,7 @@ use App\Filament\Forms\Components\SlugInput;
 use App\Models\Attribute;
 use App\Traits\HasSeo;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
-use Filament\Forms\Components\Actions\Action as FieldAction;
+use Filament\Actions\Action as FieldAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
