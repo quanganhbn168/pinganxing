@@ -68,6 +68,7 @@ class CategoryForm
                         CheckboxList::make('attributes')
                             ->label('Thuộc tính')
                             ->relationship('attributes', 'name')
+                            ->bulkToggleable()
                             ->columns(3)
                             ->helperText('VD: Màu sắc, Kích thước, RAM... Những thuộc tính này sẽ hiển thị khi tạo biến thể sản phẩm.'),
                     ]),

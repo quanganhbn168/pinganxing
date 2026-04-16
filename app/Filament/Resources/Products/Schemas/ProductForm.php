@@ -26,10 +26,8 @@ class ProductForm
         return $schema
             ->columns(1)
             ->components([
-                // ═════════════════════════════════════
-                // ROW 1: Thông tin cơ bản + Sidebar
-                // ═════════════════════════════════════
                 Section::make('Thông tin cơ bản')
+                    ->description('Định danh sản phẩm, phân loại danh mục và loại hàng hóa.')
                     ->schema([
                         Hidden::make('type')
                             ->default('simple')
@@ -49,9 +47,11 @@ class ProductForm
                         SlugInput::make('slug'),
                         TextInput::make('code')
                             ->label('Mã sản phẩm')
+                            ->placeholder('VD: CAM-IP-4MP-01')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(50),
+
                         Select::make('category_id')
                             ->label('Danh mục')
                             ->relationship('category', 'name')
@@ -65,12 +65,14 @@ class ProductForm
                             ->searchable()
                             ->preload()
                             ->required(),
+
                         Select::make('brand_id')
                             ->label('Thương hiệu')
                             ->relationship('brand', 'name')
                             ->searchable()
                             ->preload()
                             ->nullable(),
+
                         ToggleButtons::make('product_type')
                             ->label('Loại hàng hóa')
                             ->options([
@@ -84,27 +86,26 @@ class ProductForm
                     ])
                     ->columns(2),
 
-                // ═════════════════════════════════════
-                // ROW 2: Ảnh & Media (aside layout)
-                // ═════════════════════════════════════
-                Section::make('Ảnh & Media')
+                Section::make('Giá bán và tồn kho')
+                    ->description('Với sản phẩm có biến thể, giá và kho sẽ quản lý theo từng biến thể.')
                     ->schema([
-                        CuratorPicker::make('image_id')
-                            ->label('Ảnh đại diện'),
-                        CuratorPicker::make('banner_id')
-                            ->label('Banner'),
-                        CuratorPicker::make('gallery')
-                            ->label('Thư viện ảnh')
-                            ->multiple()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                        Toggle::make('has_variants')
+                            ->label('Có biến thể')
+                            ->disabled(fn (Get $get) => ! static::categoryHasVariantAttributes((int) ($get('category_id') ?? 0)))
+                            ->helperText(fn (Get $get) => static::categoryHasVariantAttributes((int) ($get('category_id') ?? 0))
+                                ? 'Bật nếu sản phẩm có nhiều phiên bản (màu, dung lượng, chuẩn kết nối...).'
+                                : 'Danh mục hiện tại chưa có thuộc tính dùng cho biến thể. Hãy cấu hình thuộc tính ở danh mục trước.')
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, bool $state) {
+                                $set('type', $state ? 'variable' : 'simple');
 
-                // ═════════════════════════════════════
-                // ROW 3: Giá & Kho (aside layout)
-                // ═════════════════════════════════════
-                Section::make('Giá & Kho')
-                    ->schema([
+                                if ($state) {
+                                    $set('is_on_sale', false);
+                                    $set('price_discount', null);
+                                }
+                            })
+                            ->columnSpanFull(),
+
                         TextInput::make('price')
                             ->label('Giá bán')
                             ->prefix('₫')
@@ -112,6 +113,7 @@ class ProductForm
                             ->stripCharacters('.')
                             ->numeric()
                             ->minValue(0)
+                            ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) $state : 0)
                             ->required(fn (Get $get) => ! (bool) $get('has_variants'))
                             ->disabled(fn (Get $get) => (bool) $get('has_variants'))
                             ->helperText(fn (Get $get) => (bool) $get('has_variants')
@@ -127,6 +129,7 @@ class ProductForm
                             ->helperText(fn (Get $get) => (bool) $get('has_variants')
                                 ? 'Sản phẩm có biến thể: tồn kho sẽ quản lý theo từng biến thể.'
                                 : null),
+
                         Toggle::make('is_on_sale')
                             ->label('Đang giảm giá')
                             ->live()
@@ -145,19 +148,35 @@ class ProductForm
                             ->stripCharacters('.')
                             ->numeric()
                             ->minValue(0)
+                            ->dehydrateStateUsing(fn ($state) => filled($state) ? (int) $state : null)
                             ->visible(fn (Get $get) => (bool) $get('is_on_sale') && ! (bool) $get('has_variants'))
                             ->requiredIf('is_on_sale', true)
+                            ->lt('price')
                             ->helperText('Nhập giá khuyến mãi (thấp hơn giá bán).'),
                     ])
                     ->columns(2),
 
-                // ═════════════════════════════════════
-                // ROW 4: Mô tả chi tiết
-                // ═════════════════════════════════════
+                Section::make('Ảnh và media')
+                    ->description('Ảnh đại diện sẽ dùng ở danh sách sản phẩm. Gallery dùng cho trang chi tiết.')
+                    ->schema([
+                        CuratorPicker::make('image_id')
+                            ->label('Ảnh đại diện'),
+                        CuratorPicker::make('banner_id')
+                            ->label('Banner'),
+                        CuratorPicker::make('gallery')
+                            ->label('Thư viện ảnh')
+                            ->multiple()
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
+
                 Section::make('Mô tả sản phẩm')
+                    ->description('Nội dung hiển thị ở trang chi tiết sản phẩm.')
                     ->schema([
                         Textarea::make('description')
                             ->label('Mô tả ngắn')
+                            ->placeholder('Tóm tắt ngắn gọn điểm nổi bật của sản phẩm...')
                             ->rows(3)
                             ->columnSpanFull(),
                         RichEditor::make('content')
@@ -168,39 +187,21 @@ class ProductForm
                             ->columnSpanFull(),
                     ]),
 
-                // ═════════════════════════════════════
-                // ROW 5: Trạng thái (aside compact)
-                // ═════════════════════════════════════
                 Section::make('Trạng thái & Hiển thị')
+                    ->description('Thiết lập trạng thái hoạt động và vị trí hiển thị sản phẩm.')
                     ->schema([
                         Toggle::make('status')
                             ->label('Kích hoạt')
                             ->default(true),
-                        Toggle::make('has_variants')
-                            ->label('Có biến thể')
-                            ->disabled(fn (Get $get) => ! static::categoryHasVariantAttributes((int) ($get('category_id') ?? 0)))
-                            ->helperText(fn (Get $get) => static::categoryHasVariantAttributes((int) ($get('category_id') ?? 0))
-                                ? 'Sản phẩm có nhiều phiên bản (màu, size...). Bật lên thì giá/kho sẽ quản lý theo biến thể.'
-                                : 'Danh mục hiện tại chưa có thuộc tính dùng cho biến thể. Hãy cấu hình thuộc tính ở danh mục trước.')
-                            ->live()
-                            ->afterStateUpdated(function (Set $set, bool $state) {
-                                $set('type', $state ? 'variable' : 'simple');
-
-                                if ($state) {
-                                    $set('is_on_sale', false);
-                                    $set('price_discount', null);
-                                }
-                            }),
                         Toggle::make('is_featured')
-                            ->label('Sản phẩm nổi bật'),
+                            ->label('Sản phẩm nổi bật')
+                            ->helperText('Ưu tiên hiển thị trong các khu vực nổi bật.'),
                         Toggle::make('is_home')
-                            ->label('Hiện trang chủ'),
+                            ->label('Hiện trang chủ')
+                            ->helperText('Hiển thị sản phẩm ở khối trang chủ.'),
                     ])
-                    ->columns(4),
+                    ->columns(3),
 
-                // ═════════════════════════════════════
-                // ROW 6: SEO (collapsed by default)
-                // ═════════════════════════════════════
                 HasSeo::seoSection(),
             ]);
     }

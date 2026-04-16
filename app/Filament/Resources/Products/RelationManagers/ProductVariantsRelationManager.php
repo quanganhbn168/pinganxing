@@ -256,10 +256,18 @@ class ProductVariantsRelationManager extends RelationManager
             ->label('Sinh biến thể')
             ->icon('heroicon-o-sparkles')
             ->color('primary')
-            ->disabled(! $this->hasVariantDefiningAttributes($categoryId))
-            ->tooltip(! $this->hasVariantDefiningAttributes($categoryId)
-                ? 'Danh mục của sản phẩm chưa có thuộc tính dùng cho biến thể.'
-                : null)
+            ->disabled(fn () => ! (bool) $this->getOwnerRecord()->has_variants || ! $this->hasVariantDefiningAttributes($categoryId))
+            ->tooltip(function () use ($categoryId) {
+                if (! (bool) $this->getOwnerRecord()->has_variants) {
+                    return 'Sản phẩm đang tắt chế độ biến thể. Hãy bật "Có biến thể" và lưu sản phẩm trước.';
+                }
+
+                if (! $this->hasVariantDefiningAttributes($categoryId)) {
+                    return 'Danh mục của sản phẩm chưa có thuộc tính dùng cho biến thể.';
+                }
+
+                return null;
+            })
             ->slideOver()
             ->schema([
                 Section::make('Chọn giá trị thuộc tính')
