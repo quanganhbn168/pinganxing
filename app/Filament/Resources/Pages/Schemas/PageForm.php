@@ -6,6 +6,7 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
@@ -24,12 +25,18 @@ class PageForm
                     ->schema([
                         Group::make()->schema([
                             Section::make('Nội dung trang')->schema([
-                                TextInput::make('title')
+                                SlugInput::sourceField(TextInput::make('title'))
                                     ->label('Tên trang')
                                     ->required()
-                                    ->maxLength(255)
-                                    ->live(debounce: 500)
-                                    ->afterStateUpdated(SlugInput::autoSlug('slug')),
+                                    ->maxLength(255),
+
+                                Hidden::make('__slug_locked')
+                                    ->default(false)
+                                    ->dehydrated(false),
+
+                                Hidden::make('__slug_last_auto')
+                                    ->default(null)
+                                    ->dehydrated(false),
 
                                 SlugInput::make('slug'),
 

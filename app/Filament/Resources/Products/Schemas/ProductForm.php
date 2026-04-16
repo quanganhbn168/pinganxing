@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Filament\Forms\Components\SlugInput;
 use App\Traits\HasSeo;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -27,13 +28,17 @@ class ProductForm
                 // ═════════════════════════════════════
                 Section::make('Thông tin cơ bản')
                     ->schema([
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên sản phẩm')
                             ->required()
                             ->maxLength(255)
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(SlugInput::autoSlug())
                             ->columnSpanFull(),
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
                         SlugInput::make('slug'),
                         TextInput::make('code')
                             ->label('Mã sản phẩm')

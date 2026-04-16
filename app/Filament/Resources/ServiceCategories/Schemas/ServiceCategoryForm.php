@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\ServiceCategories\Schemas;
 
+use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\ServiceCategory;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -22,30 +23,22 @@ class ServiceCategoryForm
 
                 Section::make('Thông tin danh mục')
                     ->schema([
-                        Select::make('parent_id')
-                            ->label('Danh mục cha')
-                            ->options(function (?ServiceCategory $record) {
-                                $query = ServiceCategory::query()->where('status', 1);
-                                if ($record) {
-                                    $excludeIds = [$record->id];
-                                    foreach ($record->children as $child) {
-                                        $excludeIds[] = $child->id;
-                                    }
-                                    $query->whereNotIn('id', $excludeIds);
-                                }
-                                return [0 => '-- Danh mục gốc --'] + $query->orderBy('name')->pluck('name', 'id')->toArray();
-                            })
-                            ->default(0)
-                            ->required()
-                            ->dehydrateStateUsing(fn ($state) => (int) ($state ?? 0))
-                            ->searchable(),
+                        ParentCategorySelect::make('parent_id')
+                            ->treeModel(ServiceCategory::class)
+                            ->rootAsZero('-- Danh mục gốc --'),
 
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên danh mục')
                             ->required()
-                            ->maxLength(255)
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(SlugInput::autoSlug()),
+                            ->maxLength(255),
+
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
                     ])

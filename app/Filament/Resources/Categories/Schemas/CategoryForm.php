@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\Categories\Schemas;
 
+use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\Category;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -23,26 +24,22 @@ class CategoryForm
 
                 Section::make('Thông tin danh mục')
                     ->schema([
-                        Select::make('parent_id')
-                            ->label('Danh mục cha')
-                            ->placeholder('-- Danh mục gốc --')
-                            ->options(function (?Category $record) {
-                                $query = Category::query()->where('status', 1);
-                                if ($record) {
-                                    $excludeIds = array_merge([$record->id], $record->getAllDescendantIds());
-                                    $query->whereNotIn('id', $excludeIds);
-                                }
-                                return $query->orderBy('name')->pluck('name', 'id');
-                            })
-                            ->searchable()
-                            ->nullable(),
+                        ParentCategorySelect::make('parent_id')
+                            ->treeModel(Category::class)
+                            ->rootAsZero('-- Danh mục gốc --'),
 
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên danh mục')
                             ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(SlugInput::autoSlug()),
+                            ->maxLength(255),
+
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
 

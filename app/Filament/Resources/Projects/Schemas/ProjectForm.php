@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use App\Traits\HasSeo;
 use App\Filament\Forms\Components\SlugInput;
 use Illuminate\Support\Str;
+use Filament\Forms\Components\Hidden;
 
 class ProjectForm
 {
@@ -27,11 +28,17 @@ class ProjectForm
             ->components([
                     Section::make('Thông tin cơ bản')
                             ->schema([
-                                TextInput::make('name')
+                                SlugInput::sourceField(TextInput::make('name'))
                                     ->label('Tên dự án')
                                     ->required()
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(SlugInput::autoSlug('slug'))
+                                    ->columnSpanFull(),
+                                Hidden::make('__slug_locked')
+                                    ->default(false)
+                                    ->dehydrated(false)
+                                    ->columnSpanFull(),
+                                Hidden::make('__slug_last_auto')
+                                    ->default(null)
+                                    ->dehydrated(false)
                                     ->columnSpanFull(),
                                 SlugInput::make('slug')
                                     ->columnSpanFull(),

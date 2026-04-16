@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\PostCategories\Schemas;
 
+use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\PostCategory;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -22,19 +23,22 @@ class PostCategoryForm
 
                 Section::make('Thông tin danh mục')
                     ->schema([
-                        Select::make('parent_id')
-                            ->label('Danh mục cha')
-                            ->placeholder('-- Danh mục gốc --')
-                            ->options(fn (?PostCategory $record) => PostCategory::getTreeOptions($record?->id))
-                            ->searchable()
-                            ->nullable(),
+                        ParentCategorySelect::make('parent_id')
+                            ->treeModel(PostCategory::class)
+                            ->rootAsNull('-- Danh mục gốc --'),
 
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên danh mục')
                             ->required()
-                            ->maxLength(255)
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(SlugInput::autoSlug()),
+                            ->maxLength(255),
+
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
 

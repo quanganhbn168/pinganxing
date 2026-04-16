@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources\ProjectCategories\Schemas;
 
+use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\ProjectCategory;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
@@ -24,20 +25,22 @@ class ProjectCategoryForm
 
                 Section::make('Thông tin danh mục')
                     ->schema([
-                        Select::make('parent_id')
-                            ->label('Danh mục cha')
-                            ->options(function (?ProjectCategory $record) {
-                                return [0 => '-- Danh mục gốc --'] + ProjectCategory::getTreeOptions(optional($record)->id);
-                            })
-                            ->searchable()
-                            ->default(0),
+                        ParentCategorySelect::make('parent_id')
+                            ->treeModel(ProjectCategory::class)
+                            ->rootAsZero('-- Danh mục gốc --'),
 
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên danh mục')
                             ->required()
-                            ->maxLength(255)
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(SlugInput::autoSlug('slug')),
+                            ->maxLength(255),
+
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
 

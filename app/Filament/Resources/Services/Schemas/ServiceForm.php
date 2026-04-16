@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Services\Schemas;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\ServiceCategory;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -30,12 +31,18 @@ class ServiceForm
                             ->searchable()
                             ->required(),
 
-                        TextInput::make('name')
+                        SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên dịch vụ')
                             ->required()
-                            ->maxLength(255)
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(SlugInput::autoSlug('slug')),
+                            ->maxLength(255),
+
+                        Hidden::make('__slug_locked')
+                            ->default(false)
+                            ->dehydrated(false),
+
+                        Hidden::make('__slug_last_auto')
+                            ->default(null)
+                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
 
