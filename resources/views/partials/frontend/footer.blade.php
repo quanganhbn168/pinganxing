@@ -11,17 +11,27 @@
                 <p class="text-sm text-gray-400 mb-6 leading-relaxed">
                     {{ $setting->description ?? 'CnetPOS - Đồng hành cùng bạn trên "Hành trình tới tương lai", mang đến giải pháp hiện đại và đẳng cấp.' }}
                 </p>
+                
+                
                 <div class="space-y-3 text-sm">
+                    
                     <div class="flex items-start">
-                        <i class="fas fa-map-marker-alt mt-1 me-3 text-blue-500 w-4"></i>
-                        <span>{{ $setting->address ?? 'Tầng 3...' }}</span>
+                        <i class="fa-solid fa-building mt-1 me-3 text-blue-500 w-4"></i>
+                        <span>MST: {{ $setting->tax_code ?? '2301372686' }}</span>
                     </div>
                     <div class="flex items-start">
+                        <i class="fas fa-map-marker-alt mt-1 me-3 text-blue-500 w-4"></i>
+                        <span>Địa chỉ: {{ $setting->address ?? 'Tầng 3...' }}</span>
+                    </div>
+
+                    <div class="flex items-start">
                         <i class="fas fa-phone-alt mt-1 me-3 text-blue-500 w-4"></i>
+                        <span>SĐT: </span>
                         <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '') }}" class="hover:text-white transition-colors">{{ $setting->phone_display ?? $setting->phone ?? '' }}</a>
                     </div>
                     <div class="flex items-start">
                         <i class="fas fa-envelope mt-1 me-3 text-blue-500 w-4"></i>
+                        <span>Email: </span>
                         <a href="mailto:{{ $setting->email ?? '' }}" class="hover:text-white transition-colors">{{ $setting->email ?? '' }}</a>
                     </div>
                 </div>
