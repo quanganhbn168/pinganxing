@@ -148,11 +148,12 @@
                 <div id="product-price-box" class="text-4xl font-bold text-blue-700 dark:text-blue-500 mb-8">
                     @if($product->price > 0)
                         <span id="product-current-price">{{ number_format($product->price) }}</span> <span class="text-2xl font-normal underline">đ</span>
-                        <span class="italic">(giá chưa bao gồm VAT)</span>
+
                     @else
                         <span id="product-current-price" class="text-red-500">Liên hệ báo giá</span>
                     @endif
                     <div id="product-compare-price" class="text-base font-normal text-gray-500 line-through mt-1 hidden"></div>
+                    <small><span class="italic">(giá chưa bao gồm VAT)</span></small>
                 </div>
 
                 <div class="mb-8">
