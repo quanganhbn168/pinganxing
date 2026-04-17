@@ -148,6 +148,7 @@
                 <div id="product-price-box" class="text-4xl font-bold text-blue-700 dark:text-blue-500 mb-8">
                     @if($product->price > 0)
                         <span id="product-current-price">{{ number_format($product->price) }}</span> <span class="text-2xl font-normal underline">đ</span>
+                        <span class="italic">(giá chưa bao gồm VAT)</span>
                     @else
                         <span id="product-current-price" class="text-red-500">Liên hệ báo giá</span>
                     @endif
@@ -199,7 +200,7 @@
                 </div>
 
                 <div class="prose prose-sm md:prose-base text-gray-600 dark:text-gray-300 dark:prose-invert mb-8">
-                    {!! Str::limit(strip_tags($product->description), 300) !!}
+                    {!! $product->description !!}
                 </div>
 
                 {{-- Khối Liên hệ --}}
