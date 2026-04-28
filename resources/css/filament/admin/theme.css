@@ -6,3 +6,15 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../vendor/awcodes/filament-curator/resources/**/*.blade.php';
 @source '../../../../vendor/awcodes/richer-editor/resources/views/**/*.blade.php';
+
+/* Rich editor UX */
+.fi-fo-rich-editor {
+    position: relative;
+}
+
+.fi-fo-rich-editor .tiptap,
+.fi-fo-rich-editor .tiptap-editor {
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

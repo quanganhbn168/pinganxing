@@ -2,12 +2,9 @@
 
 namespace App\Filament\Resources\Slides\Schemas;
 
-use App\Enums\SliderType;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Schema;
 use App\Models\Slide;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
@@ -18,24 +15,32 @@ class SlideForm
     {
         return $schema
             ->components([
-                TextInput::make('title'),
-                TextInput::make('subtitle'),
+                Textarea::make('title')
+                    ->label('Tiêu đề')
+                    ->maxLength(255)
+                    ->rows(2)
+                    ->columnSpanFull(),
+                TextInput::make('subtitle')
+                    ->label('Tiêu đề phụ')
+                    ->maxLength(255),
                 Textarea::make('description')
+                    ->label('Mô tả')
                     ->columnSpanFull()
                     ->rows(3),
-                TextInput::make('link'),
-                TextInput::make('button_text'),
+                TextInput::make('link')
+                    ->label('Liên kết')
+                    ->maxLength(255),
+                TextInput::make('button_text')
+                    ->label('Nội dung nút')
+                    ->maxLength(255),
                 CuratorPicker::make('image_id')
                     ->label('Ảnh Slide / Banner')
                     ->buttonLabel('Tải lên / Chọn ảnh')
-                    ->helperText('Hệ thống tích hợp sẵn Curator Media. Anh có thể crop ảnh trực tiếp trong popup. Kích thước khuyên dùng: Trang chủ (1920x1080), Đối tác (800x400).')
+                    ->helperText('Ảnh bắt buộc. Kích thước khuyên dùng cho slide trang chủ: 1920x1080 hoặc rộng hơn theo tỷ lệ 16:9.')
+                    ->required()
                     ->columnSpanFull(),
-                Select::make('type')
-                    ->label('Loại')
-                    ->options(SliderType::class)
-                    ->default(SliderType::HOME)
-                    ->required(),
                 TextInput::make('position')
+                    ->label('Thứ tự sắp xếp')
                     ->required()
                     ->numeric()
                     ->default(fn() => Slide::max('position') + 1 ?: 1),
@@ -43,8 +48,6 @@ class SlideForm
                     ->label("Hiển thị")
                     ->default(true)
                     ->required(),
-                Hidden::make('is_home')
-                    ->default(false),
             ]);
     }
 }

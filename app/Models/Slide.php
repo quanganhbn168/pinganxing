@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-use App\Enums\SliderType;
-
 class Slide extends Model
 {
     use HasFactory;
@@ -19,14 +17,11 @@ class Slide extends Model
         'link',
         'button_text',
         'image_id',
-        'type',
         'position',
         'status',
-        'is_home',
     ];
 
     protected $casts = [
-        'type' => SliderType::class,
         'status' => 'boolean',
     ];
 
@@ -63,10 +58,4 @@ class Slide extends Model
     {
         return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'image_id');
     }
-
-    public function banner()
-    {
-        return $this->belongsTo(\Awcodes\Curator\Models\Media::class, 'banner_id');
-    }
-
 }

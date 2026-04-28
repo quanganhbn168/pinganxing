@@ -7,7 +7,6 @@ use App\Filament\Forms\Components\SlugInput;
 use App\Models\Category;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -32,14 +31,6 @@ class CategoryForm
                             ->label('Tên danh mục')
                             ->required()
                             ->maxLength(255),
-
-                        Hidden::make('__slug_locked')
-                            ->default(false)
-                            ->dehydrated(false),
-
-                        Hidden::make('__slug_last_auto')
-                            ->default(null)
-                            ->dehydrated(false),
 
                         SlugInput::make('slug'),
 

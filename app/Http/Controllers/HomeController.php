@@ -18,15 +18,13 @@ use App\Models\Career;
 use App\Models\ProjectCategory;
 use App\Models\Partner;
 use App\Models\Brand;
-use App\Enums\SliderType;
 use App\Settings\GeneralSettings;
 use App\Settings\HomeSettings;
 class HomeController extends Controller
 {
     public function index()
     {
-        $slides = Slide::where("status", 1)->where("type", SliderType::HOME)->with('image')->orderBy('position')->get();
-        $slide_banners = Slide::where("status", 1)->where("type", SliderType::BANNER_AD)->with('image')->get();
+        $slides = Slide::where("status", 1)->with('image')->orderBy('position')->get();
         $homeProducts = Product::where("status", 1)->where("is_home", 1)->get();
         $homeCategories = Category::where("status", 1)->where("is_home", 1)->get();
         $homeServices = Service::where("status", 1)->where("is_home", 1)->get();
@@ -73,7 +71,6 @@ class HomeController extends Controller
         return view('frontend.index', compact(
             "slides",
             "allPosts",
-            "slide_banners",
             "homeProducts",
             "homeCategories",
             "homeServices",

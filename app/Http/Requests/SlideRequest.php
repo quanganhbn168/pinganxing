@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Enum;
-use App\Enums\SliderType;
 
 class SlideRequest extends FormRequest
 {
@@ -16,12 +14,14 @@ class SlideRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'            => 'required|string|max:255',
+            'title'            => 'nullable|string|max:255',
+            'subtitle'         => 'nullable|string|max:255',
+            'description'      => 'nullable|string',
             'link'             => 'nullable|string|max:500',
+            'button_text'      => 'nullable|string|max:255',
             'position'         => 'nullable|integer|min:0',
             'status'           => 'boolean',
-            'image_original_path' => 'required|string|max:255',
-            'type'  => ['required', new Enum(SliderType::class)],
+            'image_id'         => 'required|integer',
         ];
     }
 
@@ -32,14 +32,14 @@ class SlideRequest extends FormRequest
             'link' => 'đường link',
             'position' => 'thứ tự',
             'status' => 'trạng thái hiển thị',
-            'image_original_path' => 'ảnh slide',
+            'image_id' => 'ảnh slide',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'title.required' => 'Vui lòng nhập tiêu đề slide.',
+            'image_id.required' => 'Vui lòng chọn ảnh slide.',
         ];
     }
 

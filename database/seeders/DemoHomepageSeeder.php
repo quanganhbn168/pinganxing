@@ -12,7 +12,6 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Slide;
-use App\Enums\SliderType;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -125,27 +124,26 @@ class DemoHomepageSeeder extends Seeder
         }
 
         // 5. SLIDES
-        $typeVal = \App\Enums\SliderType::HOME;
         $slide1 = Slide::firstOrCreate(
             ['title' => 'Kiến Trúc ERP Tương Lai'],
             [
                 'link' => '/lien-he',
-                'type' => $typeVal,
                 'status' => 1,
+                'position' => 1,
             ]
         );
-        $slide1->is_home = 1;
+        $slide1->position = 1;
         $slide1->save();
 
         $slide2 = Slide::firstOrCreate(
             ['title' => 'Tin Cậy. Bảo Mật. Uy Tín.'],
             [
                 'link' => '/lien-he',
-                'type' => $typeVal,
                 'status' => 1,
+                'position' => 2,
             ]
         );
-        $slide2->is_home = 1;
+        $slide2->position = 2;
         $slide2->save();
         
         // 6. FIELDS (Lĩnh vực ứng dụng)

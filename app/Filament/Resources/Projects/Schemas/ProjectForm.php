@@ -2,22 +2,16 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
-use Filament\Forms\Components\FileUpload;
+use App\Filament\Forms\Components\SlugInput;
+use App\Traits\HasSeo;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\ColorPicker;
-use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
-use App\Traits\HasSeo;
-use App\Filament\Forms\Components\SlugInput;
-use Illuminate\Support\Str;
-use Filament\Forms\Components\Hidden;
 
 class ProjectForm
 {
@@ -31,14 +25,6 @@ class ProjectForm
                                 SlugInput::sourceField(TextInput::make('name'))
                                     ->label('Tên dự án')
                                     ->required()
-                                    ->columnSpanFull(),
-                                Hidden::make('__slug_locked')
-                                    ->default(false)
-                                    ->dehydrated(false)
-                                    ->columnSpanFull(),
-                                Hidden::make('__slug_last_auto')
-                                    ->default(null)
-                                    ->dehydrated(false)
                                     ->columnSpanFull(),
                                 SlugInput::make('slug')
                                     ->columnSpanFull(),

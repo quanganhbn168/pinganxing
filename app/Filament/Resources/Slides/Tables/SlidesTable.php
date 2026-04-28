@@ -21,16 +21,12 @@ class SlidesTable
                 TextColumn::make('title')
                     ->label('Tiêu đề / Link')
                     ->searchable(['title', 'link'])
+                    ->wrap()
                     ->description(fn ($record): ?string => $record->link),
-                TextColumn::make('type')
-                    ->label('Loại hiển thị')
-                    ->badge()
-                    ->sortable(),
                 TextColumn::make('position')
-                    ->label('Thứ tự sắp xếp')
+                    ->label('Sắp xếp')
                     ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
                 \Filament\Tables\Columns\ToggleColumn::make('status')
                     ->label('Trạng thái'),
                 TextColumn::make('created_at')

@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Posts\Schemas;
 
+use App\Filament\Forms\Components\SlugInput;
+use App\Models\PostCategory;
+use App\Traits\HasSeo;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
-use Awcodes\Richer\RicherEditor;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use App\Models\PostCategory;
-use App\Traits\HasSeo;
 
 class PostForm
 {
@@ -36,10 +36,13 @@ class PostForm
                             ->required()
                             ->columnSpanFull(),
 
-                        TextInput::make('title')
+                        SlugInput::sourceField(TextInput::make('title'))
                             ->label('Tiêu đề')
                             ->required()
                             ->maxLength(255)
+                            ->columnSpanFull(),
+
+                        SlugInput::make('slug')
                             ->columnSpanFull(),
 
                         Textarea::make('description')
@@ -66,9 +69,20 @@ class PostForm
                 // ── Nội dung ─────────────────────────────────────
                 Section::make('Nội dung')
                     ->schema([
-                        RicherEditor::make('content')
+                        RichEditor::make('content')
                             ->label('Nội dung')
                             ->required()
+                            ->toolbarButtons([
+                                ['bold', 'italic', 'underline', 'strike', 'link'],
+                                ['paragraph', 'h2', 'h3'],
+                                ['bulletList', 'orderedList'],
+                                ['undo', 'redo'],
+                            ])
+                            ->floatingToolbars([
+                                'paragraph' => ['bold', 'italic', 'underline', 'strike', 'link'],
+                                'heading' => ['h2', 'h3'],
+                                'list' => ['bulletList', 'orderedList'],
+                            ])
                             ->columnSpanFull(),
                     ]),
 

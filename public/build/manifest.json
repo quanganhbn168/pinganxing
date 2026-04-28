@@ -22,12 +22,12 @@
     "isEntry": true
   },
   "resources/css/filament/admin/theme.css": {
-    "file": "assets/theme-C_eu6XTA.css",
+    "file": "assets/theme-CPUKigEk.css",
     "src": "resources/css/filament/admin/theme.css",
     "isEntry": true
   },
   "resources/css/frontend.css": {
-    "file": "assets/frontend-DNJ_JIPX.css",
+    "file": "assets/frontend-Dp8I2TbL.css",
     "src": "resources/css/frontend.css",
     "isEntry": true
   },
@@ -38,18 +38,12 @@
     "isEntry": true
   },
   "resources/js/frontend.js": {
-    "file": "assets/frontend-SmXLnnz9.js",
+    "file": "assets/frontend-C9aAA3jD.js",
     "name": "frontend",
     "src": "resources/js/frontend.js",
     "isEntry": true,
     "css": [
-      "assets/frontend-3GcsHIza.css"
-    ],
-    "assets": [
-      "assets/fa-brands-400-BP5tdqmh.woff2",
-      "assets/fa-regular-400-nyy7hhHF.woff2",
-      "assets/fa-solid-900-DRAAbZTg.woff2",
-      "assets/fa-v4compatibility-DD84SGiu.woff2"
+      "assets/frontend-C8634EVZ.css"
     ]
   }
 }

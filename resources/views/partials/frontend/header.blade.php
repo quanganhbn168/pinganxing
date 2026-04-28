@@ -19,11 +19,6 @@
                     class="text-blue-400 hover:text-white transition-colors">{{ $setting->phone_display ?? $setting->phone ?? '' }}</a>
             </span>
             <div class="h-4 w-px bg-gray-700"></div>
-            @if(!empty($setting->zalo))
-                <a href="{{ $setting->zalo }}" target="_blank" class="hover:text-blue-400 transition-colors" title="Zalo">
-                    <i class="fab fa-neos text-lg"></i>
-                </a>
-            @endif
         </div>
     </div>
 </div>
@@ -34,8 +29,8 @@
     <nav class="max-w-screen-xl mx-auto flex flex-wrap items-center justify-between p-4">
         <!-- Logo -->
         <a href="{{ url('/') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/setting/no-image.png') }}" class="h-12 md:h-14 object-contain"
-                alt="{{ $setting->site_name ?? 'Logo' }}" />
+            <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/setting/no-image.png') }}"
+                class="h-12 md:h-14 object-contain" alt="{{ $setting->site_name ?? 'Logo' }}" />
         </a>
 
         <!-- Mobile Toggle & Actions -->

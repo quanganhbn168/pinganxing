@@ -36,13 +36,6 @@
     <link rel="icon" href="{{ rtrim($globalFaviconUrl, '?') }}" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ rtrim($globalFaviconUrl, '?') }}" />
 
-    {{-- FontAwesome --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        media="print" onload="this.media='all'">
-    <noscript>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    </noscript>
-
     {{-- Bundle Frontend CSS via Vite (Tailwind v4) --}}
     @vite(['resources/css/frontend.css'])
 
