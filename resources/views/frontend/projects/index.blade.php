@@ -5,116 +5,206 @@
 
 @section('content')
 
-<x-frontend.page-hero 
-    :image="$bannerUrl" 
-    :title="$pageTitle" 
-    :breadcrumb="$breadcrumbs" 
-/>
+@php
+    $mainProject = $projectFeature ?: $popularProjects->first();
+    $topProjects = $topProjects->when($mainProject, fn ($items) => $items->where('id', '!=', $mainProject->id))->take(2)->values();
+    $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
+@endphp
 
-<section class="py-16 bg-white dark:bg-gray-900">
-    <div class="max-w-screen-xl mx-auto px-4">
-        <div class="text-center mb-16">
-            @if(isset($setting->projects_description) && !empty($setting->projects_description))
-                <p class="text-lg text-gray-600 dark:text-gray-400 font-medium">{{ $setting->projects_description }}</p>
+<section class="project-index-hero {{ $bannerUrl ? 'has-banner' : '' }}" @if($bannerUrl) style="--project-hero-image: url('{{ $bannerUrl }}');" @endif>
+    <div class="container mx-auto px-4 max-w-7xl">
+        <nav class="project-index-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ url('/') }}">Trang chủ</a>
+            <span>/</span>
+            @if($activeCategory)
+                <a href="{{ route('frontend.projects.index') }}">Dự án</a>
+                <span>/</span>
+                <span>{{ $activeCategory->name }}</span>
+            @else
+                <span>Dự án</span>
             @endif
-        </div>
-
-        {{-- Khối dự án tiêu biểu (Hero Project) --}}
-        <div class="mb-16">
-            @if(isset($projectFeature) && $projectFeature)
-                <a href="{{ $projectFeature->slug_url ?? '#' }}" 
-                   class="group block bg-white dark:bg-gray-800 rounded-sm shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 {{ empty($projectFeature->slug_url) ? 'cursor-default pointer-events-none' : '' }}"
-                   @if(empty($projectFeature->slug_url)) onclick="return false;" @endif>
-                    <div class="flex flex-col lg:flex-row">
-                        {{-- Cột hình ảnh --}}
-                        <div class="w-full lg:w-3/5 relative aspect-video lg:aspect-auto">
-                            <img src="{{ $projectFeature->image ? $projectFeature->image->url : asset('images/setting/no-image.png') }}" alt="{{ $projectFeature->name ?? 'Dự án' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
-
-                        {{-- Cột thông tin --}}
-                        <div class="w-full lg:w-2/5 p-8 lg:p-10 flex flex-col justify-center">
-                            <h3 class="text-2xl font-bold text-brand-700 dark:text-brand-400 mb-6 group-hover:text-brand-800 transition-colors line-clamp-2">
-                                {{ $projectFeature->name ?? 'Hiện đang cập nhật' }}
-                            </h3>
-                            
-                            <div class="space-y-4">
-                                <div class="flex flex-col sm:flex-row sm:items-start border-b border-gray-100 dark:border-gray-700 pb-3">
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium w-36 mb-1 sm:mb-0"><i class="fas fa-building mr-2"></i> Chủ đầu tư:</span>
-                                    <strong class="text-gray-900 dark:text-white flex-1">{{ $projectFeature->investor ?? 'Hiện đang cập nhật' }}</strong>
-                                </div>
-                                
-                                <div class="flex flex-col sm:flex-row sm:items-start border-b border-gray-100 dark:border-gray-700 pb-3">
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium w-36 mb-1 sm:mb-0"><i class="fas fa-map-marker-alt mr-2"></i> Địa chỉ:</span>
-                                    <strong class="text-gray-900 dark:text-white flex-1 line-clamp-2">{{ $projectFeature->address ?? 'Hiện đang cập nhật' }}</strong>
-                                </div>
-                                
-                                <div class="flex flex-col sm:flex-row sm:items-start border-b border-gray-100 dark:border-gray-700 pb-3">
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium w-36 mb-1 sm:mb-0"><i class="fas fa-calendar-alt mr-2"></i> Năm thực hiện:</span>
-                                    <strong class="text-gray-900 dark:text-white flex-1">{{ $projectFeature->year ?? 'Hiện đang cập nhật' }}</strong>
-                                </div>
-                                
-                                <div class="flex flex-col sm:flex-row sm:items-start">
-                                    <span class="text-gray-500 dark:text-gray-400 font-medium w-36 mb-1 sm:mb-0"><i class="fas fa-dollar-sign mr-2"></i> Gói thầu:</span>
-                                    <strong class="text-gray-900 dark:text-white flex-1">
-                                        @if(isset($projectFeature->value) && is_numeric($projectFeature->value))
-                                            {{ number_format($projectFeature->value, 0, ',', '.') }} VNĐ
-                                        @else
-                                            Hiện đang cập nhật
-                                        @endif
-                                    </strong>
-                                </div>
-                            </div>
-
-                            <div class="mt-8">
-                                <span class="inline-flex items-center text-sm font-bold text-brand-600 dark:text-brand-400 group-hover:underline">
-                                    Xem chi tiết dự án <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            @endif
-        </div>
-
-        <div class="text-center mb-10">
-            <h2 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                Các dự án khác
-            </h2>
-            <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
-        </div>
-
-        @if(isset($projects) && $projects->isNotEmpty())
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                @foreach($projects as $project)
-                    <x-frontend.card 
-                        :href="$project->slug_url"
-                        :image="$project->image ? $project->image->url : asset('images/setting/no-image.png')"
-                        :title="$project->name"
-                        :description="$project->investor ? 'Chủ đầu tư: ' . $project->investor : ''"
-                    />
-                @endforeach
-            </div>
-            
-            @if(method_exists($projects, 'links'))
-                <div class="mt-10 flex justify-center">
-                    {{ $projects->links() }}
-                </div>
-            @endif
-        @else
-            <div class="bg-white dark:bg-gray-800 rounded-sm p-12 text-center border border-dashed border-gray-200 dark:border-gray-700 shadow-sm">
-                <i class="fas fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nội dung đang cập nhật</h3>
-                <p class="text-gray-500 dark:text-gray-400">Danh sách dự án đang được biên soạn.</p>
-            </div>
+        </nav>
+        <h1>{{ $pageTitle }}</h1>
+        @if($pageSubtitle)
+            <p>{{ $pageSubtitle }}</p>
         @endif
     </div>
 </section>
 
-<x-frontend.page-cta 
-    :title="$pageSettings->projects_cta_title" 
-    :description="$pageSettings->projects_cta_description" 
-    :link="$pageSettings->projects_cta_link" 
+<section class="project-index-page">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <form action="{{ $activeCategory ? $activeCategory->slug_url : route('frontend.projects.index') }}" method="GET" class="project-filter-bar">
+            <div class="project-search-box">
+                <input type="search" name="q" value="{{ $keyword }}" placeholder="Tìm kiếm dự án...">
+                <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="project-category-pills">
+                <a href="{{ route('frontend.projects.index') }}" class="{{ ! $activeCategory ? 'is-active' : '' }}">Tất cả</a>
+                @foreach($projectCategories as $category)
+                    <a href="{{ $category->slug_url }}" class="{{ $activeCategory && $activeCategory->id === $category->id ? 'is-active' : '' }}">
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
+
+            <select name="sort" onchange="this.form.submit()" aria-label="Sắp xếp dự án">
+                <option value="latest" @selected($sort === 'latest')>Mới nhất</option>
+                <option value="oldest" @selected($sort === 'oldest')>Cũ nhất</option>
+                <option value="featured" @selected($sort === 'featured')>Nổi bật</option>
+            </select>
+        </form>
+
+        @if($mainProject)
+        <div class="project-top-grid">
+            <article class="project-main-card">
+                <a href="{{ $mainProject->slug_url }}" class="project-main-image">
+                    <img src="{{ $mainProjectImage }}" alt="{{ $mainProject->name }}" loading="eager" decoding="async">
+                    <span>Nổi bật</span>
+                </a>
+                <div class="project-main-body">
+                    <div class="project-meta-line">
+                        @if($mainProject->category)
+                            <span>{{ $mainProject->category->name }}</span>
+                        @endif
+                        @if($mainProject->year)
+                            <time>{{ $mainProject->year }}</time>
+                        @endif
+                    </div>
+                    <h2><a href="{{ $mainProject->slug_url }}">{{ $mainProject->name }}</a></h2>
+                    <p>{{ Str::limit(strip_tags($mainProject->description ?? $mainProject->content), 150) }}</p>
+                    <div class="project-info-row">
+                        @if($mainProject->investor)
+                            <span><i class="fas fa-building"></i>{{ Str::limit($mainProject->investor, 34) }}</span>
+                        @endif
+                        @if($mainProject->address)
+                            <span><i class="fas fa-location-dot"></i>{{ Str::limit($mainProject->address, 34) }}</span>
+                        @endif
+                    </div>
+                    <a href="{{ $mainProject->slug_url }}" class="project-read-link">Xem chi tiết <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <div class="project-top-list">
+                @foreach($topProjects as $project)
+                @php
+                    $projectImage = $project->image?->url ?? 'https://placehold.co/360x240/eaf4fb/0e4a86?text=Project';
+                @endphp
+                <article class="project-top-card">
+                    <a href="{{ $project->slug_url }}" class="project-top-image">
+                        <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
+                    </a>
+                    <div class="project-top-body">
+                        <div class="project-meta-line">
+                            @if($project->category)
+                                <span>{{ $project->category->name }}</span>
+                            @endif
+                            @if($project->year)
+                                <time>{{ $project->year }}</time>
+                            @endif
+                        </div>
+                        <h3><a href="{{ $project->slug_url }}">{{ $project->name }}</a></h3>
+                        <p>{{ Str::limit(strip_tags($project->description ?? $project->content), 90) }}</p>
+                        <a href="{{ $project->slug_url }}" class="project-read-link">Xem chi tiết <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        @if(!empty($pageSettings->projects_content) && ! $activeCategory)
+        <section class="project-page-content">
+            {!! $pageSettings->projects_content !!}
+        </section>
+        @endif
+
+        <div class="project-content-grid">
+            <main>
+                <h2 class="project-block-title">{{ $activeCategory ? 'Dự án thuộc ' . $activeCategory->name : 'Tất cả dự án' }}</h2>
+
+                <div class="project-post-list">
+                    @forelse($projects as $project)
+                    @php
+                        $projectImage = $project->image?->url ?? 'https://placehold.co/360x220/eaf4fb/0e4a86?text=Project';
+                    @endphp
+                    <article class="project-list-card">
+                        <a href="{{ $project->slug_url }}" class="project-list-image">
+                            <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
+                        </a>
+                        <div class="project-list-body">
+                            <div class="project-meta-line">
+                                @if($project->category)
+                                    <span>{{ $project->category->name }}</span>
+                                @endif
+                                @if($project->year)
+                                    <time>{{ $project->year }}</time>
+                                @endif
+                            </div>
+                            <h3><a href="{{ $project->slug_url }}">{{ $project->name }}</a></h3>
+                            <p>{{ Str::limit(strip_tags($project->description ?? $project->content), 128) }}</p>
+                            @if($project->investor)
+                                <small>Chủ đầu tư: {{ Str::limit($project->investor, 60) }}</small>
+                            @endif
+                        </div>
+                        <a href="{{ $project->slug_url }}" class="project-list-arrow" aria-label="Xem {{ $project->name }}"><i class="fas fa-chevron-right"></i></a>
+                    </article>
+                    @empty
+                    <div class="project-empty-state">
+                        <i class="far fa-folder-open"></i>
+                        <p>Chưa có dự án phù hợp.</p>
+                    </div>
+                    @endforelse
+                </div>
+
+                @if($projects->hasPages())
+                    <div class="project-pagination">
+                        {{ $projects->links() }}
+                    </div>
+                @endif
+            </main>
+
+            <aside class="project-sidebar">
+                <section class="project-side-box">
+                    <h3>Dự án nổi bật</h3>
+                    <div class="project-featured-list">
+                        @foreach($popularProjects as $project)
+                        @php
+                            $projectImage = $project->image?->url ?? 'https://placehold.co/140x110/eaf4fb/0e4a86?text=Project';
+                        @endphp
+                        <a href="{{ $project->slug_url }}">
+                            <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
+                            <span>
+                                <strong>{{ Str::limit($project->name, 72) }}</strong>
+                                @if($project->year)
+                                    <time>{{ $project->year }}</time>
+                                @endif
+                            </span>
+                        </a>
+                        @endforeach
+                    </div>
+                </section>
+
+                <section class="project-side-box">
+                    <h3>Danh mục dự án</h3>
+                    <div class="project-topic-cloud">
+                        <a href="{{ route('frontend.projects.index') }}" class="{{ ! $activeCategory ? 'is-active' : '' }}">Tất cả danh mục</a>
+                        @foreach($projectCategories as $category)
+                            <a href="{{ $category->slug_url }}" class="{{ $activeCategory && $activeCategory->id === $category->id ? 'is-active' : '' }}">
+                                {{ $category->name }} <span>{{ $category->projects_count }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<x-frontend.page-cta
+    :title="$pageSettings->projects_cta_title"
+    :description="$pageSettings->projects_cta_description"
+    :link="$pageSettings->projects_cta_link"
 />
 
 @endsection

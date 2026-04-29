@@ -26,14 +26,17 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
+        $isNewsletter = $request->input('source') === 'newsletter';
+
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:255'],
             'phone' => [
-                'required',
+                $isNewsletter ? 'nullable' : 'required',
                 'regex:/^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/'
             ],
             'address' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email'],
+            'email' => [$isNewsletter ? 'required' : 'nullable', 'email'],
+            'subject' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string', 'max:1000'],
         ]);
 

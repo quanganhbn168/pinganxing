@@ -25,14 +25,19 @@ class HomeController extends Controller
     public function index()
     {
         $slides = Slide::where("status", 1)->with('image')->orderBy('position')->get();
-        $homeProducts = Product::where("status", 1)->where("is_home", 1)->get();
-        $homeCategories = Category::where("status", 1)->where("is_home", 1)->get();
-        $homeServices = Service::where("status", 1)->where("is_home", 1)->get();
+        $homeProducts = Product::where("status", 1)->where("is_home", 1)
+            ->with(['image', 'category'])
+            ->get();
+        $homeCategories = Category::where("status", 1)->where("is_home", 1)
+            ->with('image')
+            ->orderBy('position')
+            ->get();
+        $homeServices = Service::where("status", 1)->where("is_home", 1)->with(['image', 'banner'])->get();
         $homeProjectCategories = ProjectCategory::where("status", 1)->where("is_home", 1)->with([
             "projects" => function ($query) {
-                $query->where("status", 1);
+                $query->where("status", 1)->with(['image', 'category']);
             }
-        ])->get();
+        ])->orderBy('position')->get();
         $homeFields = FieldCategory::where("parent_id", 0)
             ->where("status", 1)
             ->with([
@@ -42,7 +47,7 @@ class HomeController extends Controller
             ])
             ->get();
         $homeProjects = $homeProjectCategories->pluck('projects')->flatten();
-        $allPosts = Post::where('status', 1)->latest()->take(3)->get();
+        $allPosts = Post::where('status', 1)->with(['image', 'category'])->latest()->take(4)->get();
         $homePostCategories = PostCategory::where('status', 1)
             ->where('is_home', 1)
             ->with([
@@ -66,7 +71,7 @@ class HomeController extends Controller
             $homeSettings->video_file = $media ? $media->url : null;
         }
 
-        $testimonials = Testimonial::where('status', 1)->get();
+        $testimonials = Testimonial::where('status', 1)->with('image')->get();
 
         return view('frontend.index', compact(
             "slides",

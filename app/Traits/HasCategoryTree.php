@@ -45,6 +45,23 @@ trait HasCategoryTree
         return $ids;
     }
 
+    /**
+     * Lấy ID của chính danh mục và toàn bộ con cháu.
+     *
+     * @param int $startId
+     * @return array<int>
+     */
+    public static function getTreeIds(int $startId): array
+    {
+        $record = static::with('childrenRecursive')->find($startId);
+
+        if (! $record) {
+            return [$startId];
+        }
+
+        return array_merge([$startId], $record->getAllDescendantIds());
+    }
+
     // ─── Dùng cho Select parent_id trong form Category ───
 
     /**

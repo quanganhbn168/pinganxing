@@ -9,6 +9,7 @@ use App\Helpers\TocHelper;
 use Illuminate\Http\Request;
 use App\Models\PostCategory;
 use App\Settings\PageSettings;
+use Awcodes\Curator\Models\Media;
 
 class PostController extends Controller
 {
@@ -27,7 +28,7 @@ class PostController extends Controller
         };
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $pageSettings = app(PageSettings::class);
 
@@ -35,10 +36,18 @@ class PostController extends Controller
         $pageTitle    = $pageSettings->posts_title    ?: 'Tin tức';
         $pageSubtitle = $pageSettings->posts_headline  ?: 'Cập nhật thông tin mới nhất về công nghệ và doanh nghiệp';
         $breadcrumbs  = [['label' => $pageTitle]];
+        $postsBannerUrl = $this->resolveMediaUrl($pageSettings->posts_banner);
+
+        $keyword = trim((string) $request->input('q', ''));
+        $categoryId = $request->input('category');
+        $sort = $request->input('sort', 'latest');
 
         // 1. Danh mục Root
-        $postCategories = PostCategory::whereNull('parent_id')
+        $postCategories = PostCategory::where(function ($query) {
+                $query->whereNull('parent_id')->orWhere('parent_id', 0);
+            })
             ->where('status', 1)
+            ->withCount(['posts' => fn ($query) => $query->where('status', 1)])
             ->get();
 
         // 2. Gán bài viết theo cây danh mục
@@ -60,16 +69,65 @@ class PostController extends Controller
             ->first();
 
         // 4. Danh sách bài (loại trừ bài nổi bật)
-        $postsQuery = Post::where('status', 1)->with(['image', 'category'])->latest();
+        $postsQuery = Post::where('status', 1)->with(['image', 'category']);
+        if ($keyword !== '') {
+            $postsQuery->where(function ($query) use ($keyword) {
+                $query->where('title', 'LIKE', "%{$keyword}%")
+                    ->orWhere('description', 'LIKE', "%{$keyword}%")
+                    ->orWhere('content', 'LIKE', "%{$keyword}%");
+            });
+        }
+        if ($categoryId && $categoryId !== 'all') {
+            $categoryIds = PostCategory::getTreeIds((int) $categoryId);
+            $postsQuery->whereIn('post_category_id', $categoryIds);
+        }
+        match ($sort) {
+            'oldest' => $postsQuery->oldest(),
+            'featured' => $postsQuery->orderByDesc('is_featured')->latest(),
+            default => $postsQuery->latest(),
+        };
         if ($featuredPost) {
             $postsQuery->where('id', '!=', $featuredPost->id);
         }
-        $posts = $postsQuery->paginate(12);
+        $posts = $postsQuery->paginate(8)->withQueryString();
+
+        $heroPosts = Post::where('status', 1)
+            ->with(['image', 'category'])
+            ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id))
+            ->latest()
+            ->take(2)
+            ->get();
+
+        $popularPosts = Post::where('status', 1)
+            ->with(['image', 'category'])
+            ->latest('updated_at')
+            ->take(5)
+            ->get();
 
         return view('frontend.post.index', compact(
             'pageSettings', 'pageTitle', 'pageSubtitle', 'breadcrumbs',
-            'postCategories', 'posts', 'featuredPost'
+            'postCategories', 'posts', 'featuredPost', 'heroPosts',
+            'popularPosts', 'keyword', 'categoryId', 'sort', 'postsBannerUrl'
         ));
+    }
+
+    private function resolveMediaUrl(mixed $settingValue): ?string
+    {
+        if (empty($settingValue)) {
+            return null;
+        }
+
+        if (is_string($settingValue) && str_starts_with($settingValue, '[') && str_ends_with($settingValue, ']')) {
+            $decoded = json_decode($settingValue, true);
+            if (is_array($decoded)) {
+                $settingValue = $decoded;
+            }
+        }
+
+        $id = is_array($settingValue) ? ($settingValue[0] ?? null) : $settingValue;
+        $media = is_numeric($id) ? Media::find((int) $id) : null;
+
+        return $media?->url ? url($media->url) : null;
     }
 
     public function detail(Post $post)

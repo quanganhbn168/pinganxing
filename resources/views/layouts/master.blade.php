@@ -52,7 +52,7 @@
 
     @include('partials.frontend.header')
 
-    <main id="main-content" class="min-h-screen @yield('main_padding', 'pt-16')">
+    <main id="main-content" class="min-h-screen">
         @yield('content')
     </main>
 
@@ -80,9 +80,6 @@
 
     {{-- Bundle Frontend JS via Vite --}}
     @vite(['resources/js/frontend.js'])
-
-    {{-- Flowbite Component Library JS --}}
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 
     <script>
         // Back to top logic

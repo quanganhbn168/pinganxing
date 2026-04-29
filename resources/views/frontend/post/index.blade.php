@@ -1,132 +1,211 @@
 @extends('layouts.master')
 @section('title', $pageTitle ?? 'Tin tức')
+@section('meta_description', $pageSettings->posts_description ?? '')
 
 @section('content')
 
-<x-frontend.page-hero
-    :title="$pageTitle"
-    :subtitle="$pageSubtitle"
-    :breadcrumb="$breadcrumbs"
-/>
+@php
+    $activeCategory = $categoryId ?: 'all';
+    $mainPost = $featuredPost ?: $popularPosts->first();
+    $topPosts = $heroPosts->when($mainPost, fn ($items) => $items->where('id', '!=', $mainPost->id))->take(2)->values();
+    $mainPostImage = $mainPost?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
+@endphp
 
-<section class="py-14 bg-white dark:bg-gray-900">
-    <div class="max-w-screen-xl mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
-
-            {{-- Cột nội dung chính --}}
-            <div class="lg:col-span-3 space-y-10">
-
-                {{-- ── BÀI VIẾT NỔI BẬT ─────────────────────────── --}}
-                @if(isset($featuredPost) && $featuredPost)
-                <div class="mb-2">
-                    <x-frontend.section-heading title="Bài viết nổi bật" />
-
-                    <a href="{{ $featuredPost->slug_url }}"
-                       class="group relative flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300">
-
-                        {{-- Ảnh --}}
-                        <div class="relative md:w-1/2 aspect-video md:aspect-auto overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-                            @if($featuredPost->image)
-                                <img src="{{ $featuredPost->image->url }}"
-                                     alt="{{ $featuredPost->title }}"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600 min-h-[240px]">
-                                    <i class="far fa-newspaper text-5xl text-blue-300 opacity-40"></i>
-                                </div>
-                            @endif
-
-                            {{-- Nhãn nổi bật --}}
-                            <div class="absolute top-4 left-4">
-                                <span class="inline-flex items-center gap-1.5 bg-amber-400 text-amber-900 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full shadow">
-                                    <i class="fas fa-star text-[10px]"></i> Nổi bật
-                                </span>
-                            </div>
-                        </div>
-
-                        {{-- Nội dung --}}
-                        <div class="flex flex-col justify-center p-6 md:p-8 md:w-1/2">
-                            @if($featuredPost->category)
-                                <span class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">
-                                    {{ $featuredPost->category->name }}
-                                </span>
-                            @endif
-
-                            <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-3">
-                                {{ $featuredPost->title }}
-                            </h2>
-
-                            @if($featuredPost->description)
-                                <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 mb-5 leading-relaxed">
-                                    {{ strip_tags($featuredPost->description) }}
-                                </p>
-                            @endif
-
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="flex items-center text-xs text-gray-400 gap-3">
-                                    <span class="flex items-center gap-1">
-                                        <i class="far fa-calendar-alt text-blue-500"></i>
-                                        {{ $featuredPost->updated_at->format('d/m/Y') }}
-                                    </span>
-                                </div>
-                                <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:gap-2 transition-all">
-                                    Đọc ngay <i class="fas fa-arrow-right text-[10px]"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                @endif
-
-                {{-- ── DANH SÁCH BÀI VIẾT ──────────────────────────── --}}
-                <div>
-                    @if(isset($featuredPost) && $featuredPost)
-                        <x-frontend.section-heading title="Bài viết mới nhất" />
-                    @else
-                        <x-frontend.section-heading title="Bài viết mới nhất" />
-                    @endif
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        @forelse($posts as $post)
-                            <x-frontend.card
-                                :href="$post->slug_url"
-                                :image="$post->image ? $post->image->url : null"
-                                :title="$post->title"
-                                :description="$post->description"
-                                :date="$post->created_at->format('d/m/Y')"
-                                :badge="$post->category->name ?? null"
-                            />
-                        @empty
-                            <div class="col-span-full text-center py-16 bg-gray-50 dark:bg-gray-800 rounded-2xl">
-                                <i class="far fa-newspaper text-4xl text-gray-300 mb-4 block"></i>
-                                <p class="text-gray-500">Chưa có bài viết nào.</p>
-                            </div>
-                        @endforelse
-                    </div>
-
-                    @if($posts->hasPages())
-                        <div class="mt-10 flex justify-center">
-                            {{ $posts->links('vendor.pagination.tailwind') }}
-                        </div>
-                    @endif
-                </div>
-
-            </div>
-
-            {{-- Sidebar --}}
-            <div class="lg:col-span-1">
-                <div class="sticky top-24">
-                    <x-frontend.aside />
-                </div>
-            </div>
-        </div>
+<section class="news-index-hero {{ $postsBannerUrl ? 'has-banner' : '' }}" @if($postsBannerUrl) style="--news-hero-image: url('{{ $postsBannerUrl }}');" @endif>
+    <div class="container mx-auto px-4 max-w-7xl">
+        <nav class="news-index-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ url('/') }}">Trang chủ</a>
+            <span>/</span>
+            <span>Tin tức</span>
+        </nav>
+        <h1>{{ $pageTitle ?? 'Tin tức & Blog' }}</h1>
+        <p>{{ $pageSubtitle ?? 'Cập nhật những xu hướng công nghệ, câu chuyện chuyển đổi số, kinh nghiệm vận hành và tin tức mới nhất từ CNETPOS.' }}</p>
     </div>
 </section>
 
-<x-frontend.page-cta 
-    :title="$pageSettings->posts_cta_title" 
-    :description="$pageSettings->posts_cta_description" 
-    :link="$pageSettings->posts_cta_link" 
-/>
+<section class="news-index-page">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <form action="{{ route('frontend.posts.index') }}" method="GET" class="news-filter-bar">
+            <div class="news-search-box">
+                <input type="search" name="q" value="{{ $keyword }}" placeholder="Tìm kiếm bài viết...">
+                <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="news-category-pills">
+                <a href="{{ route('frontend.posts.index', request()->except(['category', 'page'])) }}" class="{{ $activeCategory === 'all' ? 'is-active' : '' }}">Tất cả</a>
+                @foreach($postCategories as $category)
+                    <a href="{{ $category->slug_url }}">
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
+
+            <select name="sort" onchange="this.form.submit()" aria-label="Sắp xếp bài viết">
+                <option value="latest" @selected($sort === 'latest')>Mới nhất</option>
+                <option value="oldest" @selected($sort === 'oldest')>Cũ nhất</option>
+                <option value="featured" @selected($sort === 'featured')>Nổi bật</option>
+            </select>
+        </form>
+
+        @if($mainPost)
+        <div class="news-top-grid">
+            <article class="news-main-card">
+                <a href="{{ $mainPost->slug_url }}" class="news-main-image">
+                    <img src="{{ $mainPostImage }}" alt="{{ $mainPost->title }}" loading="eager" decoding="async">
+                    <span>Nổi bật</span>
+                </a>
+                <div class="news-main-body">
+                    <div class="news-meta-line">
+                        @if($mainPost->category)
+                            <span>{{ $mainPost->category->name }}</span>
+                        @endif
+                        <time datetime="{{ $mainPost->created_at->toDateString() }}">{{ $mainPost->created_at->format('d/m/Y') }}</time>
+                    </div>
+                    <h2><a href="{{ $mainPost->slug_url }}">{{ $mainPost->title }}</a></h2>
+                    <p>{{ Str::limit(strip_tags($mainPost->description ?? $mainPost->content), 150) }}</p>
+                    <a href="{{ $mainPost->slug_url }}" class="news-read-link">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </article>
+
+            <div class="news-top-list">
+                @foreach($topPosts as $post)
+                @php
+                    $postImage = $post->image?->url ?? 'https://placehold.co/360x240/eaf4fb/0e4a86?text=News';
+                @endphp
+                <article class="news-top-card">
+                    <a href="{{ $post->slug_url }}" class="news-top-image">
+                        <img src="{{ $postImage }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                    </a>
+                    <div class="news-top-body">
+                        <div class="news-meta-line">
+                            @if($post->category)
+                                <span>{{ $post->category->name }}</span>
+                            @endif
+                            <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('d/m/Y') }}</time>
+                        </div>
+                        <h3><a href="{{ $post->slug_url }}">{{ $post->title }}</a></h3>
+                        <p>{{ Str::limit(strip_tags($post->description ?? $post->content), 92) }}</p>
+                        <a href="{{ $post->slug_url }}" class="news-read-link">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        @if(!empty($pageSettings->posts_content))
+        <section class="news-page-content">
+            {!! $pageSettings->posts_content !!}
+        </section>
+        @endif
+
+        <div class="news-content-grid">
+            <main>
+                <h2 class="news-block-title">Tất cả bài viết</h2>
+
+                <div class="news-post-list">
+                    @forelse($posts as $post)
+                    @php
+                        $postImage = $post->image?->url ?? 'https://placehold.co/360x220/eaf4fb/0e4a86?text=News';
+                    @endphp
+                    <article class="news-list-card">
+                        <a href="{{ $post->slug_url }}" class="news-list-image">
+                            <img src="{{ $postImage }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                        </a>
+                        <div class="news-list-body">
+                            <div class="news-meta-line">
+                                @if($post->category)
+                                    <span>{{ $post->category->name }}</span>
+                                @endif
+                                <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('d/m/Y') }}</time>
+                            </div>
+                            <h3><a href="{{ $post->slug_url }}">{{ $post->title }}</a></h3>
+                            <p>{{ Str::limit(strip_tags($post->description ?? $post->content), 130) }}</p>
+                        </div>
+                        <a href="{{ $post->slug_url }}" class="news-list-arrow" aria-label="Đọc {{ $post->title }}"><i class="fas fa-chevron-right"></i></a>
+                    </article>
+                    @empty
+                    <div class="news-empty-state">
+                        <i class="far fa-newspaper"></i>
+                        <p>Chưa có bài viết phù hợp.</p>
+                    </div>
+                    @endforelse
+                </div>
+
+                @if($posts->hasPages())
+                    <div class="news-pagination">
+                        {{ $posts->links() }}
+                    </div>
+                @endif
+            </main>
+
+            <aside class="news-sidebar">
+                <section class="news-side-box">
+                    <h3>Bài viết nổi bật</h3>
+                    <div class="news-featured-list">
+                        @foreach($popularPosts as $post)
+                        @php
+                            $postImage = $post->image?->url ?? 'https://placehold.co/140x110/eaf4fb/0e4a86?text=News';
+                        @endphp
+                        <a href="{{ $post->slug_url }}">
+                            <img src="{{ $postImage }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                            <span>
+                                <strong>{{ Str::limit($post->title, 72) }}</strong>
+                                <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('d/m/Y') }}</time>
+                            </span>
+                        </a>
+                        @endforeach
+                    </div>
+                </section>
+
+                <section class="news-side-box">
+                    <h3>Chủ đề quan tâm</h3>
+                    <div class="news-topic-cloud">
+                        <a href="{{ route('frontend.posts.index') }}" class="{{ $activeCategory === 'all' ? 'is-active' : '' }}">Tất cả chủ đề</a>
+                        @foreach($postCategories as $category)
+                            <a href="{{ $category->slug_url }}">
+                                {{ $category->name }} <span>{{ $category->posts_count }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <section class="news-newsletter">
+            <div class="news-newsletter-icon">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <div>
+                <h2>Đăng ký nhận bản tin</h2>
+                <p>Nhận những bài viết hữu ích về công nghệ, chuyển đổi số và giải pháp quản trị doanh nghiệp mới nhất từ CNETPOS.</p>
+                @error('email')
+                    <div class="news-newsletter-message is-error">{{ $message }}</div>
+                @enderror
+            </div>
+            <form action="{{ route('contact.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="source" value="newsletter">
+                <input type="hidden" name="name" value="Đăng ký nhận bản tin">
+                <input type="hidden" name="subject" value="Đăng ký nhận bản tin">
+                <input type="hidden" name="message" value="Khách hàng đăng ký nhận bản tin từ trang tin tức.">
+                <div class="news-newsletter-input-group">
+                    <input
+                        id="newsletter-email"
+                        type="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        required
+                        placeholder="Nhập email của bạn"
+                    >
+                    <button type="submit">Đăng ký ngay</button>
+                </div>
+                <small>Chúng tôi cam kết bảo mật thông tin của bạn.</small>
+            </form>
+        </section>
+
+    </div>
+</section>
+
 
 @endsection

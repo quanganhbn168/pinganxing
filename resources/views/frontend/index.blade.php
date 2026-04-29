@@ -31,8 +31,8 @@
 
                 @if($hasSlideOverlay)
                 <div class="hero-shade"></div>
-                <div class="container mx-auto px-4 hero-content flex flex-col justify-center w-full mt-4 md:mt-0 md:h-full md:pt-20">
-                    <div class="hero-copy max-w-3xl text-left">
+                <div class="hero-content">
+                    <div class="hero-copy text-left">
                         @if($slide->subtitle)
                             <span data-hero-anim="1" class="inline-block px-4 py-1.5 bg-accent-500/20 text-accent-400 font-bold rounded text-sm uppercase mb-4 border border-accent-500/30">
                                 {{ $slide->subtitle }}
@@ -40,13 +40,13 @@
                         @endif
 
                         @if($slide->title)
-                        <h1 data-hero-anim="2" class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 md:mb-6">
+                        <h1 data-hero-anim="2" class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-4 md:mb-6">
                             {!! nl2br(e($slide->title)) !!}
                         </h1>
                         @endif
 
                         @if($slide->description)
-                        <p data-hero-anim="3" class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl leading-relaxed">
+                        <p data-hero-anim="3" class="text-sm sm:text-base md:text-xl text-gray-200 mb-6 md:mb-8 max-w-2xl leading-relaxed">
                             {!! nl2br(e($slide->description)) !!}
                         </p>
                         @endif
@@ -122,75 +122,104 @@
 </section>
 
 {{-- 3. ABOUT / CORE VALUES --}}
-<section class="py-20 bg-gray-50">
-    <div class="container mx-auto px-4 max-w-7xl overflow-hidden md:overflow-visible">
-        <div class="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
-            <div data-aos="fade-right">
-                <h2 class="section-title mb-6">{!! $homeSettings->intro_title ?? 'Kiến Trúc Đột Phá<br><span class="text-brand-700">Vận Hành Bền Vững</span>' !!}</h2>
-                <div class="text-gray-600 text-lg mb-8 leading-relaxed prose max-w-none">
-                    {!! $homeSettings->intro_description ?? 'Chúng tôi cung cấp hệ thống quản trị ERP toàn diện, được thiết kế theo chuẩn Enterprise khắt khe nhất. Tối ưu hóa dòng chảy kinh doanh, tự động hóa quy trình và bảo mật dữ liệu tuyệt đối.' !!}
+@php
+    $hasVideo = !empty($homeSettings->video_url) || !empty($homeSettings->video_file);
+    $videoLink = !empty($homeSettings->video_url) ? $homeSettings->video_url : (!empty($homeSettings->video_file) ? asset($homeSettings->video_file) : '#');
+    $introCounters = isset($homeSettings->counters) && is_array($homeSettings->counters) && count($homeSettings->counters) > 0
+        ? array_slice($homeSettings->counters, 0, 4)
+        : [
+            ['value' => '11+', 'label' => 'Năm phát triển'],
+            ['value' => '400+', 'label' => 'Khách hàng tin tưởng'],
+            ['value' => '160+', 'label' => 'Nhân sự chuyên môn'],
+            ['value' => '24/7', 'label' => 'Hỗ trợ tận tâm'],
+        ];
+    $introCounterIcons = ['fas fa-chart-line', 'fas fa-users', 'fas fa-user-tie', 'fas fa-headset'];
+@endphp
+<section class="intro-section py-16 md:py-20">
+    <div class="container mx-auto px-4 max-w-7xl relative z-10">
+        <div class="grid lg:grid-cols-[1.06fr_0.94fr] gap-10 lg:gap-16 items-center">
+            <div class="intro-media order-2 lg:order-1" data-aos="fade-right">
+                <div class="intro-image-frame aspect-[4/3] group">
+                    <img src="{{ !empty($homeSettings->intro_image) ? asset($homeSettings->intro_image) : 'https://placehold.co/800x600/1e293b/ffffff?text=Về+Chúng+Tôi' }}" alt="{{ strip_tags($homeSettings->intro_title ?? 'Về Chúng Tôi') }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+
+                    @if($hasVideo)
+                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/35 transition-colors duration-300">
+                        <a href="{{ $videoLink }}" target="_blank" data-fancybox="video" class="w-16 h-16 md:w-20 md:h-20 bg-white/90 rounded-full flex items-center justify-center text-accent-500 text-xl md:text-2xl shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-110 hover:bg-accent-500 hover:text-white transition-all pl-1">
+                            <i class="fas fa-play"></i>
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="intro-panel order-1 lg:order-2" data-aos="fade-left">
+                <div class="intro-eyebrow"><i class="fas fa-info-circle"></i> Giới thiệu</div>
+                <h2 class="section-title mb-6">{!! $homeSettings->intro_title ?? 'Giới thiệu về <span class="text-brand-700">CNETPOS</span>' !!}</h2>
+                <div class="text-gray-600 text-base md:text-lg mb-7 leading-relaxed prose max-w-none">
+                    {!! $homeSettings->intro_description ?? 'Thành lập từ năm 2014, CNETPOS đã trở thành đơn vị cung cấp giải pháp công nghệ hàng đầu trong lĩnh vực F&B, bán lẻ, dịch vụ và quản trị vận hành.' !!}
                 </div>
 
                 @if(!empty($homeSettings->intro_features))
-                <div class="space-y-6">
+                <div class="grid sm:grid-cols-2 gap-4 mb-8">
                     @foreach($homeSettings->intro_features as $feature)
-                    <div class="flex gap-4" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
-                        <div class="text-brand-600 pt-1 text-2xl"><i class="{{ $feature['icon'] ?? 'fas fa-check' }}"></i></div>
+                    <div class="flex gap-3" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
+                        <div class="text-brand-600 pt-1 text-lg"><i class="{{ $feature['icon'] ?? 'fas fa-check' }}"></i></div>
                         <div>
-                            <h4 class="font-bold text-gray-900 text-lg mb-1">{{ $feature['title'] ?? '' }}</h4>
+                            <h4 class="font-bold text-gray-900 text-sm md:text-base mb-1">{{ $feature['title'] ?? '' }}</h4>
                             <p class="text-gray-600 text-sm">{{ $feature['description'] ?? '' }}</p>
                         </div>
                     </div>
                     @endforeach
                 </div>
                 @endif
-            </div>
-            <div class="relative" data-aos="fade-left">
-                <div class="absolute -inset-4 bg-gray-200 z-0"></div>
 
-                @php
-                    $hasVideo = !empty($homeSettings->video_url) || !empty($homeSettings->video_file);
-                    $videoLink = !empty($homeSettings->video_url) ? $homeSettings->video_url : (!empty($homeSettings->video_file) ? asset($homeSettings->video_file) : '#');
-                @endphp
-
-                <div class="relative z-10 border border-gray-200 overflow-hidden shadow-sm aspect-[4/3] group block">
-                    <img src="{{ !empty($homeSettings->intro_image) ? asset($homeSettings->intro_image) : 'https://placehold.co/800x600/1e293b/ffffff?text=Về+Chúng+Tôi' }}" alt="{{ strip_tags($homeSettings->intro_title ?? 'Về Chúng Tôi') }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-
-                    @if($hasVideo)
-                    <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-colors duration-300">
-                        <a href="{{ $videoLink }}" target="_blank" data-fancybox="video" class="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center text-accent-500 text-2xl shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:scale-110 hover:bg-accent-500 hover:text-white transition-all pl-1">
-                            <i class="fas fa-play"></i>
-                        </a>
+                <div class="grid grid-cols-2 gap-5 md:gap-6">
+                    @foreach($introCounters as $counter)
+                    <div class="intro-stat" data-aos="zoom-in" data-aos-delay="{{ min($loop->index * 80, 240) }}">
+                        <div class="intro-stat-icon">
+                            <i class="{{ $counter['icon'] ?? $introCounterIcons[$loop->index % count($introCounterIcons)] }}"></i>
+                        </div>
+                        <div>
+                            <div class="font-black text-2xl md:text-3xl text-brand-900 leading-none mb-1">{{ $counter['value'] ?? '' }}</div>
+                            <div class="text-xs md:text-sm text-gray-600 font-semibold">{{ $counter['label'] ?? '' }}</div>
+                        </div>
                     </div>
-                    @endif
+                    @endforeach
                 </div>
-
-                @if(!$hasVideo && (!isset($homeSettings->counters) || count($homeSettings->counters) == 0))
-                <div class="absolute -bottom-4 left-4 md:-bottom-6 md:-left-6 bg-white p-4 md:p-6 rounded-lg shadow-xl z-20 flex items-center gap-3 md:gap-4 right-4 md:right-auto">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-accent-100 text-accent-600 flex items-center justify-center text-lg md:text-xl font-bold">10+</div>
-                    <div>
-                        <div class="font-bold text-gray-900 text-sm md:text-base">Năm Kinh Nghiệm</div>
-                        <div class="text-xs md:text-sm text-gray-500">Triển khai phần mềm</div>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
     </div>
 </section>
 
-{{-- 3.5. STATS / COUNTERS --}}
-@if(isset($homeSettings->counters) && is_array($homeSettings->counters) && count($homeSettings->counters) > 0)
-<section class="py-12 bg-brand-900 relative overflow-hidden">
-    <div class="absolute inset-0 w-full h-full opacity-10"><svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="2" fill="#ffffff"/></pattern></defs><rect width="100%" height="100%" fill="url(#dots)"/></svg></div>
-    <div class="container mx-auto px-4 max-w-7xl relative z-10">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-brand-700/50">
-            @foreach($homeSettings->counters as $counter)
-            <div class="text-center px-4" data-aos="zoom-in" data-aos-delay="{{ min($loop->index * 80, 240) }}">
-                {{-- Corporate Style: Hidden Icons --}}
-                <div class="font-black text-5xl text-white mb-2 tracking-tighter">{{ $counter['value'] ?? '' }}</div>
-                <div class="text-brand-300 font-bold uppercase tracking-wider text-sm">{{ $counter['label'] ?? '' }}</div>
-            </div>
+{{-- 3.8. FIELDS (LĨNH VỰC) --}}
+@if(isset($homeFields) && $homeFields->count())
+<section id="fields" class="fields-section py-16 md:py-20">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="text-center mb-10 md:mb-14" data-aos="fade-up">
+            <h2 class="home-section-title center">{{ $homeSettings->fields_title ?? 'Lĩnh Vực Hoạt Động' }}</h2>
+            @if(!empty($homeSettings->fields_description))
+                <p class="text-gray-600 max-w-2xl mx-auto mt-4">{{ $homeSettings->fields_description }}</p>
+            @endif
+        </div>
+
+        <div class="fields-grid" data-aos="fade-up" data-aos-delay="120">
+            @foreach($homeFields as $field)
+            @php
+                $fieldImage = $field->image_id ? ($field->image?->url ?? null) : null;
+                $fieldImage = $fieldImage ?: 'https://placehold.co/720x430/eaf4fb/0e4a86?text=Industry';
+            @endphp
+            <a href="{{ route('frontend.field.bySlug', $field->slug) }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
+                <span class="field-card-media">
+                    <img src="{{ $fieldImage }}" alt="{{ $field->name }}" loading="lazy" decoding="async">
+                </span>
+                <span class="field-card-body">
+                    <span class="field-card-title">{{ $field->name }}</span>
+                    @if(!empty($field->description) || !empty($field->content))
+                        <span class="field-card-text">{{ Str::limit(strip_tags($field->description ?? $field->content), 110) }}</span>
+                    @endif
+                    <span class="field-card-link">Tìm hiểu thêm <i class="fas fa-arrow-right"></i></span>
+                </span>
+            </a>
             @endforeach
         </div>
     </div>
@@ -199,64 +228,46 @@
 
 {{-- 4. CORE SERVICES --}}
 @if(isset($homeServices) && $homeServices->count())
-<section id="services" class="py-20 bg-white">
+<section id="services" class="services-section py-16 md:py-20">
     <div class="container mx-auto px-4 max-w-7xl">
-        <div class="text-center mb-16" data-aos="fade-up">
-            <h2 class="section-title center">{{ $homeSettings->services_title ?? 'Dịch Vụ Cung Cấp' }}</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto mt-4">{{ $homeSettings->services_description ?? 'Hệ sinh thái phần mềm quản trị chuyên sâu, đáp ứng chuẩn mực nghiệp vụ cho đa dạng ngành nghề.' }}</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($homeServices as $service)
-            <div class="group relative bg-white border border-gray-200 border-t-4 border-t-transparent hover:border-t-brand-600 rounded-sm p-8 hover:shadow-lg transition-all duration-300 flex flex-col h-full" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
-                <div class="text-brand-600 text-4xl mb-6 transform group-hover:rotate-3 transition-transform duration-300 origin-bottom-left">
-                    <i class="fas fa-cube"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-4 group-hover:text-brand-700 transition-colors">
-                    <a href="{{ route('frontend.service.bySlug', $service->slug) }}" class="before:absolute before:inset-0">{{ $service->name }}</a>
-                </h3>
-                <p class="text-gray-600 mb-6 font-sans text-sm leading-relaxed flex-grow line-clamp-3">
-                    {{ Str::limit(strip_tags($service->description ?? $service->content), 120) }}
-                </p>
-                <div class="mt-auto flex items-center text-brand-600 font-bold uppercase tracking-wider text-xs">
-                    Xem chi tiết <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </div>
+        <div class="services-layout">
+            <div class="services-intro" data-aos="fade-right">
+                <h2 class="home-section-title">{{ $homeSettings->services_title ?? 'Dịch vụ của chúng tôi' }}</h2>
+                <p>{{ $homeSettings->services_description ?? 'Tư vấn, triển khai đến vận hành tối ưu, CNETPOS luôn đồng hành dài hạn cùng doanh nghiệp.' }}</p>
+                <a href="{{ route('frontend.services.index') }}" class="services-all-link">
+                    Xem tất cả dịch vụ <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
 
-{{-- 3.8. FIELDS (LĨNH VỰC) --}}
-@if(isset($homeFields) && $homeFields->count())
-<section id="fields" class="py-20 bg-gray-50 border-b border-gray-100">
-    <div class="container mx-auto px-4 max-w-7xl">
-        <div class="text-center mb-16" data-aos="fade-up">
-            <h2 class="section-title center">{{ $homeSettings->fields_title ?? 'Lĩnh Vực Hoạt Động' }}</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto mt-4">{{ $homeSettings->fields_description ?? 'Nền tảng ERP của chúng tôi được thiết kế linh hoạt, đáp ứng giải pháp chuyên sâu cho từng ngành nghề đặc thù.' }}</p>
-        </div>
-        <div class="swiper field-swiper pb-12" data-aos="fade-up" data-aos-delay="120">
-            <div class="swiper-wrapper">
-                @foreach($homeFields as $field)
-                <div class="swiper-slide">
-                    <a href="{{ route('frontend.field.bySlug', $field->slug) }}" class="group block bg-brand-900 rounded-sm overflow-hidden shadow-sm hover:shadow-lg border border-brand-800 transition-all relative aspect-[3/4] flex flex-col justify-end text-left">
-                        <img src="{{ $field->image_id ? $field->image?->url : 'https://placehold.co/400x533/1e293b/ffffff?text=Industry' }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-50 group-hover:opacity-60">
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-900/60 to-transparent"></div>
-                        <div class="p-6 relative z-10 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                            <div class="w-12 h-12 bg-white/10 backdrop-blur text-white border border-white/20 rounded-sm flex items-center justify-center text-xl mb-4 group-hover:bg-accent-500 group-hover:border-accent-500 transition-colors shadow-lg">
-                                <i class="fas fa-industry"></i>
-                            </div>
-                            <h3 class="font-bold text-white text-lg group-hover:text-accent-400 transition-colors uppercase tracking-wider">{{ $field->name }}</h3>
-                            <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300 mt-2">
-                                <span class="text-brand-200 text-sm flex items-center gap-2">Tìm hiểu thêm <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+            <div class="services-list" data-aos="fade-left">
+                @foreach($homeServices as $service)
+                @php
+                    $serviceImage = $service->banner_id ? ($service->banner?->url ?? null) : null;
+                    $serviceImage = $serviceImage ?: ($service->image_id ? ($service->image?->url ?? null) : null);
+                    $serviceImage = $serviceImage ?: 'https://placehold.co/1000x360/0b3762/ffffff?text=Service';
+                    $serviceSummary = Str::limit(strip_tags($service->description ?? $service->content), 150);
+                    $serviceBullets = collect(preg_split('/[\\r\\n]+|(?<=[.!?])\\s+/', strip_tags($service->description ?? $service->content)))
+                        ->map(fn ($item) => trim($item))
+                        ->filter()
+                        ->take(3);
+                @endphp
+                <a href="{{ route('frontend.service.bySlug', $service->slug) }}" class="service-feature-card group" style="--service-card-image: url('{{ $serviceImage }}');" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
+                    <span class="service-feature-content">
+                        <span class="service-feature-title">{{ $service->name }}</span>
+                        @if($serviceSummary)
+                            <span class="service-feature-summary">{{ $serviceSummary }}</span>
+                        @endif
+                        @if($serviceBullets->count())
+                        <span class="service-feature-bullets">
+                            @foreach($serviceBullets as $bullet)
+                                <span><i class="fas fa-check"></i>{{ $bullet }}</span>
+                            @endforeach
+                        </span>
+                        @endif
+                    </span>
+                </a>
                 @endforeach
             </div>
-            <div class="swiper-pagination"></div>
         </div>
     </div>
 </section>
@@ -264,211 +275,309 @@
 
 {{-- 5. FEATURED PROJECTS (TABS) --}}
 @if(isset($homeProjects) && $homeProjects->count())
-<section id="projects" class="py-20 bg-brand-900 border-t border-brand-800">
+@php
+    $projectTabs = collect([
+        (object) [
+            'id' => 'all',
+            'name' => 'Tất cả',
+            'projects' => $homeProjects->values(),
+        ],
+    ]);
+
+    if (isset($homeProjectCategories)) {
+        $projectTabs = $projectTabs->merge(
+            $homeProjectCategories
+                ->filter(fn ($category) => $category->projects->count() > 0)
+                ->map(fn ($category) => (object) [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'projects' => $category->projects->values(),
+                ])
+        );
+    }
+@endphp
+<section id="projects" class="home-projects-section py-16 md:py-20">
     <div class="container mx-auto px-4 max-w-7xl">
-        <div class="text-center mb-12" data-aos="fade-up">
-            <h2 class="section-title !text-white center">{{ $homeSettings->projects_title ?? 'Dự Án Tiêu Biểu' }}</h2>
-            <p class="text-brand-100 mt-4 max-w-2xl mx-auto">{{ $homeSettings->projects_description ?? 'Những dự án công nghệ và công trình tiêu biểu được tín nhiệm bởi các đối tác.' }}</p>
-        </div>
-
-        <div class="mb-10 w-full overflow-hidden" data-aos="fade-up" data-aos-delay="100">
-            <ul class="flex whitespace-nowrap justify-start md:justify-center overflow-x-auto pb-1 no-scrollbar border-b border-brand-800 text-sm font-bold text-center space-x-8" id="project-tab" data-tabs-toggle="#project-tab-content" role="tablist">
-                <li role="presentation">
-                    <button class="inline-block pb-4 text-brand-300 hover:text-white border-b-2 border-transparent aria-selected:border-accent-500 aria-selected:text-white transition-colors" id="all-projects-tab" data-tabs-target="#all-projects" type="button" role="tab" aria-controls="all-projects" aria-selected="true">Tất Cả</button>
-                </li>
-                @if(isset($homeProjectCategories))
-                @foreach($homeProjectCategories as $category)
-                <li role="presentation">
-                    <button class="inline-block pb-4 text-brand-300 hover:text-white border-b-2 border-transparent aria-selected:border-accent-500 aria-selected:text-white transition-colors" id="cat-{{ $category->id }}-tab" data-tabs-target="#cat-{{ $category->id }}" type="button" role="tab" aria-controls="cat-{{ $category->id }}" aria-selected="false">{{ $category->name }}</button>
-                </li>
+        <div class="home-projects-heading" data-aos="fade-up">
+            <h2>{{ $homeSettings->projects_title ?? 'Dự án tiêu biểu' }}</h2>
+            <div class="home-project-tabs" role="tablist" aria-label="Danh mục dự án">
+                @foreach($projectTabs as $tab)
+                <button
+                    type="button"
+                    class="home-project-tab {{ $loop->first ? 'is-active' : '' }}"
+                    data-project-tab="project-panel-{{ $tab->id }}"
+                    role="tab"
+                    aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                >
+                    {{ $tab->name }}
+                </button>
                 @endforeach
-                @endif
-            </ul>
+            </div>
         </div>
 
-        <div id="project-tab-content" data-aos="fade-up" data-aos-delay="180">
-            <div class="p-0" id="all-projects" role="tabpanel" aria-labelledby="all-projects-tab">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[580px]">
-                    @php
-                        $allList = $homeProjects->take(5);
-                        $firstProject = $allList->first();
-                        $restProjects = $allList->slice(1, 4);
-                    @endphp
-
-                    @if($firstProject)
-                    <a href="{{ route('frontend.project.bySlug', $firstProject->slug) }}" class="group relative border border-brand-700 bg-brand-800 shadow-lg rounded-sm overflow-hidden flex h-72 lg:h-full">
-                        <div class="absolute inset-0">
-                            <img src="{{ $firstProject->image_id ? $firstProject->image?->url : 'https://placehold.co/800x600/1e293b/ffffff?text=Project' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        {{-- Subtle always-visible gradient --}}
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-transparent to-transparent"></div>
-                        {{-- Title always visible --}}
-                        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-2">
-                            <h3 class="text-2xl md:text-3xl font-bold text-white">{{ $firstProject->name }}</h3>
-                        </div>
-                        {{-- Glass hover panel --}}
-                        <div class="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out backdrop-blur-md bg-brand-900/50 border-t border-white/20 p-6 md:p-8">
-                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">{{ $firstProject->name }}</h3>
-                            <span class="text-accent-400 font-bold text-sm tracking-widest uppercase flex items-center gap-2">Trải nghiệm <i class="fas fa-arrow-right"></i></span>
-                        </div>
+        <div class="home-project-panels" data-aos="fade-up" data-aos-delay="120">
+            @foreach($projectTabs as $tab)
+            @php
+                $projectList = $tab->projects->take(4)->values();
+                $featuredProject = $projectList->first();
+                $sideProjects = $projectList->slice(1, 3);
+            @endphp
+            <div class="home-project-panel {{ $loop->first ? 'is-active' : '' }}" id="project-panel-{{ $tab->id }}" role="tabpanel">
+                @if($featuredProject)
+                @php
+                    $featuredImage = $featuredProject->image_id ? ($featuredProject->image?->url ?? null) : null;
+                    $featuredImage = $featuredImage ?: 'https://placehold.co/980x620/0b3762/ffffff?text=Project';
+                    $featuredSummary = Str::limit(strip_tags($featuredProject->description ?? $featuredProject->content), 120);
+                    $featuredStats = collect([
+                        ['value' => $featuredProject->year, 'label' => 'Năm triển khai'],
+                        ['value' => $featuredProject->value, 'label' => 'Giá trị dự án'],
+                        ['value' => $featuredProject->investor, 'label' => 'Chủ đầu tư'],
+                    ])->filter(fn ($item) => filled($item['value']))->take(3);
+                @endphp
+                <div class="home-project-layout">
+                    <a href="{{ route('frontend.project.bySlug', $featuredProject->slug) }}" class="home-project-featured">
+                        <img src="{{ $featuredImage }}" alt="{{ $featuredProject->name }}" loading="lazy" decoding="async">
+                        <span class="home-project-featured-shade"></span>
+                        <span class="home-project-featured-content">
+                            @if($featuredProject->category)
+                                <span class="home-project-badge">{{ $featuredProject->category->name }}</span>
+                            @endif
+                            <span class="home-project-featured-title">{{ $featuredProject->name }}</span>
+                            @if($featuredSummary)
+                                <span class="home-project-featured-text">{{ $featuredSummary }}</span>
+                            @endif
+                            @if($featuredStats->count())
+                            <span class="home-project-stats">
+                                @foreach($featuredStats as $stat)
+                                <span>
+                                    <strong>{{ Str::limit($stat['value'], 16) }}</strong>
+                                    <small>{{ $stat['label'] }}</small>
+                                </span>
+                                @endforeach
+                            </span>
+                            @endif
+                            <span class="home-project-link">Xem chi tiết dự án <i class="fas fa-arrow-right"></i></span>
+                        </span>
                     </a>
-                    @endif
 
-                    @if($restProjects->count() > 0)
-                    <div class="grid grid-cols-2 grid-rows-2 gap-3 md:gap-4 h-72 lg:h-full">
-                        @foreach($restProjects as $project)
-                        <a href="{{ route('frontend.project.bySlug', $project->slug) }}" class="group relative border border-brand-700 bg-brand-800 shadow-lg rounded-sm overflow-hidden flex h-full">
-                            <div class="absolute inset-0">
-                                <img src="{{ $project->image_id ? $project->image?->url : 'https://placehold.co/600x450/1e293b/ffffff?text=Project' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            </div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-transparent to-transparent"></div>
-                            {{-- Title always visible --}}
-                            <div class="absolute bottom-0 left-0 right-0 p-3 md:p-4 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-1">
-                                <h3 class="text-xs md:text-sm font-bold text-white line-clamp-2">{{ $project->name }}</h3>
-                            </div>
-                            {{-- Glass hover panel --}}
-                            <div class="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out backdrop-blur-md bg-brand-900/50 border-t border-white/20 p-3 md:p-4">
-                                <h3 class="text-xs md:text-sm font-bold text-white mb-2 line-clamp-2">{{ $project->name }}</h3>
-                                <span class="text-accent-400 font-bold text-xs tracking-wider uppercase flex items-center gap-1">Xem <i class="fas fa-angle-right"></i></span>
-                            </div>
+                    <div class="home-project-side-list">
+                        @foreach($sideProjects as $project)
+                        @php
+                            $projectImage = $project->image_id ? ($project->image?->url ?? null) : null;
+                            $projectImage = $projectImage ?: 'https://placehold.co/360x220/eaf4fb/0e4a86?text=Project';
+                            $projectSummary = Str::limit(strip_tags($project->description ?? $project->content), 82);
+                        @endphp
+                        <a href="{{ route('frontend.project.bySlug', $project->slug) }}" class="home-project-side-card">
+                            <span class="home-project-side-media">
+                                <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
+                            </span>
+                            <span class="home-project-side-body">
+                                @if($project->category)
+                                    <span class="home-project-side-category">{{ $project->category->name }}</span>
+                                @endif
+                                <strong>{{ $project->name }}</strong>
+                                @if($projectSummary)
+                                    <span>{{ $projectSummary }}</span>
+                                @endif
+                                <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
+                            </span>
                         </a>
                         @endforeach
                     </div>
-                    @endif
                 </div>
-                <div class="text-center mt-10">
-                    <a href="{{ route('frontend.projects.index') }}" class="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white text-white hover:text-brand-900 border border-white/20 rounded font-bold transition-all text-sm uppercase tracking-wide">Xem toàn bộ hệ thống dự án</a>
-                </div>
-            </div>
-
-            @if(isset($homeProjectCategories))
-            @foreach($homeProjectCategories as $category)
-            <div class="hidden p-0" id="cat-{{ $category->id }}" role="tabpanel" aria-labelledby="cat-{{ $category->id }}-tab">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[400px]">
-                    @php
-                        $catList = $category->projects->take(5);
-                        $catFirstProject = $catList->first();
-                        $catRestProjects = $catList->slice(1, 4);
-                    @endphp
-
-                    @if($catFirstProject)
-                    <a href="{{ route('frontend.project.bySlug', $catFirstProject->slug) }}" class="group block relative border border-brand-700 bg-brand-800 shadow-lg lg:row-span-2 flex flex-col h-full rounded-sm overflow-hidden aspect-[4/3] lg:aspect-auto">
-                        <div class="w-full h-full absolute inset-0">
-                            <img src="{{ $catFirstProject->image_id ? $catFirstProject->image?->url : 'https://placehold.co/800x600/1e293b/ffffff?text=Project' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-transparent"></div>
-                        <div class="p-8 absolute bottom-0 left-0 w-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                            <h3 class="text-3xl font-bold text-white mb-2">{{ $catFirstProject->name }}</h3>
-                            <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300 delay-100 mt-2">
-                                <span class="text-accent-400 font-bold text-sm tracking-widest uppercase flex items-center gap-2">Trải nghiệm <i class="fas fa-arrow-right"></i></span>
-                            </div>
-                        </div>
-                    </a>
-                    @else
-                    <div class="col-span-full py-12 text-center text-brand-300 bg-brand-800/30 rounded-sm border border-brand-800/50">
-                        Đang cập nhật dự án cho danh mục này...
-                    </div>
-                    @endif
-
-                    @if($catRestProjects->count() > 0)
-                    <div class="grid grid-cols-2 gap-6 h-full">
-                        @foreach($catRestProjects as $project)
-                        <a href="{{ route('frontend.project.bySlug', $project->slug) }}" class="group block relative border border-brand-700 bg-brand-800 shadow-lg rounded-sm overflow-hidden flex flex-col h-full aspect-[4/3]">
-                            <div class="w-full h-full absolute inset-0">
-                                <img src="{{ $project->image_id ? $project->image?->url : 'https://placehold.co/600x450/1e293b/ffffff?text=Project' }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            </div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/50 to-transparent"></div>
-                            <div class="p-5 absolute bottom-0 left-0 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                <h3 class="text-lg font-bold text-white mb-1 line-clamp-2">{{ $project->name }}</h3>
-                                <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300 mt-1">
-                                    <span class="text-brand-300 font-bold text-xs tracking-wider uppercase flex items-center gap-1">Xem <i class="fas fa-angle-right"></i></span>
-                                </div>
-                            </div>
-                        </a>
-                        @endforeach
-                    </div>
-                    @endif
-                </div>
+                @endif
             </div>
             @endforeach
+        </div>
+
+        <div class="home-project-all">
+            <a href="{{ route('frontend.projects.index') }}">Xem tất cả dự án <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- 5.2. CUSTOMER TESTIMONIALS --}}
+@if(isset($testimonials) && $testimonials->count())
+<section class="home-testimonials-section py-12 md:py-14">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="swiper home-testimonials-swiper" data-aos="fade-up">
+            <div class="swiper-wrapper">
+                @foreach($testimonials as $testimonial)
+                @php
+                    $testimonialImage = $testimonial->image?->url ?? 'https://placehold.co/260x260/e2e8f0/0b3762?text=Khach+hang';
+                    $positionParts = collect(explode('-', $testimonial->position ?? ''))
+                        ->map(fn ($item) => trim($item))
+                        ->filter()
+                        ->values();
+                    $customerTitle = $positionParts->first() ?: $testimonial->position;
+                    $customerCompany = $positionParts->count() > 1 ? $positionParts->slice(1)->implode(' - ') : null;
+                @endphp
+                <div class="swiper-slide">
+                    <article class="home-testimonial-card">
+                        <div class="home-testimonial-quote">
+                            <i class="fas fa-quote-left"></i>
+                            <div>
+                                <h2>Khách hàng nói gì</h2>
+                                <p>{{ $testimonial->content }}</p>
+                            </div>
+                        </div>
+
+                        <div class="home-testimonial-person">
+                            <img src="{{ $testimonialImage }}" alt="{{ $testimonial->name }}" loading="lazy" decoding="async">
+                            <div>
+                                <strong>{{ $testimonial->name }}</strong>
+                                @if($customerTitle)
+                                    <span>{{ $customerTitle }}</span>
+                                @endif
+                                @if($customerCompany)
+                                    <em>{{ $customerCompany }}</em>
+                                @endif
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                @endforeach
+            </div>
+            @if($testimonials->count() > 1)
+                <div class="home-testimonials-pagination swiper-pagination"></div>
             @endif
         </div>
     </div>
 </section>
 @endif
 
-{{-- 5.5. PORTALS / QUICK LINKS (Tuyển dụng - Đại lý - Báo giá) --}}
-<section class="py-16 bg-gray-50 border-t border-gray-200">
-    <div class="container mx-auto px-4 max-w-7xl">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <a href="{{ route('frontend.careers.index') }}" class="group block bg-white border border-gray-200 rounded-sm p-8 hover:border-brand-500 hover:shadow-md transition-all" data-aos="fade-up">
-                <div class="text-brand-600 text-3xl mb-4 group-hover:text-brand-700">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $pageSettings->careers_title ?? 'Tuyển Dụng' }}</h3>
-                <p class="text-gray-600 mb-6 font-sans text-sm">{{ $pageSettings->careers_description ?? 'Gia nhập đội ngũ kỹ sư tài năng của chúng tôi để cùng phát triển các hệ thống đẳng cấp.' }}</p>
-                <div class="flex items-center text-brand-600 font-bold uppercase tracking-wider text-xs">Xem vị trí <i class="fas fa-arrow-right ml-2"></i></div>
-            </a>
-
-            <a href="{{ route('agency.index') }}" class="group block bg-white border border-gray-200 rounded-sm p-8 hover:border-brand-500 hover:shadow-md transition-all" data-aos="fade-up" data-aos-delay="100">
-                <div class="text-brand-600 text-3xl mb-4 group-hover:text-brand-700">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $pageSettings->agency_title ?? 'Hợp Tác Đại Lý' }}</h3>
-                <p class="text-gray-600 mb-6 font-sans text-sm">{{ $pageSettings->agency_description ?? 'Chính sách chiết khấu, hỗ trợ kỹ thuật và đào tạo bán hàng toàn diện từ A-Z.' }}</p>
-                <div class="flex items-center text-brand-600 font-bold uppercase tracking-wider text-xs">Đăng ký ngay <i class="fas fa-arrow-right ml-2"></i></div>
-            </a>
-
-            <a href="{{ route('consulting.index') }}" class="group block bg-white border border-gray-200 rounded-sm p-8 hover:border-brand-500 hover:shadow-md transition-all" data-aos="fade-up" data-aos-delay="200">
-                <div class="text-brand-600 text-3xl mb-4 group-hover:text-brand-700">
-                    <i class="fas fa-file-signature"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $pageSettings->consulting_title ?? 'Nhận Báo Giá' }}</h3>
-                <p class="text-gray-600 mb-6 font-sans text-sm">{{ $pageSettings->consulting_description ?? 'Cung cấp thông tin, chuyên gia sẽ thiết kế lộ trình chuyển đổi và báo giá chi tiết.' }}</p>
-                <div class="flex items-center text-brand-600 font-bold uppercase tracking-wider text-xs">Gửi yêu cầu <i class="fas fa-arrow-right ml-2"></i></div>
-            </a>
-        </div>
-    </div>
-</section>
-
 {{-- 6. PRODUCTS / HARDWARE --}}
 @if(isset($homeProducts) && $homeProducts->count())
-<section class="py-20 bg-gray-50">
+@php
+    $fallbackProductCategories = $homeProducts
+        ->pluck('category')
+        ->filter()
+        ->unique('id')
+        ->values();
+
+    $productTabs = (isset($homeCategories) && $homeCategories->count() ? $homeCategories : $fallbackProductCategories)
+        ->filter(fn ($category) => $homeProducts->where('category_id', $category->id)->count() > 0)
+        ->values();
+
+    if ($productTabs->isEmpty()) {
+        $productTabs = collect([(object) [
+            'id' => 'featured',
+            'name' => 'Sản phẩm nổi bật',
+            'description' => $homeSettings->products_description ?? 'Phân phối thiết bị phần cứng, máy chủ và linh kiện mạng chuyên dụng.',
+            'slug_url' => route('products.index'),
+        ]]);
+    }
+@endphp
+<section id="products" class="home-product-showcase py-16 md:py-20">
     <div class="container mx-auto px-4 max-w-7xl">
-        <div class="text-center mb-16" data-aos="fade-up">
-            <h2 class="section-title center">{{ $homeSettings->products_title ?? 'Sản Phẩm & Thiết Bị' }}</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto mt-4">{{ $homeSettings->products_description ?? 'Phân phối thiết bị phần cứng, máy chủ và linh kiện mạng chuyên dụng.' }}</p>
+        <div class="home-product-heading" data-aos="fade-up">
+            <h2>{{ $homeSettings->products_title ?? 'Sản phẩm' }}</h2>
+            <div class="home-product-tabs" role="tablist" aria-label="Danh mục sản phẩm">
+                @foreach($productTabs as $category)
+                <button
+                    type="button"
+                    class="home-product-tab {{ $loop->first ? 'is-active' : '' }}"
+                    data-product-tab="product-tab-{{ $category->id }}"
+                    role="tab"
+                    aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                >
+                    {{ $category->name }}
+                </button>
+                @endforeach
+            </div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            @foreach($homeProducts->take(4) as $product)
-            <div class="corp-card flex flex-col h-full bg-white group overflow-hidden p-1" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
-                <div class="relative aspect-square bg-gray-50 flex items-center justify-center p-4 rounded-t-[11px] overflow-hidden">
-                    <img src="{{ $product->image ? $product->image?->url : 'https://placehold.co/400x400/f8fafc/0e4a86?text=Product' }}" class="max-w-full max-h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute inset-0 bg-brand-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <a href="{{ route('frontend.product.bySlug', $product->slug) }}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-900 hover:bg-accent-500 hover:text-white transition-colors">
-                            <i class="fas fa-search"></i>
-                        </a>
+        <div class="home-product-panels" data-aos="fade-up" data-aos-delay="120">
+            @foreach($productTabs as $category)
+            @php
+                $tabProducts = $category->id === 'featured'
+                    ? $homeProducts
+                    : $homeProducts->where('category_id', $category->id)->values();
+            @endphp
+            <div class="home-product-panel {{ $loop->first ? 'is-active' : '' }}" id="product-tab-{{ $category->id }}" role="tabpanel">
+                <div class="swiper home-product-swiper">
+                    <div class="swiper-wrapper">
+                        @foreach($tabProducts as $product)
+                        @php
+                            $productImage = $product->image ? ($product->image?->url ?? null) : null;
+                            $productImage = $productImage ?: 'https://placehold.co/760x460/0b3762/ffffff?text=CNETPOS';
+                            $productDescription = Str::limit(strip_tags($product->description ?? $product->content), 150);
+                            $featureItems = collect(preg_split('/[\\r\\n]+|(?<=[.!?])\\s+/', strip_tags($product->description ?? $product->content)))
+                                ->map(fn ($item) => trim($item))
+                                ->filter()
+                                ->take(4);
+                            $defaultFeatures = [
+                                ['icon' => 'fas fa-cash-register', 'title' => 'Quản lý bán hàng', 'text' => 'Theo dõi bán hàng, tồn kho và vận hành theo thời gian thực'],
+                                ['icon' => 'fas fa-chart-pie', 'title' => 'Báo cáo & Phân tích', 'text' => 'Dữ liệu trực quan hỗ trợ ra quyết định nhanh hơn'],
+                                ['icon' => 'fas fa-shield-alt', 'title' => 'Bảo mật cao', 'text' => 'Vận hành ổn định, phân quyền rõ ràng cho từng vai trò'],
+                                ['icon' => 'fas fa-plug', 'title' => 'Tích hợp mở', 'text' => 'Kết nối linh hoạt với thiết bị và hệ thống liên quan'],
+                            ];
+                        @endphp
+                        <div class="swiper-slide">
+                            <article class="home-product-card">
+                                <div class="home-product-copy">
+                                    <div class="home-product-brand">
+                                        <span><i class="fas fa-cube"></i></span>
+                                        {{ $category->name }}
+                                    </div>
+                                    <h3>{{ $product->name }}</h3>
+                                    @if($productDescription)
+                                        <p>{{ $productDescription }}</p>
+                                    @endif
+                                    <a href="{{ route('frontend.product.bySlug', $product->slug) }}" class="home-product-detail">
+                                        Xem chi tiết sản phẩm <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                                <a href="{{ route('frontend.product.bySlug', $product->slug) }}" class="home-product-visual" aria-label="{{ $product->name }}">
+                                    <img src="{{ $productImage }}" alt="{{ $product->name }}" loading="lazy" decoding="async">
+                                </a>
+
+                                <div class="home-product-features">
+                                    @if($featureItems->count())
+                                        @foreach($featureItems as $feature)
+                                        <div class="home-product-feature">
+                                            <span><i class="fas fa-check"></i></span>
+                                            <div>
+                                                <strong>{{ Str::limit($feature, 34) }}</strong>
+                                                <p>{{ Str::limit($feature, 72) }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    @else
+                                        @foreach($defaultFeatures as $feature)
+                                        <div class="home-product-feature">
+                                            <span><i class="{{ $feature['icon'] }}"></i></span>
+                                            <div>
+                                                <strong>{{ $feature['title'] }}</strong>
+                                                <p>{{ $feature['text'] }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </article>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
-                <div class="p-5 flex flex-col flex-grow text-center">
-                    <h3 class="font-bold text-gray-900 mb-2 text-sm md:text-base line-clamp-2 group-hover:text-brand-600 transition-colors">{{ $product->name }}</h3>
-                    <div class="mt-auto flex flex-col items-center justify-center">
-                        @if($product->price)
-                            <span class="text-brand-700 font-bold text-lg">{{ number_format($product->price) }}₫</span>
-                        @endif
-                        @if($product->compare_at_price)
-                            <span class="text-gray-400 text-xs line-through mt-1">{{ number_format($product->compare_at_price) }}₫</span>
-                        @endif
-                    </div>
-                </div>
+
+                @if($tabProducts->count() > 1)
+                <button type="button" class="home-product-nav home-product-prev" aria-label="Sản phẩm trước">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button type="button" class="home-product-nav home-product-next" aria-label="Sản phẩm tiếp theo">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                @endif
             </div>
             @endforeach
         </div>
 
-        <div class="text-center mt-10">
-            <a href="{{ route('products.index') }}" class="inline-flex items-center text-brand-700 font-bold hover:text-brand-900 transition-colors">
-                Xem toàn bộ cửa hàng <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        <div class="home-product-bottom">
+            <a href="{{ route('products.index') }}">
+                Xem toàn bộ cửa hàng <i class="fas fa-arrow-right"></i>
             </a>
         </div>
     </div>
@@ -476,53 +585,101 @@
 @endif
 
 {{-- 7. LATEST NEWS --}}
-@if(isset($allPosts) && $allPosts->count())
-<section class="py-20 bg-white border-t border-gray-100">
+<section class="home-news-section pt-16 md:pt-20 pb-14 md:pb-16">
     <div class="container mx-auto px-4 max-w-7xl">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12" data-aos="fade-up">
-            <div>
-                <h2 class="section-title">{{ $homeSettings->posts_title ?? 'Tin Tức Mới Nhất' }}</h2>
-                @if(isset($homeSettings->posts_description) && !empty($homeSettings->posts_description))
-                <p class="text-gray-600 max-w-2xl mt-4">{{ $homeSettings->posts_description }}</p>
-                @endif
-            </div>
-            <a href="{{ route('frontend.posts.index') }}" class="mt-6 md:mt-0 px-6 py-2 border border-gray-200 hover:border-brand-500 text-gray-600 hover:text-brand-700 rounded transition-colors text-sm font-medium">
-                Xem tất cả
-            </a>
+        @if(isset($allPosts) && $allPosts->count())
+        @php
+            $featuredPost = $allPosts->first();
+            $sidePosts = $allPosts->slice(1, 3);
+            $featuredPostImage = $featuredPost->image ? ($featuredPost->image?->url ?? null) : null;
+            $featuredPostImage = $featuredPostImage ?: 'https://placehold.co/720x450/eaf4fb/0e4a86?text=News';
+        @endphp
+        <div class="home-news-heading" data-aos="fade-up">
+            <h2>{{ $homeSettings->posts_title ?? 'Tin tức & Blog' }}</h2>
+            <a href="{{ route('frontend.posts.index') }}">Xem tất cả bài viết <i class="fas fa-arrow-right"></i></a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @foreach($allPosts->take(3) as $post)
-            <div class="corp-card overflow-hidden group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
-                <a href="{{ $post->slug_url }}" class="block aspect-[16/10] overflow-hidden relative">
-                    <img src="{{ $post->image ? $post->image?->url : 'https://placehold.co/600x400/e2e8f0/0e4a86?text=News' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-900 px-3 py-1 rounded text-xs font-bold shadow-sm">
-                        {{ $post->created_at->format('d/m/Y') }}
-                    </div>
+        <div class="home-news-layout" data-aos="fade-up" data-aos-delay="100">
+            <article class="home-news-feature">
+                <a href="{{ $featuredPost->slug_url }}" class="home-news-feature-image">
+                    <img src="{{ $featuredPostImage }}" alt="{{ $featuredPost->title }}" loading="lazy" decoding="async">
                 </a>
-                <div class="p-6 text-left">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-brand-600 transition-colors">
-                        <a href="{{ $post->slug_url }}">{{ $post->title }}</a>
-                    </h3>
-                    <p class="text-gray-600 text-sm line-clamp-3 mb-4">{{ Str::limit(strip_tags($post->description ?? $post->content), 120) }}</p>
-                    <a href="{{ $post->slug_url }}" class="text-brand-700 text-sm font-bold flex items-center group-hover:text-brand-900">
-                        Đọc tiếp <i class="fas fa-angle-right ml-2"></i>
-                    </a>
+                <div class="home-news-feature-body">
+                    @if($featuredPost->category)
+                        <span class="home-news-category">{{ $featuredPost->category->name }}</span>
+                    @endif
+                    <h3><a href="{{ $featuredPost->slug_url }}">{{ $featuredPost->title }}</a></h3>
+                    <p>{{ Str::limit(strip_tags($featuredPost->description ?? $featuredPost->content), 145) }}</p>
+                    <a href="{{ $featuredPost->slug_url }}" class="home-news-link">Đọc bài viết <i class="fas fa-arrow-right"></i></a>
                 </div>
+            </article>
+
+            <div class="home-news-list">
+                @foreach($sidePosts as $post)
+                @php
+                    $postImage = $post->image ? ($post->image?->url ?? null) : null;
+                    $postImage = $postImage ?: 'https://placehold.co/220x150/eaf4fb/0e4a86?text=News';
+                @endphp
+                <a href="{{ $post->slug_url }}" class="home-news-row">
+                    <span class="home-news-row-image">
+                        <img src="{{ $postImage }}" alt="{{ $post->title }}" loading="lazy" decoding="async">
+                    </span>
+                    <span class="home-news-row-body">
+                        <strong>{{ $post->title }}</strong>
+                        <span>
+                            @if($post->category)
+                                <em>{{ $post->category->name }}</em>
+                            @endif
+                            <time datetime="{{ $post->created_at->toDateString() }}">{{ $post->created_at->format('d/m/Y') }}</time>
+                        </span>
+                    </span>
+                </a>
+                @endforeach
             </div>
-            @endforeach
+        </div>
+        @endif
+    </div>
+</section>
+
+{{-- 8. PORTALS / QUICK LINKS (Tuyển dụng - Tư vấn - Đại lý) --}}
+<section class="home-actions-section pt-8 md:pt-10 pb-4 md:pb-6">
+    <div class="container mx-auto px-4 max-w-7xl">
+        <div class="home-action-grid" data-aos="fade-up" data-aos-delay="160">
+            <a href="{{ route('frontend.careers.index') }}" class="home-action-card home-action-careers">
+                <span class="home-action-content">
+                    <strong>{{ $pageSettings->careers_title ?? 'Tuyển dụng' }}</strong>
+                    <span>{{ $pageSettings->careers_description ?? 'Gia nhập CNETPOS để cùng kiến tạo giải pháp công nghệ cho doanh nghiệp.' }}</span>
+                    <em>Xem các vị trí đang tuyển <i class="fas fa-arrow-right"></i></em>
+                </span>
+                <img src="{{ asset('images/setting/lien-he-bg.jpg') }}" alt="Tuyển dụng" loading="lazy" decoding="async">
+            </a>
+
+            <div class="home-consult-box">
+                <h3>Tư vấn giải pháp</h3>
+                <p>Đội ngũ chuyên gia của chúng tôi sẵn sàng lắng nghe và đề xuất giải pháp phù hợp nhất cho doanh nghiệp của bạn.</p>
+                <form action="{{ route('consulting.store') }}" method="POST">
+                    @csrf
+                    <div class="home-consult-fields">
+                        <input type="text" name="name" required placeholder="Họ và tên*">
+                        <input type="tel" name="phone" required placeholder="Số điện thoại*">
+                        <input type="email" name="email" placeholder="Email">
+                        <input type="text" name="details" placeholder="Nhu cầu tư vấn*">
+                    </div>
+                    <button type="submit">Gửi yêu cầu tư vấn</button>
+                </form>
+            </div>
+
+            <a href="{{ route('agency.index') }}" class="home-action-card home-action-agency">
+                <span class="home-action-content">
+                    <strong>{{ $pageSettings->agency_title ?? 'Đại lý / Nhà cung cấp' }}</strong>
+                    <span>{{ $pageSettings->agency_description ?? 'Cùng hợp tác, mở rộng hệ sinh thái và mang giải pháp CNETPOS đến nhiều doanh nghiệp hơn.' }}</span>
+                    <em>Trở thành đối tác <i class="fas fa-arrow-right"></i></em>
+                </span>
+                <img src="{{ asset('images/setting/bat-tay.png') }}" alt="Đại lý / Nhà cung cấp" loading="lazy" decoding="async">
+            </a>
         </div>
     </div>
 </section>
-@endif
-
-<div data-aos="fade-up">
-    <x-frontend.page-cta
-        :title="$pageSettings->consulting_cta_title"
-        :description="$pageSettings->consulting_cta_description"
-        :link="$pageSettings->consulting_cta_link"
-    />
-</div>
 
 @endsection
 
@@ -597,16 +754,107 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        new Swiper('.field-swiper', {
-            slidesPerView: 1.2,
-            spaceBetween: 16,
-            autoplay: { delay: 4000 },
-            pagination: { el: '.field-swiper .swiper-pagination', clickable: true },
-            breakpoints: {
-                480: { slidesPerView: 2, spaceBetween: 20 },
-                640: { slidesPerView: 3, spaceBetween: 24 },
-                1024: { slidesPerView: 4, spaceBetween: 32 }
-            }
+        const projectSections = document.querySelectorAll('.home-projects-section');
+        projectSections.forEach((section) => {
+            const tabs = section.querySelectorAll('[data-project-tab]');
+            const panels = section.querySelectorAll('.home-project-panel');
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const targetId = tab.getAttribute('data-project-tab');
+                    const targetPanel = section.querySelector(`#${targetId}`);
+
+                    tabs.forEach((item) => {
+                        const isActive = item === tab;
+                        item.classList.toggle('is-active', isActive);
+                        item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                    });
+
+                    panels.forEach((panel) => {
+                        panel.classList.toggle('is-active', panel === targetPanel);
+                    });
+                });
+            });
+        });
+
+        const testimonialSwiperEl = document.querySelector('.home-testimonials-swiper');
+        const testimonialSlideCount = testimonialSwiperEl ? testimonialSwiperEl.querySelectorAll('.swiper-slide').length : 0;
+
+        if (testimonialSlideCount > 0) {
+            new Swiper(testimonialSwiperEl, {
+                slidesPerView: 1,
+                loop: testimonialSlideCount > 1,
+                speed: 650,
+                autoplay: testimonialSlideCount > 1 ? {
+                    delay: 6000,
+                    disableOnInteraction: false,
+                } : false,
+                pagination: {
+                    el: '.home-testimonials-pagination',
+                    clickable: true,
+                },
+            });
+        }
+
+        const productSections = document.querySelectorAll('.home-product-showcase');
+        productSections.forEach((section) => {
+            const tabs = section.querySelectorAll('[data-product-tab]');
+            const panels = section.querySelectorAll('.home-product-panel');
+            const productSwipers = new Map();
+
+            const initProductSwiper = (panel) => {
+                if (!panel || productSwipers.has(panel.id)) {
+                    return productSwipers.get(panel?.id);
+                }
+
+                const slider = panel.querySelector('.home-product-swiper');
+                if (!slider) {
+                    return null;
+                }
+
+                const slideCount = slider.querySelectorAll('.swiper-slide').length;
+                const swiper = new Swiper(slider, {
+                    slidesPerView: 1,
+                    spaceBetween: 24,
+                    loop: slideCount > 1,
+                    grabCursor: slideCount > 1,
+                    speed: 650,
+                    navigation: {
+                        nextEl: panel.querySelector('.home-product-next'),
+                        prevEl: panel.querySelector('.home-product-prev'),
+                    },
+                });
+
+                productSwipers.set(panel.id, swiper);
+                return swiper;
+            };
+
+            const activateTab = (tab) => {
+                const targetId = tab.getAttribute('data-product-tab');
+                const targetPanel = section.querySelector(`#${targetId}`);
+
+                tabs.forEach((item) => {
+                    const isActive = item === tab;
+                    item.classList.toggle('is-active', isActive);
+                    item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+
+                panels.forEach((panel) => {
+                    panel.classList.toggle('is-active', panel === targetPanel);
+                });
+
+                const swiper = initProductSwiper(targetPanel);
+                if (swiper) {
+                    setTimeout(() => swiper.update(), 0);
+                }
+            };
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', () => activateTab(tab));
+            });
+
+            const activePanel = section.querySelector('.home-product-panel.is-active');
+            initProductSwiper(activePanel);
         });
 
         if (window.AOS) {

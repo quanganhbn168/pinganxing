@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cart_items', function (Blueprint $table) {
+            $table->index('user_id', 'cart_items_user_id_index');
             $table->dropUnique(['user_id', 'product_id']);
             $table->unique(['user_id', 'product_id', 'product_variant_id'], 'cart_items_user_product_variant_unique');
         });
@@ -19,6 +20,7 @@ return new class extends Migration
         Schema::table('cart_items', function (Blueprint $table) {
             $table->dropUnique('cart_items_user_product_variant_unique');
             $table->unique(['user_id', 'product_id']);
+            $table->dropIndex('cart_items_user_id_index');
         });
     }
 };

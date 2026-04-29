@@ -75,17 +75,17 @@
 <div class="bg-gray-50 dark:bg-gray-900 py-10 md:py-16">
     <div class="max-w-screen-xl mx-auto px-4">
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
-            
+
             {{-- Cột NỘI DUNG CHÍNH (Trai) --}}
             <div class="w-full lg:w-3/4">
                 <article class="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 dark:border-gray-700">
-                    
+
                     {{-- Meta Header --}}
                     <header class="mb-8 border-b border-gray-100 dark:border-gray-700 pb-8">
                         <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-4">
                             {{ $post->title }}
                         </h1>
-                        
+
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm font-medium">
                                 <span class="flex items-center mr-4">
@@ -95,7 +95,7 @@
                                     <i class="far fa-user mr-2 text-blue-600"></i> Admin
                                 </span>
                             </div>
-                            
+
                             {{-- Chia sẻ --}}
                             <div class="flex items-center">
                                 <x-social-share :title="$post->title" />
@@ -126,7 +126,11 @@
                         </div>
                     </footer>
                 </article>
-
+                {{-- BÌNH LUẬN --}}
+                <div class="mt-12 bg-white dark:bg-gray-800 p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <x-comment-list :comments="$post->approvedComments" />
+                    <x-comment-form :commentable="$post" type="post" />
+                </div>
                 {{-- BÀI VIẾT LIÊN QUAN --}}
                 @if ($relatedPosts->count())
                 <div class="mt-12 md:mt-16">
@@ -136,7 +140,7 @@
                             <div class="absolute -bottom-[4px] left-0 w-16 h-1 bg-blue-600 rounded-r-full"></div>
                         </h3>
                     </div>
-                    
+
                     <div class="swiper related-post-swiper overflow-hidden py-4 -my-4 px-2">
                         <div class="swiper-wrapper">
                             @foreach ($relatedPosts as $related)
@@ -144,7 +148,7 @@
                                     <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
                                         <a href="{{ $related->slug_url }}" class="block relative aspect-video overflow-hidden">
                                             <img src="{{ $related->image?->url ?? $related->banner?->url ?? ($related->image ? $related->image?->url : asset('images/setting/no-image.png')) }}"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                  alt="{{ $related->title }}" loading="lazy">
                                         </a>
                                         <div class="p-4 flex flex-col flex-1">
@@ -163,17 +167,13 @@
                 </div>
                 @endif
 
-                {{-- BÌNH LUẬN --}}
-                <div class="mt-12 bg-white dark:bg-gray-800 p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <x-comment-list :comments="$post->approvedComments" />
-                    <x-comment-form :commentable="$post" type="post" />
-                </div>
+
             </div>
 
             {{-- Cột SIDEBAR (Phải) --}}
             <div class="w-full lg:w-1/4">
                 <aside class="sticky-sidebar space-y-8">
-                    
+
                     {{-- Widget Danh mục --}}
                     <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
                         <h4 class="text-lg font-bold text-gray-900 dark:text-white uppercase mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">
@@ -182,7 +182,7 @@
                         <ul class="space-y-3">
                             @foreach($allCategories as $category)
                             <li>
-                                <a href="{{ $category->slug_url }}" 
+                                <a href="{{ $category->slug_url }}"
                                    class="flex items-center text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors group">
                                     <span class="w-2 h-2 rounded-full bg-blue-100 group-hover:bg-blue-600 transition-colors mr-3"></span>
                                     {{ $category->name }}
@@ -205,12 +205,12 @@
                         </div>
                     </div>
                     @endif
-                    
+
                     {{-- Form Tư Vấn --}}
                     <div class="hidden md:block">
                         @include('partials.frontend.contact_register')
                     </div>
-                    
+
                 </aside>
             </div>
 
