@@ -32,7 +32,7 @@ class HomeController extends Controller
             ->with('image')
             ->orderBy('position')
             ->get();
-        $homeServices = Service::where("status", 1)->where("is_home", 1)->with(['image', 'banner'])->get();
+        $homeServicesCategories = ServiceCategory::where("status", 1)->where("is_home", 1)->with(['image', 'banner'])->get();
         $homeProjectCategories = ProjectCategory::where("status", 1)->where("is_home", 1)->with([
             "projects" => function ($query) {
                 $query->where("status", 1)->with(['image', 'category']);
@@ -78,7 +78,7 @@ class HomeController extends Controller
             "allPosts",
             "homeProducts",
             "homeCategories",
-            "homeServices",
+            "homeServicesCategories",
             "homeProjectCategories",
             "homeFields",
             "homeProjects",

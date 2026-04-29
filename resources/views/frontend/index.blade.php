@@ -226,7 +226,7 @@
 @endif
 
 {{-- 4. CORE SERVICES --}}
-@if(isset($homeServices) && $homeServices->count())
+@if(isset($homeServicesCategories) && $homeServicesCategories->count())
 <section id="services" class="services-section py-16 md:py-20">
     <div class="container mx-auto px-4 max-w-7xl">
         <div class="services-layout">
@@ -239,7 +239,7 @@
             </div>
 
             <div class="services-list" data-aos="fade-left">
-                @foreach($homeServices as $service)
+                @foreach($homeServicesCategories as $service)
                 @php
                     $serviceImage = $service->banner_id ? ($service->banner?->url ?? null) : null;
                     $serviceImage = $serviceImage ?: ($service->image_id ? ($service->image?->url ?? null) : null);

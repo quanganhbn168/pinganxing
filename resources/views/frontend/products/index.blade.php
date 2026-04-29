@@ -38,7 +38,7 @@
 
 <div class="bg-white dark:bg-gray-900 py-12">
     <div class="max-w-screen-xl mx-auto px-4">
-        
+
         {{-- Toolbar Lọc / Tìm kiếm --}}
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-10 flex flex-col md:flex-row gap-4 justify-between items-center">
             <div class="w-full md:w-1/3">
@@ -71,7 +71,7 @@
                             <a href="{{ $item->category->slug_url }}" class="hover:text-blue-600 transition-colors">
                                 {{ $item->category->name }}
                             </a>
-                            <div class="absolute -bottom-[4px] left-0 w-16 h-1 bg-blue-600 rounded-r-full"></div>
+                            <div class="absolute -bottom-1 left-0 w-16 h-1 bg-blue-600 rounded-r-full"></div>
                         </h3>
 
                         @if ($item->products->count() > 0)
@@ -115,10 +115,10 @@
     </div>
 </div>
 
-<x-frontend.page-cta 
-    :title="$pageSettings->products_cta_title" 
-    :description="$pageSettings->products_cta_description" 
-    :link="$pageSettings->products_cta_link" 
+<x-frontend.page-cta
+    :title="$pageSettings->products_cta_title"
+    :description="$pageSettings->products_cta_description"
+    :link="$pageSettings->products_cta_link"
 />
 
 @endsection
@@ -130,7 +130,7 @@
         const categorySelect = document.getElementById('category-select');
         if(categorySelect) {
             categorySelect.addEventListener('change', function() {
-                if (this.value) window.location.href = this.value; 
+                if (this.value) window.location.href = this.value;
             });
         }
 
@@ -140,7 +140,7 @@
             const slider = section.querySelector('.category-product-slider');
             const nextBtn = section.querySelector('.category-custom-next');
             const prevBtn = section.querySelector('.category-custom-prev');
-            
+
             if(slider) {
                 new Swiper(slider, {
                     slidesPerView: 2,
