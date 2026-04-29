@@ -11,11 +11,13 @@
         <div class="swiper-wrapper">
             @forelse($slides as $slide)
             @php
+                $hasPrimaryButton = filled($slide->button_text) || filled($slide->link);
+                $hasSecondaryButton = filled($slide->button_text_2) || filled($slide->link_2);
                 $hasSlideOverlay = filled($slide->subtitle)
                     || filled($slide->title)
                     || filled($slide->description)
-                    || filled($slide->button_text)
-                    || filled($slide->link);
+                    || $hasPrimaryButton
+                    || $hasSecondaryButton;
             @endphp
             <div class="swiper-slide hero-slide {{ $slides->count() === 1 ? 'is-single' : '' }}">
                 <img
@@ -51,11 +53,19 @@
                         </p>
                         @endif
 
-                        @if($slide->link || $slide->button_text)
+                        @if($hasPrimaryButton || $hasSecondaryButton)
                         <div data-hero-anim="4" class="flex flex-col sm:flex-row items-center gap-3 w-full mt-2">
-                            <a href="{{ $slide->link ?? '#' }}" class="w-full sm:w-auto text-center px-10 py-3.5 bg-accent-500 hover:bg-accent-600 text-white font-bold rounded-lg transition-colors shadow-lg shadow-accent-500/30">
-                                {{ $slide->button_text ?: 'Xem chi tiết' }} <i class="fas fa-arrow-right ml-2"></i>
-                            </a>
+                            @if($hasPrimaryButton)
+                                <a href="{{ filled($slide->link) ? $slide->link : '#' }}" class="w-full sm:w-auto text-center px-10 py-3.5 bg-accent-500 hover:bg-accent-600 text-white font-bold rounded-lg transition-colors shadow-lg shadow-accent-500/30">
+                                    {{ $slide->button_text ?: 'Xem chi tiết' }} <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            @endif
+
+                            @if($hasSecondaryButton)
+                                <a href="{{ filled($slide->link_2) ? $slide->link_2 : '#' }}" class="w-full sm:w-auto text-center px-10 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/40 transition-colors backdrop-blur-sm">
+                                    {{ $slide->button_text_2 ?: 'Tìm hiểu thêm' }} <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            @endif
                         </div>
                         @endif
                     </div>

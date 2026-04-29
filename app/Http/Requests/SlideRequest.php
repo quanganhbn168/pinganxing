@@ -19,6 +19,8 @@ class SlideRequest extends FormRequest
             'description'      => 'nullable|string',
             'link'             => 'nullable|string|max:500',
             'button_text'      => 'nullable|string|max:255',
+            'button_text_2'    => 'nullable|string|max:255',
+            'link_2'           => 'nullable|string|max:255',
             'position'         => 'nullable|integer|min:0',
             'status'           => 'boolean',
             'image_id'         => 'required|integer',

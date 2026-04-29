@@ -16,6 +16,8 @@ class Slide extends Model
         'description',
         'link',
         'button_text',
+        'button_text_2',
+        'link_2',
         'image_id',
         'position',
         'status',
