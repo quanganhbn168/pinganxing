@@ -9,16 +9,16 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-
+use Awcodes\Curator\Components\Tables\CuratorColumn;
 class FieldsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->reorderable('position')
             ->columns([
-                \Awcodes\Curator\Components\Tables\CuratorColumn::make('image')
+                CuratorColumn::make('image')
                     ->label('Ảnh')
-                    ->circular()
                     ->size(40),
                 TextColumn::make('name')
                     ->label('Tên lĩnh vực')
@@ -29,9 +29,6 @@ class FieldsTable
                     ->sortable(),
                 IconColumn::make('status')
                     ->label('Kích hoạt')
-                    ->boolean(),
-                IconColumn::make('is_featured')
-                    ->label('Nổi bật')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->dateTime()

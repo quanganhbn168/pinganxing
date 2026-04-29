@@ -20,10 +20,6 @@ class CategoriesTable
             ->reorderable('position')
             ->defaultSort('position')
             ->columns([
-                TextColumn::make('position')
-                    ->label('#')
-                    ->sortable()
-                    ->width('60px'),
                 CuratorColumn::make('image')
                     ->label('Ảnh')
                     ->circular()
@@ -54,6 +50,11 @@ class CategoriesTable
                 ToggleColumn::make('status')
                     ->label('Kích hoạt')
                     ->alignCenter(),
+
+                ToggleColumn::make('is_home')
+                    ->label('Trang chủ')
+                    ->alignCenter(),
+
                 TextColumn::make('updated_at')
                     ->label('Cập nhật')
                     ->since()

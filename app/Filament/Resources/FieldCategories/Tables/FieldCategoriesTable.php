@@ -5,32 +5,38 @@ namespace App\Filament\Resources\FieldCategories\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Awcodes\Curator\Components\Tables\CuratorColumn;
+use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 
 class FieldCategoriesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->reorderable('position')
             ->columns([
-                TextColumn::make('name')
-                    ->searchable(),
-                TextColumn::make('position')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('parent.name')
-                    ->searchable(),
-                \Awcodes\Curator\Components\Tables\CuratorColumn::make('image')
+                CuratorColumn::make('image')
                     ->label('Ảnh / Icon')
-                    ->circular()
                     ->size(40),
-                IconColumn::make('status')
-                    ->boolean(),
-                TextColumn::make('order')
-                    ->numeric()
-                    ->sortable(),
+                TextColumn::make('name')
+                ->label('Tên danh mục')
+                    ->searchable(),
+                TextColumn::make('parent.name')
+                ->label('Danh mục gốc')
+                ->default("-")
+                ->badge()
+                    ->searchable(),
+
+                ToggleColumn::make('status')
+                ->label('Kích hoạt'),
+
+                ToggleColumn::make('is_home')
+                ->label('Hiện trang chủ'),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -45,6 +51,17 @@ class FieldCategoriesTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, $record) {
+                        if ($record->fields()->exists()) {
+                            Notification::make()->warning()->title('Không thể xóa!')->body('Danh mục đang chứa lĩnh vực.')->send();
+                            $action->cancel();
+                        }
+                        if ($record->children()->exists()) {
+                            Notification::make()->warning()->title('Không thể xóa!')->body('Danh mục này đang có thư mục con.')->send();
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
