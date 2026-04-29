@@ -12,6 +12,8 @@ trait HasTags
      */
     public function tags(): MorphToMany
     {
-        return $this->morphToMany(Tag::class, 'taggable');
+        return $this->morphToMany(Tag::class, 'taggable')
+            ->orderBy('sort_order')
+            ->orderBy('name');
     }
 }

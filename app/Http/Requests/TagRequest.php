@@ -13,11 +13,14 @@ class TagRequest extends FormRequest
 
     public function rules(): array
     {
-        $id = $this->route('tag');
+        $tag = $this->route('tag');
+        $id = is_object($tag) && method_exists($tag, 'getKey') ? $tag->getKey() : $tag;
 
         return [
             'name' => 'required|string|max:255|unique:tags,name,' . $id,
-            'slug' => 'nullable|string|max:255|unique:tags,slug,' . $id,
+            'color' => 'nullable|string|max:20',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer|min:0',
         ];
     }
 }

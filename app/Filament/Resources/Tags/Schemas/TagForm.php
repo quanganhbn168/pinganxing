@@ -6,10 +6,7 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
-use App\Filament\Forms\Components\SlugInput;
 
 class TagForm
 {
@@ -21,11 +18,13 @@ class TagForm
                 Section::make('Thông tin Thẻ')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Tên Thẻ (Tag)')
-                            ->required(),
+                            ->label('Tên thẻ')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
 
                         Textarea::make('description')
-                            ->label('Mô tả ngắn gọn')
+                            ->label('Mô tả')
                             ->rows(3)
                             ->columnSpanFull(),
                     ])
@@ -40,7 +39,6 @@ class TagForm
                             
                         TextInput::make('sort_order')
                             ->label('Thứ tự sắp xếp')
-                            ->required()
                             ->numeric()
                             ->default(0),
                     ])

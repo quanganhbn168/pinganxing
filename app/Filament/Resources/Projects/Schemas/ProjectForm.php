@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Filament\Forms\Components\SlugInput;
+use App\Filament\Forms\Components\TagSelect;
 use App\Traits\HasSeo;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\RichEditor;
@@ -68,11 +69,8 @@ class ProjectForm
                                     ->label('Hiển thị Nổi bật (Trang chủ)')
                                     ->default(false)
                                     ->required(),
-                                Select::make('tags')
-                                    ->label('Gắn Thẻ (Tags)')
-                                    ->relationship('tags', 'name')
-                                    ->multiple()
-                                    ->preload(),
+                                TagSelect::make()
+                                    ->columnSpanFull(),
                             ]),
                         Section::make('Ảnh đại diện & Bìa')
                             ->schema([

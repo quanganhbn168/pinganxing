@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
 
@@ -24,6 +25,12 @@ class ProjectsTable
                     ->label('Danh mục')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('tags.name')
+                    ->label('Thẻ')
+                    ->badge()
+                    ->separator(',')
+                    ->limitList(3)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('status')
                     ->label('Trạng thái'),
                 ToggleColumn::make('is_home')
@@ -42,7 +49,12 @@ class ProjectsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('tags')
+                    ->label('Thẻ')
+                    ->relationship('tags', 'name', modifyQueryUsing: fn ($query) => $query->ordered())
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
             ])
             ->recordActions([
                 EditAction::make(),

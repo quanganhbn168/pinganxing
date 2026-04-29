@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Filament\Forms\Components\SlugInput;
+use App\Filament\Forms\Components\TagSelect;
 use App\Models\Attribute;
 use App\Traits\HasSeo;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
@@ -209,6 +210,8 @@ class ProductForm
                         Toggle::make('is_home')
                             ->label('Hiện trang chủ')
                             ->helperText('Hiển thị sản phẩm ở khối trang chủ.'),
+                        TagSelect::make()
+                            ->columnSpanFull(),
                     ])
                     ->columns(3),
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Tag extends Model
 {
@@ -16,11 +17,32 @@ class Tag extends Model
         'sort_order',
     ];
 
+    protected $casts = [
+        'sort_order' => 'integer',
+    ];
+
     // ─── Scopes ───
 
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    // ─── Relationships ───
+
+    public function products(): MorphToMany
+    {
+        return $this->morphedByMany(Product::class, 'taggable');
+    }
+
+    public function posts(): MorphToMany
+    {
+        return $this->morphedByMany(Post::class, 'taggable');
+    }
+
+    public function projects(): MorphToMany
+    {
+        return $this->morphedByMany(Project::class, 'taggable');
     }
 
     // ─── Helpers ───

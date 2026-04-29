@@ -43,6 +43,12 @@ class ProductsTable
                     ->label('Thương hiệu')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('tags.name')
+                    ->label('Thẻ')
+                    ->badge()
+                    ->separator(',')
+                    ->limitList(3)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('price')
                     ->label('Giá bán')
                     ->money('VND')
@@ -84,6 +90,12 @@ class ProductsTable
                 SelectFilter::make('brand_id')
                     ->label('Thương hiệu')
                     ->relationship('brand', 'name')
+                    ->preload()
+                    ->searchable(),
+                SelectFilter::make('tags')
+                    ->label('Thẻ')
+                    ->relationship('tags', 'name', modifyQueryUsing: fn ($query) => $query->ordered())
+                    ->multiple()
                     ->preload()
                     ->searchable(),
             ])
