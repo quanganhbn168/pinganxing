@@ -21,7 +21,7 @@ class SlugObserver
             return;
         }
 
-        app(SlugGenerator::class)->syncModel($model, $sourceString);
+        app(SlugGenerator::class)->syncModel($model, $sourceString, optional($model->slugData)->id);
     }
 
     public function deleting(Model $model): void
