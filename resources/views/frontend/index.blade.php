@@ -217,7 +217,7 @@
                 $fieldImage = $field->image_id ? ($field->image?->url ?? null) : null;
                 $fieldImage = $fieldImage ?: 'https://placehold.co/720x430/eaf4fb/0e4a86?text=Industry';
             @endphp
-            <a href="{{ route('frontend.field.bySlug', $field->slug_url) }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
+            <a href="{{ $field->slug_url }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
                 <span class="field-card-media">
                     <img src="{{ $fieldImage }}" alt="{{ $field->name }}" loading="lazy" decoding="async">
                 </span>
