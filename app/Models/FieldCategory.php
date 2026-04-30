@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-use App\Traits\HasFaqs;
 use App\Traits\HasSlug;
 
 class FieldCategory extends Model
 {
-    use HasFactory, HasSlug, HasFaqs, \App\Traits\HasCategoryTree;
+    use HasFactory, HasSlug, \App\Traits\HasCategoryTree;
 
     protected $fillable = [
         'name',
@@ -64,6 +64,18 @@ class FieldCategory extends Model
     public function banner(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'banner_id');
+    }
+
+    public function faqs(): MorphMany
+    {
+        return $this->morphMany(Faq::class, 'faqable')
+            ->orderBy('position')
+            ->orderBy('id');
+    }
+
+    public function activeFaqs(): MorphMany
+    {
+        return $this->faqs()->active();
     }
 
     // ─── Scopes ───
