@@ -60,10 +60,18 @@
 
 @section('content')
 
-<x-frontend.page-hero 
-    :image="$bannerUrl" 
-    :title="$pageTitle" 
-    :breadcrumb="$breadcrumbs" 
+<x-frontend.leaderboard
+    :image="$bannerUrl"
+    :title="$pageTitle"
+    :subline="$project->category?->name"
+    :description="$project->description"
+    :breadcrumb="$breadcrumbs"
+    :stats="array_values(array_filter([
+        $project->year ? ['icon' => 'fas fa-calendar-check', 'value' => $project->year, 'label' => 'Năm triển khai'] : null,
+        $project->investor ? ['icon' => 'fas fa-building', 'value' => Str::limit($project->investor, 18), 'label' => 'Chủ đầu tư'] : null,
+        $project->address ? ['icon' => 'fas fa-location-dot', 'value' => Str::limit($project->address, 18), 'label' => 'Địa điểm'] : null,
+        $project->value ? ['icon' => 'fas fa-chart-line', 'value' => $project->value, 'label' => 'Quy mô'] : null,
+    ]))"
 />
 
 <div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">

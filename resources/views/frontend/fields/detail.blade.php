@@ -140,9 +140,21 @@
 @endphp
 
 @section('content')
-<div class="banner">
-    <img src="{{ $field->banner?->url ?? asset($setting->banner) }}" alt="{{ $field->name }}" class="w-100">
-</div>
+@php
+    $fieldBannerUrl = $field->image?->url ?? ($setting->banner ?? null);
+    $fieldBreadcrumbs = collect($breadcrumbs ?? [])
+        ->map(fn ($category) => ['label' => $category->name, 'url' => $category->slug_url])
+        ->push(['label' => $pageTitle])
+        ->toArray();
+@endphp
+
+<x-frontend.leaderboard
+    :image="$fieldBannerUrl"
+    :title="$pageTitle"
+    :subline="$field->category?->name"
+    :description="$field->summary ?? $field->meta_description"
+    :breadcrumb="$fieldBreadcrumbs"
+/>
 
 <div class="container py-4">
     <div class="row">

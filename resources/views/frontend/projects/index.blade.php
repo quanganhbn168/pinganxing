@@ -14,26 +14,15 @@
         $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
     @endphp
 
-    <section class="project-index-hero {{ $bannerUrl ? 'has-banner' : '' }}"
-        @if ($bannerUrl) style="--project-hero-image: url('{{ $bannerUrl }}');" @endif>
-        <div class="container mx-auto px-4 max-w-7xl">
-            <nav class="project-index-breadcrumb" aria-label="Breadcrumb">
-                <a href="{{ url('/') }}">Trang chủ</a>
-                <span>/</span>
-                @if ($activeCategory)
-                    <a href="{{ route('frontend.projects.index') }}">Dự án</a>
-                    <span>/</span>
-                    <span>{{ $activeCategory->name }}</span>
-                @else
-                    <span>Dự án</span>
-                @endif
-            </nav>
-            <h1>{{ $pageTitle }}</h1>
-            @if ($pageSubtitle)
-                <p>{{ $pageSubtitle }}</p>
-            @endif
-        </div>
-    </section>
+    <x-frontend.leaderboard
+        :image="$bannerUrl"
+        :title="$pageTitle"
+        :subline="$activeCategory ? 'Dự án theo danh mục' : $pageSettings->projects_leaderboard_subline"
+        :description="$activeCategory ? $activeCategory->description : ($pageSettings->projects_leaderboard_description ?: $pageSubtitle)"
+        :breadcrumb="$breadcrumbs"
+        :actions="$activeCategory ? [] : $pageSettings->projects_leaderboard_actions"
+        :stats="$activeCategory ? [] : $pageSettings->projects_leaderboard_stats"
+    />
 
     <section class="project-index-page">
         <div class="container mx-auto px-4 max-w-7xl">

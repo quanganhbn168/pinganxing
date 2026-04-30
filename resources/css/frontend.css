@@ -1435,68 +1435,6 @@
     }
   }
 
-  .project-index-hero {
-    position: relative;
-    overflow: hidden;
-    padding: 4.5rem 0 3.5rem;
-    background:
-      radial-gradient(circle at 80% 50%, rgba(10, 139, 241, .32), transparent 24rem),
-      linear-gradient(100deg, #061a33 0%, #082647 46%, #0b3762 100%);
-    color: #ffffff;
-  }
-
-  .project-index-hero.has-banner {
-    background:
-      linear-gradient(90deg, rgba(6, 26, 51, .94) 0%, rgba(8, 38, 71, .84) 52%, rgba(11, 55, 98, .58) 100%),
-      var(--project-hero-image);
-    background-size: cover;
-    background-position: center;
-  }
-
-  .project-index-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(120deg, transparent 0 47%, rgba(96, 165, 250, .16) 47% 48%, transparent 48% 100%),
-      linear-gradient(60deg, transparent 0 58%, rgba(96, 165, 250, .1) 58% 59%, transparent 59% 100%);
-    opacity: .65;
-    pointer-events: none;
-  }
-
-  .project-index-hero .container {
-    position: relative;
-    z-index: 1;
-  }
-
-  .project-index-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: .55rem;
-    color: rgba(226, 232, 240, .86);
-    font-size: .84rem;
-    font-weight: 650;
-    margin-bottom: 1rem;
-  }
-
-  .project-index-breadcrumb a:hover {
-    color: #ffffff;
-  }
-
-  .project-index-hero h1 {
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: .9rem;
-  }
-
-  .project-index-hero p {
-    max-width: 44rem;
-    color: rgba(239, 246, 255, .92);
-    font-size: clamp(.95rem, 1.5vw, 1.08rem);
-    line-height: 1.7;
-  }
-
   .project-index-page {
     position: relative;
     overflow: hidden;
@@ -1973,10 +1911,6 @@
   }
 
   @media (max-width: 767px) {
-    .project-index-hero {
-      padding: 3.5rem 0 2.8rem;
-    }
-
     .project-list-card {
       padding: .8rem;
     }

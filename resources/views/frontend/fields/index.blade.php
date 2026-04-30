@@ -4,11 +4,14 @@
 
 
 
-<x-frontend.page-hero 
-    :image="$bannerUrl" 
-    :title="$pageTitle" 
-    :subtitle="$pageSubtitle ?? null"
-    :breadcrumb="$breadcrumbs" 
+<x-frontend.leaderboard
+    :image="$bannerUrl"
+    :title="$pageTitle"
+    :subline="$pageSettings->fields_leaderboard_subline"
+    :description="$pageSettings->fields_leaderboard_description ?: ($pageSubtitle ?? null)"
+    :breadcrumb="$breadcrumbs"
+    :actions="$pageSettings->fields_leaderboard_actions"
+    :stats="$pageSettings->fields_leaderboard_stats"
 />
 
 <div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">

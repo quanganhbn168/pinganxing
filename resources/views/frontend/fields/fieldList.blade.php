@@ -4,10 +4,12 @@
 
 
 
-<x-frontend.page-hero 
-    :image="$bannerUrl" 
-    :title="$pageTitle" 
-    :breadcrumb="$breadcrumbs" 
+<x-frontend.leaderboard
+    :image="$bannerUrl"
+    :title="$pageTitle"
+    subline="Lĩnh vực hoạt động"
+    :description="$current_category->description"
+    :breadcrumb="$breadcrumbs"
 />
 
 <div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">

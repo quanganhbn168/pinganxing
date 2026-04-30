@@ -6,6 +6,7 @@ use App\Models\Field;
 use App\Models\FieldCategory;
 use App\Models\Slug;
 use App\Settings\PageSettings;
+use Awcodes\Curator\Models\Media;
 use Illuminate\View\View;
 
 class FieldController extends Controller
@@ -32,7 +33,8 @@ class FieldController extends Controller
 
         $pageTitle    = $pageSettings->fields_title    ?: 'Lĩnh vực hoạt động';
         $pageSubtitle = $pageSettings->fields_headline ?: null;
-        $bannerUrl    = $setting->banner ?? asset('images/setting/no-banner.png');
+        $bannerUrl    = $this->resolveMediaUrl($pageSettings->fields_banner)
+            ?? ($setting->banner ?? asset('images/setting/no-banner.png'));
         $breadcrumbs  = [['label' => $pageTitle]];
 
         $field_categories = FieldCategory::where("status", 1)->where("parent_id", 0)->get();
@@ -82,5 +84,24 @@ class FieldController extends Controller
         }
 
         return view("frontend.fields.detail", compact("field", "pageTitle", "breadcrumbs"));
+    }
+
+    private function resolveMediaUrl(mixed $settingValue): ?string
+    {
+        if (empty($settingValue)) {
+            return null;
+        }
+
+        if (is_string($settingValue) && str_starts_with($settingValue, '[') && str_ends_with($settingValue, ']')) {
+            $decoded = json_decode($settingValue, true);
+            if (is_array($decoded)) {
+                $settingValue = $decoded;
+            }
+        }
+
+        $id = is_array($settingValue) ? ($settingValue[0] ?? null) : $settingValue;
+        $media = is_numeric($id) ? Media::find((int) $id) : null;
+
+        return $media?->url ? url($media->url) : null;
     }
 }
