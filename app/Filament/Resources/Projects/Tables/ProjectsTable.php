@@ -18,6 +18,9 @@ class ProjectsTable
     {
         return $table
             ->columns([
+                CuratorColumn::make('image')
+                    ->label('Ảnh đại diện')
+                    ->size(40),
                 TextColumn::make('name')
                     ->label('Tên dự án')
                     ->searchable(),
@@ -35,10 +38,7 @@ class ProjectsTable
                     ->label('Trạng thái'),
                 ToggleColumn::make('is_home')
                     ->label('Trang chủ'),
-                CuratorColumn::make('image')
-                    ->label('Ảnh đại diện')
-                    ->circular()
-                    ->size(40),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
