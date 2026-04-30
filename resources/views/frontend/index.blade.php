@@ -217,7 +217,7 @@
                 $fieldImage = $field->image_id ? ($field->image?->url ?? null) : null;
                 $fieldImage = $fieldImage ?: 'https://placehold.co/720x430/eaf4fb/0e4a86?text=Industry';
             @endphp
-            <a href="{{ route('frontend.field.bySlug', $field->slug) }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
+            <a href="{{ route('frontend.field.bySlug', $field->slug_url) }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
                 <span class="field-card-media">
                     <img src="{{ $fieldImage }}" alt="{{ $field->name }}" loading="lazy" decoding="async">
                 </span>
@@ -262,7 +262,7 @@
                         ->filter()
                         ->take(3);
                 @endphp
-                <a href="{{ route('frontend.service.bySlug', $service->slug) }}" class="service-feature-card group" style="--service-card-image: url('{{ $serviceImage }}');" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
+                <a href="{{ route('frontend.service.bySlug', $service->slug_url) }}" class="service-feature-card group" style="--service-card-image: url('{{ $serviceImage }}');" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
                     <span class="service-feature-content">
                         <span class="service-feature-title">{{ $service->name }}</span>
                         @if($serviceSummary)
@@ -345,7 +345,7 @@
                     ])->filter(fn ($item) => filled($item['value']))->take(3);
                 @endphp
                 <div class="home-project-layout">
-                    <a href="{{ route('frontend.project.bySlug', $featuredProject->slug) }}" class="home-project-featured">
+                    <a href="{{ route('frontend.project.bySlug', $featuredProject->slug_url) }}" class="home-project-featured">
                         <img src="{{ $featuredImage }}" alt="{{ $featuredProject->name }}" loading="lazy" decoding="async">
                         <span class="home-project-featured-shade"></span>
                         <span class="home-project-featured-content">
