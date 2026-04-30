@@ -30,7 +30,7 @@ class PostCategoryForm
                         ParentCategorySelect::make('parent_id')
                             ->label('Danh mục cha')
                             ->treeModel(PostCategory::class)
-                            ->rootAsNull('-- Danh mục gốc --')
+                            ->rootAsZero('-- Danh mục gốc --')
                             ->columnSpanFull(),
 
                         Grid::make([
