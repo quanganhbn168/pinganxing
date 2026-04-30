@@ -33,9 +33,8 @@
             <div class="space-y-20 lg:space-y-32">
                 @foreach($field_categories as $index => $field_category)
                     <div class="fields-grid" data-aos="fade-up" data-aos-delay="120">
-            @foreach($homeFields as $field)
             @php
-                $fieldImage = $field->image_id ? ($field->image?->url ?? null) : null;
+                $fieldImage = $field_category->image_id ? ($field_category->image?->url ?? null) : null;
                 $fieldImage = $fieldImage ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Industry';
             @endphp
             <a href="{{ $field->slug_url }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 320) }}">
@@ -50,7 +49,6 @@
                     <span class="field-card-link">Tìm hiểu thêm <i class="fas fa-arrow-right"></i></span>
                 </span>
             </a>
-            @endforeach
         </div>
                 @endforeach
             </div>
