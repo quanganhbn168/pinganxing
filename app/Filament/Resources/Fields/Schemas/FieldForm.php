@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Fields\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\FieldCategory;
 use App\Traits\HasSeo;
@@ -109,6 +110,8 @@ class FieldForm
                         'default' => 1,
                         'lg' => 1,
                     ]),
+
+                FaqRepeater::make(),
             ]);
     }
 }

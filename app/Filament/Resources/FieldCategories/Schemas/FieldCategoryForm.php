@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\FieldCategories\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\FieldCategory;
@@ -237,25 +238,7 @@ class FieldCategoryForm
                                 ->pluck('name', 'id'))
                             ->columnSpanFull(),
 
-                        Repeater::make('faqs')
-                            ->label('Câu hỏi thường gặp')
-                            ->schema([
-                                TextInput::make('question')
-                                    ->label('Câu hỏi')
-                                    ->required()
-                                    ->columnSpanFull(),
-                                Textarea::make('answer')
-                                    ->label('Câu trả lời')
-                                    ->rows(3)
-                                    ->required()
-                                    ->columnSpanFull(),
-                            ])
-                            ->reorderable()
-                            ->collapsible()
-                            ->defaultItems(0)
-                            ->maxItems(12)
-                            ->columnSpanFull()
-                            ->addActionLabel('+ Thêm câu hỏi'),
+                        FaqRepeater::make(),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

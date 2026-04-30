@@ -14,116 +14,46 @@
     :stats="$pageSettings->fields_leaderboard_stats"
 />
 
-@php
-    $overviewDescription = $pageSettings->fields_description ?? $setting->fields_description ?? null;
-    $featuredCategory = $featuredFieldCategory ?? ($field_categories->first() ?? null);
-    $showcaseFields = $featuredCategory?->fields ?? collect();
-    $showcaseImage = $featuredCategory?->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=CNETPOS';
-    $showcaseDescription = Str::limit(strip_tags((string) ($featuredCategory?->solution_overview ?: $featuredCategory?->description ?: $featuredCategory?->content ?: $overviewDescription)), 280);
-    $businessChallenges = collect($featuredCategory?->business_challenges ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['title'] ?? null) || filled($item['description'] ?? null)))
-        ->values();
-    $cnetposSolutions = collect($featuredCategory?->cnetpos_solutions ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['title'] ?? null) || filled($item['description'] ?? null)))
-        ->values();
-    $keyFeatures = collect($featuredCategory?->key_features ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['title'] ?? null) || filled($item['description'] ?? null)))
-        ->values();
-    $showcaseBullets = $showcaseFields->pluck('name')->filter()->take(5)->values();
-
-    if ($showcaseBullets->isEmpty()) {
-        $showcaseBullets = collect([
-            'Chuẩn hóa nghiệp vụ theo mô hình vận hành thực tế',
-            'Kết nối dữ liệu bán hàng, nhân sự, kho và tài chính',
-            'Tối ưu báo cáo quản trị theo thời gian thực',
-            'Mở rộng linh hoạt theo quy mô doanh nghiệp',
-        ]);
-    }
-
-    if ($businessChallenges->isEmpty()) {
-        $businessChallenges = $showcaseBullets->take(4)->map(fn ($title) => ['title' => $title, 'description' => null]);
-    }
-
-    if ($cnetposSolutions->isEmpty()) {
-        $cnetposSolutions = $showcaseBullets->take(4)->map(fn ($title) => ['title' => $title, 'description' => null]);
-    }
-
-    if ($keyFeatures->isEmpty()) {
-        $keyFeatures = $showcaseBullets->take(5)->map(fn ($title) => [
-            'icon' => 'fas fa-layer-group',
-            'title' => $title,
-            'description' => null,
-        ]);
-    }
-
-    $processSteps = collect($featuredCategory?->implementation_steps ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['title'] ?? null) || filled($item['description'] ?? null)))
-        ->values();
-
-    if ($processSteps->isEmpty()) {
-        $processSteps = collect([
-            ['title' => 'Khảo sát & Tư vấn', 'description' => 'Hiểu đặc thù vận hành và mục tiêu doanh nghiệp.', 'icon' => 'fas fa-clipboard-check'],
-            ['title' => 'Đề xuất giải pháp', 'description' => 'Phân tích lộ trình, phạm vi và cấu hình phù hợp.', 'icon' => 'fas fa-lightbulb'],
-            ['title' => 'Ký kết & Chuẩn bị', 'description' => 'Thống nhất phương án, kế hoạch triển khai.', 'icon' => 'fas fa-file-signature'],
-            ['title' => 'Triển khai & Đào tạo', 'description' => 'Cài đặt, cấu hình và đào tạo đội ngũ sử dụng.', 'icon' => 'fas fa-chalkboard-user'],
-            ['title' => 'Chạy thử & Nghiệm thu', 'description' => 'Kiểm thử, tối ưu và nghiệm thu giải pháp.', 'icon' => 'fas fa-circle-check'],
-            ['title' => 'Vận hành & Hỗ trợ', 'description' => 'Đồng hành, hỗ trợ 24/7 và phát triển lâu dài.', 'icon' => 'fas fa-headset'],
-        ]);
-    }
-
-    $impactStats = collect($featuredCategory?->impact_stats ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['value'] ?? null) || filled($item['label'] ?? null)))
-        ->values();
-
-    if ($impactStats->isEmpty()) {
-        $impactStats = collect([
-            ['value' => '+35%', 'label' => 'Doanh thu bình quân'],
-            ['value' => '-25%', 'label' => 'Thời gian kiểm kho'],
-            ['value' => '-30%', 'label' => 'Hao hụt hàng hóa'],
-            ['value' => '+50%', 'label' => 'Hiệu suất nhân viên'],
-        ]);
-    }
-
-    $faqs = collect($featuredCategory?->faqs ?? [])
-        ->filter(fn ($item) => is_array($item) && (filled($item['question'] ?? null) || filled($item['answer'] ?? null)))
-        ->values();
-
-    if ($faqs->isEmpty()) {
-        $faqs = collect([
-            ['question' => 'CNETPOS có phù hợp với doanh nghiệp nhỏ không?', 'answer' => 'Có. Giải pháp có thể cấu hình theo quy mô hiện tại và mở rộng khi doanh nghiệp phát triển.'],
-            ['question' => 'Chi phí triển khai được tính như thế nào?', 'answer' => 'Chi phí phụ thuộc vào phạm vi nghiệp vụ, số điểm vận hành, thiết bị và mức độ tích hợp cần triển khai.'],
-            ['question' => 'Thời gian triển khai giải pháp là bao lâu?', 'answer' => 'Thông thường từ vài tuần tùy mô hình vận hành, dữ liệu hiện có và mức độ tùy biến.'],
-            ['question' => 'Doanh nghiệp có được hướng dẫn sử dụng không?', 'answer' => 'Đội ngũ CNETPOS đào tạo, bàn giao tài liệu và hỗ trợ trong quá trình vận hành thực tế.'],
-        ]);
-    }
-
-    $allFeaturedFields = ($featuredFields ?? collect())->values();
-    $relatedProjects = ($relatedProjects ?? collect())->values();
-    $tabCategories = $field_categories
-        ->filter(fn ($category) => $category->fields->isNotEmpty())
-        ->values();
-@endphp
-
 <div class="field-index-page">
     <div class="max-w-screen-xl mx-auto px-4">
-        @if(!empty($overviewDescription))
-            <div class="field-index-heading" data-aos="fade-up">
-                <span>Tổng quan lĩnh vực</span>
-                <h2>Chúng tôi đồng hành cùng doanh nghiệp trên mọi lĩnh vực</h2>
+        <div class="field-index-heading" data-aos="fade-up">
+            <span>Tổng quan lĩnh vực</span>
+            <h2>Chúng tôi đồng hành cùng doanh nghiệp trên mọi lĩnh vực</h2>
+            @if(!empty($overviewDescription))
                 <p>{{ $overviewDescription }}</p>
-            </div>
+            @endif
+        </div>
+
+        @if($fieldCategoryCards->isNotEmpty())
+            <section class="field-category-section" data-aos="fade-up" data-aos-delay="80">
+                <div class="fields-grid">
+                    @foreach($fieldCategoryCards as $card)
+                        <a href="{{ $card['url'] }}" class="field-card group" data-aos="fade-up" data-aos-delay="{{ $card['delay'] }}">
+                            <span class="field-card-media">
+                                <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" loading="lazy" decoding="async">
+                            </span>
+                            <span class="field-card-body">
+                                <span class="field-card-title">{{ $card['title'] }}</span>
+                                @if(!empty($card['description']))
+                                    <span class="field-card-text">{{ $card['description'] }}</span>
+                                @endif
+                                <span class="field-card-link">Tìm hiểu thêm <i class="fas fa-arrow-right"></i></span>
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
         @endif
 
-        @if(isset($field_categories) && $field_categories->isNotEmpty())
+        @if($fieldCategoryCards->isNotEmpty())
             <section class="field-showcase" data-aos="fade-up" data-aos-delay="80">
                 <div class="field-showcase-media">
-                    <img src="{{ $showcaseImage }}" alt="{{ $featuredCategory?->name ?? $pageTitle }}" loading="lazy" decoding="async">
+                    <img src="{{ $showcaseImage }}" alt="{{ $featuredFieldCategory?->name ?? $pageTitle }}" loading="lazy" decoding="async">
 
-                    @if($showcaseFields->first())
-                        @php $storyField = $showcaseFields->first(); @endphp
-                        <a href="{{ $storyField->slug_url }}" class="field-showcase-story">
-                            <span>{{ $storyField->category?->name ?? $featuredCategory?->name }}</span>
-                            <strong>{{ $storyField->name }}</strong>
+                    @if($storyFieldCard)
+                        <a href="{{ $storyFieldCard['url'] }}" class="field-showcase-story">
+                            <span>{{ $storyFieldCard['badge'] }}</span>
+                            <strong>{{ $storyFieldCard['title'] }}</strong>
                             <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
                         </a>
                     @endif
@@ -131,7 +61,7 @@
 
                 <div class="field-showcase-main">
                     <span class="field-section-kicker">Lĩnh vực tiêu biểu</span>
-                    <h2>{{ $featuredCategory?->name ?? 'Giải pháp theo lĩnh vực' }}</h2>
+                    <h2>{{ $featuredFieldCategory?->name ?? 'Giải pháp theo lĩnh vực' }}</h2>
 
                     <div class="field-showcase-columns">
                         <div class="field-info-stack">
@@ -196,7 +126,7 @@
                     </div>
 
                     <div class="field-showcase-actions">
-                        <a href="{{ $featuredCategory?->slug_url ?? route('frontend.fields.index') }}">
+                        <a href="{{ $featuredFieldCategory?->slug_url ?? route('frontend.fields.index') }}">
                             Tư vấn giải pháp cho ngành này
                         </a>
                         <a href="{{ route('contact.show') }}" class="is-secondary">
@@ -221,7 +151,7 @@
                 <div class="field-process-grid">
                     @foreach($processSteps as $step)
                         <article class="field-process-card">
-                            <span class="field-process-number">{{ str_pad((string) ($loop->index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                            <span class="field-process-number">{{ $step['number'] }}</span>
                             <i class="{{ $step['icon'] ?? 'fas fa-circle-check' }}"></i>
                             <h3>{{ $step['title'] ?? $step['description'] ?? '' }}</h3>
                             <p>{{ $step['description'] ?? '' }}</p>
@@ -230,7 +160,7 @@
                 </div>
             </section>
 
-            @if($relatedProjects->isNotEmpty())
+            @if($relatedProjectCards->isNotEmpty())
                 <section class="field-project-section" data-aos="fade-up" data-aos-delay="140">
                     <div class="field-featured-heading">
                         <span>Dự án nổi bật</span>
@@ -238,16 +168,13 @@
                     </div>
 
                     <div class="field-project-grid">
-                        @foreach($relatedProjects as $project)
-                            @php
-                                $projectImage = $project->image?->url ?: 'https://placehold.co/520x360/eaf4fb/0e4a86?text=Project';
-                            @endphp
-                            <a href="{{ $project->slug_url }}" class="field-project-card">
-                                <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
-                                <span>{{ $project->category?->name ?? 'Dự án' }}</span>
-                                <strong>{{ $project->name }}</strong>
-                                @if($project->description)
-                                    <p>{{ Str::limit(strip_tags($project->description), 90) }}</p>
+                        @foreach($relatedProjectCards as $card)
+                            <a href="{{ $card['url'] }}" class="field-project-card">
+                                <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" loading="lazy" decoding="async">
+                                <span>{{ $card['badge'] }}</span>
+                                <strong>{{ $card['title'] }}</strong>
+                                @if(!empty($card['description']))
+                                    <p>{{ $card['description'] }}</p>
                                 @endif
                                 <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
                             </a>
@@ -266,9 +193,9 @@
                     <button type="button" class="field-tab is-active" data-field-tab="field-panel-all" role="tab" aria-selected="true">
                         Tất cả
                     </button>
-                    @foreach($tabCategories as $field_category)
-                        <button type="button" class="field-tab" data-field-tab="field-panel-{{ $field_category->id }}" role="tab" aria-selected="false">
-                            {{ $field_category->name }}
+                    @foreach($fieldTabPanels as $panel)
+                        <button type="button" class="field-tab" data-field-tab="{{ $panel['id'] }}" role="tab" aria-selected="false">
+                            {{ $panel['name'] }}
                         </button>
                     @endforeach
                 </div>
@@ -276,25 +203,19 @@
                 <div class="field-tab-panels">
                     <div class="field-tab-panel is-active" id="field-panel-all" role="tabpanel">
                         <div class="field-featured-grid">
-                            @forelse($allFeaturedFields as $field)
-                                @php
-                                    $fieldImage = $field->image?->url ?: ($field->category?->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=CNETPOS');
-                                @endphp
-                                <a href="{{ $field->slug_url }}" class="field-mini-card">
-                                    <img src="{{ $fieldImage }}" alt="{{ $field->name }}" loading="lazy" decoding="async">
-                                    <span>{{ $field->category?->name ?? 'Lĩnh vực' }}</span>
-                                    <strong>{{ $field->name }}</strong>
+                            @forelse($featuredFieldCards as $card)
+                                <a href="{{ $card['url'] }}" class="field-mini-card">
+                                    <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" loading="lazy" decoding="async">
+                                    <span>{{ $card['badge'] }}</span>
+                                    <strong>{{ $card['title'] }}</strong>
                                     <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
                                 </a>
                             @empty
-                                @foreach($field_categories->take(6) as $field_category)
-                                    @php
-                                        $categoryImage = $field_category->image?->url ?: 'https://placehold.co/420x420/eaf4fb/0e4a86?text=CNETPOS';
-                                    @endphp
-                                    <a href="{{ $field_category->slug_url }}" class="field-mini-card">
-                                        <img src="{{ $categoryImage }}" alt="{{ $field_category->name }}" loading="lazy" decoding="async">
+                                @foreach($fieldCategoryCards->take(6) as $card)
+                                    <a href="{{ $card['url'] }}" class="field-mini-card">
+                                        <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" loading="lazy" decoding="async">
                                         <span>Lĩnh vực</span>
-                                        <strong>{{ $field_category->name }}</strong>
+                                        <strong>{{ $card['title'] }}</strong>
                                         <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
                                     </a>
                                 @endforeach
@@ -302,17 +223,14 @@
                         </div>
                     </div>
 
-                    @foreach($tabCategories as $field_category)
-                        <div class="field-tab-panel" id="field-panel-{{ $field_category->id }}" role="tabpanel">
+                    @foreach($fieldTabPanels as $panel)
+                        <div class="field-tab-panel" id="{{ $panel['id'] }}" role="tabpanel">
                             <div class="field-featured-grid">
-                                @foreach($field_category->fields->take(6) as $field)
-                                    @php
-                                        $fieldImage = $field->image?->url ?: ($field_category->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=CNETPOS');
-                                    @endphp
-                                    <a href="{{ $field->slug_url }}" class="field-mini-card">
-                                        <img src="{{ $fieldImage }}" alt="{{ $field->name }}" loading="lazy" decoding="async">
-                                        <span>{{ $field_category->name }}</span>
-                                        <strong>{{ $field->name }}</strong>
+                                @foreach($panel['cards'] as $card)
+                                    <a href="{{ $card['url'] }}" class="field-mini-card">
+                                        <img src="{{ $card['image'] }}" alt="{{ $card['title'] }}" loading="lazy" decoding="async">
+                                        <span>{{ $card['badge'] }}</span>
+                                        <strong>{{ $card['title'] }}</strong>
                                         <em>Xem chi tiết <i class="fas fa-arrow-right"></i></em>
                                     </a>
                                 @endforeach

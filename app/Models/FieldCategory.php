@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasFaqs;
 use App\Traits\HasSlug;
 
 class FieldCategory extends Model
 {
-    use HasFactory, HasSlug, \App\Traits\HasCategoryTree;
+    use HasFactory, HasSlug, HasFaqs, \App\Traits\HasCategoryTree;
 
     protected $fillable = [
         'name',
@@ -26,7 +27,6 @@ class FieldCategory extends Model
         'impact_stats',
         'implementation_steps',
         'related_project_ids',
-        'faqs',
         'status',
         'is_home',
         'position',
@@ -45,7 +45,6 @@ class FieldCategory extends Model
         'impact_stats' => 'array',
         'implementation_steps' => 'array',
         'related_project_ids' => 'array',
-        'faqs' => 'array',
     ];
 
     // ─── Relationships riêng ───

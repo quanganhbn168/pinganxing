@@ -41,9 +41,6 @@ return new class extends Migration
                 $table->json('related_project_ids')->nullable()->after('implementation_steps');
             }
 
-            if (! Schema::hasColumn('field_categories', 'faqs')) {
-                $table->json('faqs')->nullable()->after('related_project_ids');
-            }
         });
     }
 
@@ -51,7 +48,6 @@ return new class extends Migration
     {
         Schema::table('field_categories', function (Blueprint $table) {
             foreach ([
-                'faqs',
                 'related_project_ids',
                 'implementation_steps',
                 'impact_stats',

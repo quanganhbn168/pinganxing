@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Traits\HasSlug;
 use App\Traits\HasComments;
+use App\Traits\HasFaqs;
 
 class Field extends Model
 {
-    use HasFactory, HasSlug, HasComments;
+    use HasFactory, HasSlug, HasComments, HasFaqs;
 
     protected $fillable = [
         'field_category_id',

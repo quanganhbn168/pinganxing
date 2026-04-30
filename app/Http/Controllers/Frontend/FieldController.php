@@ -8,6 +8,8 @@ use App\Models\Project;
 use App\Models\Slug;
 use App\Settings\PageSettings;
 use Awcodes\Curator\Models\Media;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class FieldController extends Controller
@@ -45,6 +47,9 @@ class FieldController extends Controller
             })
             ->with([
                 'image',
+                'faqs' => function ($query) {
+                    $query->active();
+                },
                 'fields' => function ($query) {
                     $query->where('status', 1)
                         ->with(['image', 'category'])
@@ -93,9 +98,122 @@ class FieldController extends Controller
                 ->values();
         }
 
+        $overviewDescription = $pageSettings->fields_description ?? $setting->fields_description ?? null;
+        $showcaseFields = $featuredFieldCategory?->fields ?? collect();
+        $showcaseBullets = $showcaseFields->pluck('name')->filter()->take(5)->values();
+
+        if ($showcaseBullets->isEmpty()) {
+            $showcaseBullets = collect([
+                'Chuẩn hóa nghiệp vụ theo mô hình vận hành thực tế',
+                'Kết nối dữ liệu bán hàng, nhân sự, kho và tài chính',
+                'Tối ưu báo cáo quản trị theo thời gian thực',
+                'Mở rộng linh hoạt theo quy mô doanh nghiệp',
+            ]);
+        }
+
+        $businessChallenges = $this->landingItems($featuredFieldCategory?->business_challenges);
+        $cnetposSolutions = $this->landingItems($featuredFieldCategory?->cnetpos_solutions);
+        $keyFeatures = $this->landingItems($featuredFieldCategory?->key_features);
+        $processSteps = $this->landingItems($featuredFieldCategory?->implementation_steps);
+        $impactStats = $this->landingItems($featuredFieldCategory?->impact_stats, ['value', 'label']);
+
+        if ($businessChallenges->isEmpty()) {
+            $businessChallenges = $showcaseBullets->take(4)->map(fn (string $title) => ['title' => $title, 'description' => null]);
+        }
+
+        if ($cnetposSolutions->isEmpty()) {
+            $cnetposSolutions = $showcaseBullets->take(4)->map(fn (string $title) => ['title' => $title, 'description' => null]);
+        }
+
+        if ($keyFeatures->isEmpty()) {
+            $keyFeatures = $showcaseBullets->take(5)->map(fn (string $title) => [
+                'icon' => 'fas fa-layer-group',
+                'title' => $title,
+                'description' => null,
+            ]);
+        }
+
+        if ($processSteps->isEmpty()) {
+            $processSteps = collect([
+                ['title' => 'Khảo sát & Tư vấn', 'description' => 'Hiểu đặc thù vận hành và mục tiêu doanh nghiệp.', 'icon' => 'fas fa-clipboard-check'],
+                ['title' => 'Đề xuất giải pháp', 'description' => 'Phân tích lộ trình, phạm vi và cấu hình phù hợp.', 'icon' => 'fas fa-lightbulb'],
+                ['title' => 'Ký kết & Chuẩn bị', 'description' => 'Thống nhất phương án, kế hoạch triển khai.', 'icon' => 'fas fa-file-signature'],
+                ['title' => 'Triển khai & Đào tạo', 'description' => 'Cài đặt, cấu hình và đào tạo đội ngũ sử dụng.', 'icon' => 'fas fa-chalkboard-user'],
+                ['title' => 'Chạy thử & Nghiệm thu', 'description' => 'Kiểm thử, tối ưu và nghiệm thu giải pháp.', 'icon' => 'fas fa-circle-check'],
+                ['title' => 'Vận hành & Hỗ trợ', 'description' => 'Đồng hành, hỗ trợ 24/7 và phát triển lâu dài.', 'icon' => 'fas fa-headset'],
+            ]);
+        }
+
+        if ($impactStats->isEmpty()) {
+            $impactStats = collect([
+                ['value' => '+35%', 'label' => 'Doanh thu bình quân'],
+                ['value' => '-25%', 'label' => 'Thời gian kiểm kho'],
+                ['value' => '-30%', 'label' => 'Hao hụt hàng hóa'],
+                ['value' => '+50%', 'label' => 'Hiệu suất nhân viên'],
+            ]);
+        }
+
+        $processSteps = $processSteps
+            ->values()
+            ->map(fn (array $step, int $index) => array_merge($step, [
+                'number' => str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+            ]));
+
+        $faqs = $this->faqItems($featuredFieldCategory?->faqs ?? collect());
+
+        if ($faqs->isEmpty()) {
+            $faqs = collect([
+                ['question' => 'CNETPOS có phù hợp với doanh nghiệp nhỏ không?', 'answer' => 'Có. Giải pháp có thể cấu hình theo quy mô hiện tại và mở rộng khi doanh nghiệp phát triển.'],
+                ['question' => 'Chi phí triển khai được tính như thế nào?', 'answer' => 'Chi phí phụ thuộc vào phạm vi nghiệp vụ, số điểm vận hành, thiết bị và mức độ tích hợp cần triển khai.'],
+                ['question' => 'Thời gian triển khai giải pháp là bao lâu?', 'answer' => 'Thông thường từ vài tuần tùy mô hình vận hành, dữ liệu hiện có và mức độ tùy biến.'],
+                ['question' => 'Doanh nghiệp có được hướng dẫn sử dụng không?', 'answer' => 'Đội ngũ CNETPOS đào tạo, bàn giao tài liệu và hỗ trợ trong quá trình vận hành thực tế.'],
+            ]);
+        }
+
+        $fieldCategoryCards = $field_categories
+            ->values()
+            ->map(fn (FieldCategory $category, int $index) => $this->categoryCard($category, $index))
+            ->values();
+
+        $featuredFieldCards = $this->fieldCards($featuredFields);
+        $relatedProjectCards = $this->projectCards($relatedProjects);
+        $fieldTabPanels = $field_categories
+            ->filter(fn (FieldCategory $category) => $category->fields->isNotEmpty())
+            ->map(fn (FieldCategory $category) => [
+                'id' => 'field-panel-' . $category->id,
+                'name' => $category->name,
+                'cards' => $this->fieldCards($category->fields->take(6), $category),
+            ])
+            ->values();
+
+        $storyField = $showcaseFields->first();
+        $storyFieldCard = $storyField ? $this->fieldCard($storyField, $featuredFieldCategory) : null;
+        $showcaseImage = $featuredFieldCategory?->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=CNETPOS';
+        $showcaseDescription = Str::limit(strip_tags((string) ($featuredFieldCategory?->solution_overview ?: $featuredFieldCategory?->description ?: $featuredFieldCategory?->content ?: $overviewDescription)), 280);
+
         return view('frontend.fields.index', compact(
-            "field_categories", "featuredFieldCategory", "featuredFields", "relatedProjects", "setting", "pageSettings",
-            "pageTitle", "pageSubtitle", "bannerUrl", "breadcrumbs"
+            'field_categories',
+            'featuredFieldCategory',
+            'setting',
+            'pageSettings',
+            'pageTitle',
+            'pageSubtitle',
+            'bannerUrl',
+            'breadcrumbs',
+            'overviewDescription',
+            'fieldCategoryCards',
+            'showcaseImage',
+            'showcaseDescription',
+            'storyFieldCard',
+            'businessChallenges',
+            'cnetposSolutions',
+            'keyFeatures',
+            'processSteps',
+            'impactStats',
+            'relatedProjectCards',
+            'featuredFieldCards',
+            'fieldTabPanels',
+            'faqs',
         ));
     }
     public function byCategory(FieldCategory $fieldCategory): View
@@ -157,5 +275,77 @@ class FieldController extends Controller
         $media = is_numeric($id) ? Media::find((int) $id) : null;
 
         return $media?->url ? url($media->url) : null;
+    }
+
+    private function landingItems(mixed $items, array $keys = ['title', 'description']): Collection
+    {
+        return collect($items ?? [])
+            ->filter(function ($item) use ($keys) {
+                if (! is_array($item)) {
+                    return false;
+                }
+
+                foreach ($keys as $key) {
+                    if (filled($item[$key] ?? null)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->values();
+    }
+
+    private function faqItems(mixed $items): Collection
+    {
+        return collect($items ?? [])
+            ->map(fn ($faq) => is_array($faq)
+                ? $faq
+                : ['question' => $faq->question ?? null, 'answer' => $faq->answer ?? null])
+            ->filter(fn (array $item) => filled($item['question'] ?? null) || filled($item['answer'] ?? null))
+            ->values();
+    }
+
+    private function categoryCard(FieldCategory $category, int $index = 0): array
+    {
+        return [
+            'url' => $category->slug_url,
+            'image' => $category->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Industry',
+            'title' => $category->name,
+            'description' => Str::limit(strip_tags((string) ($category->description ?: $category->content)), 110),
+            'delay' => min($index * 80, 320),
+        ];
+    }
+
+    private function fieldCard(Field $field, ?FieldCategory $fallbackCategory = null): array
+    {
+        $category = $field->category ?? $fallbackCategory;
+
+        return [
+            'url' => $field->slug_url,
+            'image' => $field->image?->url ?: ($category?->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=CNETPOS'),
+            'title' => $field->name,
+            'badge' => $category?->name ?? 'Lĩnh vực',
+        ];
+    }
+
+    private function fieldCards(iterable $fields, ?FieldCategory $fallbackCategory = null): Collection
+    {
+        return collect($fields)
+            ->map(fn (Field $field) => $this->fieldCard($field, $fallbackCategory))
+            ->values();
+    }
+
+    private function projectCards(iterable $projects): Collection
+    {
+        return collect($projects)
+            ->map(fn (Project $project) => [
+                'url' => $project->slug_url,
+                'image' => $project->image?->url ?: 'https://placehold.co/520x360/eaf4fb/0e4a86?text=Project',
+                'title' => $project->name,
+                'badge' => $project->category?->name ?? 'Dự án',
+                'description' => Str::limit(strip_tags((string) $project->description), 90),
+            ])
+            ->values();
     }
 }

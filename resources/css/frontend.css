@@ -3282,6 +3282,10 @@
     margin-top: 1rem;
   }
 
+  .field-category-section {
+    margin-bottom: 3rem;
+  }
+
   .field-showcase {
     display: grid;
     grid-template-columns: minmax(14rem, .92fr) minmax(0, 1.55fr) minmax(12rem, .74fr);

@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Traits\HasSlug;
 use App\Traits\HasComments;
+use App\Traits\HasFaqs;
 use App\Traits\HasTags;
 
 class Project extends Model
 {
-    use HasFactory, HasSlug, HasComments, HasTags;
+    use HasFactory, HasSlug, HasComments, HasFaqs, HasTags;
 
     protected $fillable = [
         'name',

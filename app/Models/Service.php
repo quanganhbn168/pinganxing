@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Traits\HasSlug;
 use App\Traits\HasComments;
+use App\Traits\HasFaqs;
 
 class Service extends Model
 {
-    use HasFactory, HasSlug, HasComments;
+    use HasFactory, HasSlug, HasComments, HasFaqs;
 
     protected $fillable = [
         'service_category_id',

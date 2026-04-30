@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Services\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\ServiceCategory;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
@@ -122,6 +123,8 @@ class ServiceForm
                         'default' => 1,
                         'lg' => 1,
                     ]),
+
+                FaqRepeater::make(),
             ]);
     }
 }

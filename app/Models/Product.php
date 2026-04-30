@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use App\Traits\HasSlug;
 use App\Traits\HasSeo;
+use App\Traits\HasFaqs;
 use App\Traits\HasTags;
 
 class Product extends Model
 {
-    use HasFactory, HasSlug, HasSeo, HasTags;
+    use HasFactory, HasSlug, HasSeo, HasFaqs, HasTags;
 
     protected $fillable = [
         'type',

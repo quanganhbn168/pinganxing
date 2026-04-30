@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\SlugInput;
 use App\Filament\Forms\Components\TagSelect;
 use App\Models\Attribute;
@@ -214,6 +215,8 @@ class ProductForm
                             ->columnSpanFull(),
                     ])
                     ->columns(3),
+
+                FaqRepeater::make(),
 
                 HasSeo::seoSection(),
             ]);

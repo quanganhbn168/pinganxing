@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Posts\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\SlugInput;
 use App\Filament\Forms\Components\TagSelect;
 use App\Models\PostCategory;
@@ -116,6 +117,8 @@ class PostForm
                         'default' => 1,
                         'lg' => 1,
                     ]),
+
+                FaqRepeater::make(),
             ]);
     }
 }

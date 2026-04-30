@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Schemas;
 
+use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\SlugInput;
 use App\Filament\Forms\Components\TagSelect;
 use App\Traits\HasSeo;
@@ -81,6 +82,8 @@ class ProjectForm
                         CuratorPicker::make('banner_id')
                             ->label('Ảnh Bìa / Banner'),
                     ])->columns(2),
+
+                FaqRepeater::make(),
 
                 HasSeo::seoSection(),
             ]);
