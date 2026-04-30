@@ -6,7 +6,6 @@ use App\Filament\Forms\Components\FaqRepeater;
 use App\Filament\Forms\Components\ParentCategorySelect;
 use App\Filament\Forms\Components\SlugInput;
 use App\Models\FieldCategory;
-use App\Models\Project;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -105,7 +104,7 @@ class FieldCategoryForm
                     ]),
 
                 Section::make('Landing page lĩnh vực')
-                    ->description('Các khối hiển thị dưới leaderboard: tổng quan, thách thức, giải pháp, tính năng, hiệu quả, quy trình, dự án và FAQ.')
+                    ->description('Các khối hiển thị dưới leaderboard: tổng quan, thách thức, giải pháp, tính năng, hiệu quả, quy trình và FAQ.')
                     ->schema([
                         Textarea::make('solution_overview')
                             ->label('Tổng quan giải pháp')
@@ -224,19 +223,6 @@ class FieldCategoryForm
                             ->maxItems(8)
                             ->columnSpanFull()
                             ->addActionLabel('+ Thêm bước'),
-
-                        Select::make('related_project_ids')
-                            ->label('Dự án nổi bật liên quan')
-                            ->helperText('Chọn các dự án tiêu biểu hiển thị trong block "Dự án tiêu biểu theo lĩnh vực".')
-                            ->multiple()
-                            ->searchable()
-                            ->preload()
-                            ->options(fn () => Project::query()
-                                ->where('status', true)
-                                ->orderByDesc('is_home')
-                                ->orderBy('name')
-                                ->pluck('name', 'id'))
-                            ->columnSpanFull(),
 
                         FaqRepeater::make(),
                     ])

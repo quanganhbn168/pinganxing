@@ -26,7 +26,6 @@ class FieldCategory extends Model
         'key_features',
         'impact_stats',
         'implementation_steps',
-        'related_project_ids',
         'status',
         'is_home',
         'position',
@@ -44,7 +43,6 @@ class FieldCategory extends Model
         'key_features' => 'array',
         'impact_stats' => 'array',
         'implementation_steps' => 'array',
-        'related_project_ids' => 'array',
     ];
 
     // ─── Relationships riêng ───

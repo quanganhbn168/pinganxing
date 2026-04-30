@@ -65,28 +65,6 @@ class FieldController extends Controller
 
         $featuredFieldCategory = $field_categories->firstWhere('is_home', true) ?? $field_categories->first();
 
-        $projectIdsByCategory = $field_categories
-            ->mapWithKeys(fn (FieldCategory $category) => [
-                $category->id => collect($category->related_project_ids ?? [])
-                    ->filter()
-                    ->map(fn ($id) => (int) $id)
-                    ->values(),
-            ]);
-
-        $allRelatedProjectIds = $projectIdsByCategory
-            ->flatten()
-            ->unique()
-            ->values();
-
-        $relatedProjectsById = $allRelatedProjectIds->isNotEmpty()
-            ? Project::query()
-                ->where('status', 1)
-                ->whereIn('id', $allRelatedProjectIds)
-                ->with(['image', 'category'])
-                ->get()
-                ->keyBy('id')
-            : collect();
-
         $overviewDescription = $pageSettings->fields_description ?? $setting->fields_description ?? null;
         $showcaseFields = $featuredFieldCategory?->fields ?? collect();
         $showcaseBullets = $showcaseFields->pluck('name')->filter()->take(5)->values();
@@ -164,26 +142,42 @@ class FieldController extends Controller
             ->map(fn (FieldCategory $category, int $index) => $this->categoryCard($category, $index))
             ->values();
 
-        $projectTabPanels = $field_categories
-            ->map(function (FieldCategory $category) use ($projectIdsByCategory, $relatedProjectsById) {
-                $projectIds = $projectIdsByCategory->get($category->id, collect());
-                $projects = $projectIds
-                    ->map(fn (int $id) => $relatedProjectsById->get($id))
-                    ->filter()
-                    ->values();
+        $projectsForTabs = Project::query()
+            ->where('status', 1)
+            ->whereHas('category', fn ($query) => $query->where('status', 1))
+            ->with(['image', 'category', 'slugData'])
+            ->orderByDesc('is_home')
+            ->latest()
+            ->get();
+
+        $projectTabPanels = $projectsForTabs
+            ->filter(fn (Project $project) => $project->category)
+            ->groupBy(fn (Project $project) => $project->category->id)
+            ->map(function (Collection $projects) {
+                $category = $projects->first()->category;
 
                 return [
                     'id' => 'project-panel-' . $category->id,
                     'name' => $category->name,
-                    'cards' => $this->projectCards($projects),
+                    'sort_key' => sprintf(
+                        '%d-%010d-%s',
+                        $category->is_home ? 0 : 1,
+                        $category->position ?? 0,
+                        $category->name
+                    ),
+                    'cards' => $this->projectCards($projects->take(6)),
                 ];
             })
             ->filter(fn (array $panel) => $panel['cards']->isNotEmpty())
+            ->sortBy('sort_key')
+            ->map(fn (array $panel) => [
+                'id' => $panel['id'],
+                'name' => $panel['name'],
+                'cards' => $panel['cards'],
+            ])
             ->values();
-        $allProjectCards = $projectTabPanels
-            ->flatMap(fn (array $panel) => $panel['cards'])
-            ->unique('url')
-            ->values();
+
+        $allProjectCards = $this->projectCards($projectsForTabs->take(12));
 
         $storyField = $showcaseFields->first();
         $storyFieldCard = $storyField ? $this->fieldCard($storyField, $featuredFieldCategory) : null;

@@ -167,8 +167,8 @@
                     <h2>Dự án tiêu biểu theo lĩnh vực</h2>
                 </div>
 
-                <div class="field-tabs" role="tablist" aria-label="Lọc dự án tiêu biểu theo lĩnh vực">
-                    <button type="button" class="field-tab is-active" data-field-tab="field-panel-all" role="tab" aria-selected="true">
+                <div class="field-tabs" role="tablist" aria-label="Lọc dự án tiêu biểu theo danh mục dự án">
+                    <button type="button" class="field-tab is-active" data-field-tab="project-panel-all" role="tab" aria-selected="true">
                         Tất cả
                     </button>
                     @foreach($projectTabPanels as $panel)
@@ -179,7 +179,7 @@
                 </div>
 
                 <div class="field-tab-panels">
-                    <div class="field-tab-panel is-active" id="field-panel-all" role="tabpanel">
+                    <div class="field-tab-panel is-active" id="project-panel-all" role="tabpanel">
                         <div class="field-project-grid">
                             @foreach($allProjectCards as $card)
                                 <a href="{{ $card['url'] }}" class="field-project-card">
