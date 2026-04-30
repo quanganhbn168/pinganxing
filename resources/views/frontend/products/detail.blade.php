@@ -59,20 +59,28 @@
     $productBreadcrumbs[] = ['label' => $product->name];
 @endphp
 
-<x-frontend.leaderboard
-    :image="$product->banner?->url ?? $product->image?->url ?? $pageSettings->products_banner"
-    :title="$product->name"
-    :subline="$product->category?->name ?? 'Sản phẩm'"
-    :description="$product->meta_description ?? Str::limit(strip_tags((string) $product->description), 180)"
-    :breadcrumb="$productBreadcrumbs"
-    :actions="[
-        ['label' => 'Liên hệ tư vấn', 'url' => route('contact.show'), 'icon' => 'fas fa-headset', 'style' => 'primary'],
-        ['label' => 'Xem thông tin', 'url' => '#product-detail', 'icon' => 'fas fa-chevron-down', 'style' => 'secondary'],
-    ]"
-/>
-
 <div id="product-detail" class="bg-white dark:bg-gray-900 py-10 scroll-mt-24">
     <div class="max-w-screen-xl mx-auto px-4">
+        <nav class="mb-8 text-sm font-semibold text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
+            <ol class="flex flex-wrap items-center gap-2">
+                <li>
+                    <a href="{{ url('/') }}" class="hover:text-brand-700 dark:hover:text-brand-400">Trang chủ</a>
+                </li>
+                @foreach($productBreadcrumbs as $breadcrumb)
+                    <li class="text-gray-300 dark:text-gray-600">/</li>
+                    <li>
+                        @if(!empty($breadcrumb['url']))
+                            <a href="{{ $breadcrumb['url'] }}" class="hover:text-brand-700 dark:hover:text-brand-400">
+                                {{ $breadcrumb['label'] }}
+                            </a>
+                        @else
+                            <span class="text-gray-900 dark:text-white">{{ $breadcrumb['label'] }}</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ol>
+        </nav>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
 
             {{-- CỘT TRÁI: ẢNH SẢN PHẨM --}}
