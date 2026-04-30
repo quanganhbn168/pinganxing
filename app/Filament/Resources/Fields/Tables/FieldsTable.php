@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
 class FieldsTable
@@ -30,6 +31,8 @@ class FieldsTable
                 IconColumn::make('status')
                     ->label('Kích hoạt')
                     ->boolean(),
+                ToggleColumn::make('is_featured')
+                    ->label('Nổi bật'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

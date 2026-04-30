@@ -19,15 +19,33 @@ class FieldCategory extends Model
         'parent_id',
         'description',
         'content',
+        'solution_overview',
+        'business_challenges',
+        'cnetpos_solutions',
+        'key_features',
+        'impact_stats',
+        'implementation_steps',
+        'related_project_ids',
+        'faqs',
         'status',
+        'is_home',
         'position',
         'order',
         'image_id',
+        'banner_id',
     ];
 
     protected $casts = [
         'parent_id' => 'integer',
         'status' => 'boolean',
+        'is_home' => 'boolean',
+        'business_challenges' => 'array',
+        'cnetpos_solutions' => 'array',
+        'key_features' => 'array',
+        'impact_stats' => 'array',
+        'implementation_steps' => 'array',
+        'related_project_ids' => 'array',
+        'faqs' => 'array',
     ];
 
     // ─── Relationships riêng ───
@@ -40,6 +58,11 @@ class FieldCategory extends Model
     public function image(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'image_id');
+    }
+
+    public function banner(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'banner_id');
     }
 
     // ─── Scopes ───

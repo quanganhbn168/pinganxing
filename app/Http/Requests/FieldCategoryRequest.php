@@ -40,6 +40,16 @@ class FieldCategoryRequest extends FormRequest
             ],
             'description' => 'nullable|string',
             'content' => 'nullable|string',
+            'solution_overview' => 'nullable|string',
+            'business_challenges' => 'nullable|array',
+            'cnetpos_solutions' => 'nullable|array',
+            'key_features' => 'nullable|array',
+            'impact_stats' => 'nullable|array',
+            'implementation_steps' => 'nullable|array',
+            'related_project_ids' => 'nullable|array',
+            'related_project_ids.*' => 'integer|exists:projects,id',
+            'faqs' => 'nullable|array',
+            'is_home' => 'boolean',
             'status' => 'boolean',
             'order' => 'nullable|integer|min:0',
             // Media
@@ -56,6 +66,15 @@ class FieldCategoryRequest extends FormRequest
             'parent_id' => 'danh mục cha',
             'description' => 'mô tả',
             'content' => 'nội dung',
+            'solution_overview' => 'tổng quan giải pháp',
+            'business_challenges' => 'thách thức doanh nghiệp',
+            'cnetpos_solutions' => 'giải pháp của CNETPOS',
+            'key_features' => 'tính năng nổi bật',
+            'impact_stats' => 'hiệu quả đạt được',
+            'implementation_steps' => 'quy trình triển khai',
+            'related_project_ids' => 'dự án nổi bật liên quan',
+            'faqs' => 'câu hỏi thường gặp',
+            'is_home' => 'lĩnh vực tiêu biểu',
             'status' => 'trạng thái',
             'order' => 'thứ tự',
         ];
@@ -71,6 +90,7 @@ class FieldCategoryRequest extends FormRequest
 
         $this->merge([
             'status' => (bool) $this->status,
+            'is_home' => (bool) $this->is_home,
             'order' => $this->order ? (int) $this->order : 0,
             'parent_id' => (int) ($this->parent_id ?? 0),
         ]);

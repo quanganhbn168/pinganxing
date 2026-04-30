@@ -35,7 +35,7 @@ class FieldCategoriesTable
                 ->label('Kích hoạt'),
 
                 ToggleColumn::make('is_home')
-                ->label('Hiện trang chủ'),
+                ->label('Tiêu biểu'),
 
                 TextColumn::make('created_at')
                     ->dateTime()

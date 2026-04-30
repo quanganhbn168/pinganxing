@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Field;
 use App\Models\FieldCategory;
+use App\Models\Project;
 use App\Models\Slug;
 use App\Settings\PageSettings;
 use Awcodes\Curator\Models\Media;
@@ -37,10 +38,63 @@ class FieldController extends Controller
             ?? ($setting->banner ?? asset('images/setting/no-banner.png'));
         $breadcrumbs  = [['label' => $pageTitle]];
 
-        $field_categories = FieldCategory::where("status", 1)->where("parent_id", 0)->get();
+        $field_categories = FieldCategory::query()
+            ->where('status', 1)
+            ->where(function ($query) {
+                $query->where('parent_id', 0)->orWhereNull('parent_id');
+            })
+            ->with([
+                'image',
+                'fields' => function ($query) {
+                    $query->where('status', 1)
+                        ->with(['image', 'category'])
+                        ->orderByDesc('is_featured')
+                        ->latest();
+                },
+            ])
+            ->orderByDesc('is_home')
+            ->orderBy('position')
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get();
+
+        $featuredFieldCategory = $field_categories->firstWhere('is_home', true) ?? $field_categories->first();
+
+        $featuredFields = Field::query()
+            ->where('status', 1)
+            ->where('is_featured', 1)
+            ->with(['image', 'category'])
+            ->latest()
+            ->take(8)
+            ->get();
+
+        if ($featuredFields->isEmpty()) {
+            $featuredFields = $field_categories
+                ->flatMap(fn (FieldCategory $category) => $category->fields)
+                ->unique('id')
+                ->take(8)
+                ->values();
+        }
+
+        $relatedProjectIds = collect($featuredFieldCategory?->related_project_ids ?? [])
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->values();
+
+        $relatedProjects = collect();
+
+        if ($relatedProjectIds->isNotEmpty()) {
+            $relatedProjects = Project::query()
+                ->where('status', 1)
+                ->whereIn('id', $relatedProjectIds)
+                ->with(['image', 'category'])
+                ->get()
+                ->sortBy(fn (Project $project) => $relatedProjectIds->search($project->id))
+                ->values();
+        }
 
         return view('frontend.fields.index', compact(
-            "field_categories", "setting", "pageSettings",
+            "field_categories", "featuredFieldCategory", "featuredFields", "relatedProjects", "setting", "pageSettings",
             "pageTitle", "pageSubtitle", "bannerUrl", "breadcrumbs"
         ));
     }
