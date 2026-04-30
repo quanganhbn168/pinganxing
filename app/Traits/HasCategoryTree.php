@@ -117,28 +117,34 @@ trait HasCategoryTree
      * @param string   $prefix
      * @return array  [id => '── Tên danh mục']
      */
-    public static function getTreeOptions(?int $excludeId = null, ?int $parentId = 0, string $prefix = ''): array
+    public static function getTreeOptions(?int $excludeId = null, ?int $parentId = null, string $prefix = ''): array
     {
-        // Lấy danh sách cần loại bỏ
         $excludeIds = [];
+
         if ($excludeId) {
             $record = static::with('childrenRecursive')->find($excludeId);
+
             if ($record) {
                 $excludeIds = array_merge([$excludeId], $record->getAllDescendantIds());
             }
         }
 
-        $options = [];
-        $items = static::query()
+        $query = static::query()
             ->where('status', true)
-            ->where('parent_id', $parentId)
             ->whereNotIn('id', $excludeIds)
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
 
-        foreach ($items as $item) {
+        if ($parentId === null) {
+            $query->whereNull('parent_id');
+        } else {
+            $query->where('parent_id', $parentId);
+        }
+
+        $options = [];
+
+        foreach ($query->get() as $item) {
             $options[$item->id] = $prefix . $item->name;
-            // Đệ quy lấy con
+
             $childOptions = static::getTreeOptions($excludeId, $item->id, $prefix . '── ');
             $options = $options + $childOptions;
         }
