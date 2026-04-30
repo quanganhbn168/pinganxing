@@ -21,6 +21,8 @@ class PostCategory extends Model
         'banner_id',
         'status',
         'is_home',
+        'description',
+        'content',
     ];
 
     protected $casts = [
