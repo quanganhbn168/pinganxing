@@ -40,30 +40,11 @@
 </script>
 @endpush
 
-@push('css')
-<style>
-    .prose-custom img {
-        max-width: 100%;
-        height: auto !important;
-        border-radius: 0.75rem;
-        margin: 2rem auto;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .prose-custom p {
-        text-align: justify;
-        line-height: 1.8;
-    }
-    .sticky-sidebar {
-        position: sticky;
-        top: 6rem;
-        z-index: 10;
-    }
-</style>
-@endpush
-
 @section('content')
 @php
-    $bannerUrl = $post->banner?->url ?: ($post->banner ? asset($post->banner) : asset($setting->banner ?? ''));
+    $bannerUrl = $post->banner?->url ?: (!empty($setting->banner) ? asset($setting->banner) : null);
+    $mainUrl = $post->image?->url ?: ($post->image ? $post->image?->url : null);
+    $postSummary = $post->description ?? Str::limit(strip_tags((string) $post->content), 180);
     $postBreadcrumbs = [
         ['label' => 'Tin tức', 'url' => route('frontend.posts.index')],
     ];
@@ -76,155 +57,121 @@
 @endphp
 
 <x-frontend.leaderboard
-    :image="$bannerUrl ?: ($post->image?->url ?? $pageSettings->posts_banner)"
+    :image="$bannerUrl ?: ($mainUrl ?? $pageSettings->posts_banner)"
     :title="$post->title"
     :subline="$post->category?->name ?? 'Tin tức'"
-    :description="$post->description ?? Str::limit(strip_tags((string) $post->content), 180)"
+    :description="$postSummary"
     :breadcrumb="$postBreadcrumbs"
 />
 
-<div class="bg-gray-50 dark:bg-gray-900 py-10 md:py-16">
+<div class="post-detail-page">
     <div class="max-w-screen-xl mx-auto px-4">
-        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
-
-            {{-- Cột NỘI DUNG CHÍNH (Trai) --}}
-            <div class="w-full lg:w-3/4">
-                <article class="bg-white dark:bg-gray-800 rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 dark:border-gray-700">
-
-                    {{-- Meta Header --}}
-                    <header class="mb-8 border-b border-gray-100 dark:border-gray-700 pb-8">
-                        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-4">
-                            {{ $post->title }}
-                        </h1>
-
-                        <div class="flex flex-wrap items-center justify-between gap-4">
-                            <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm font-medium">
-                                <span class="flex items-center mr-4">
-                                    <i class="far fa-calendar-alt mr-2 text-blue-600"></i> {{ $post->updated_at->format('d/m/Y') }}
-                                </span>
-                                <span class="flex items-center">
-                                    <i class="far fa-user mr-2 text-blue-600"></i> Admin
-                                </span>
-                            </div>
-
-                            {{-- Chia sẻ --}}
-                            <div class="flex items-center">
-                                <x-social-share :title="$post->title" />
-                            </div>
-                        </div>
-                    </header>
-
-                    {{-- Ảnh Main nếu có --}}
-                    @php
-                        $mainUrl = $post->image?->url ?: ($post->image ? $post->image?->url : null);
-                    @endphp
+        <div class="post-detail-layout">
+            <main class="post-detail-main">
+                <article class="post-article-card">
                     @if($mainUrl)
-                    <div class="mb-10 rounded-2xl overflow-hidden shadow-sm">
-                         <img src="{{ $mainUrl }}" alt="{{ $post->title }}" class="w-full h-auto object-cover">
-                    </div>
+                        <figure class="post-article-cover">
+                            <img src="{{ $mainUrl }}" alt="{{ $post->title }}" loading="eager" decoding="async">
+                        </figure>
                     @endif
 
-                    {{-- Nội dung bài viết HTML --}}
-                    <div class="prose prose-lg md:prose-xl max-w-none prose-blue dark:prose-invert prose-custom mb-10">
-                        {!! $contentHtml !!}
-                    </div>
+                    <div class="post-article-inner">
+                        <header class="post-article-header">
+                            <div class="post-article-meta">
+                                @if($post->category)
+                                    <a href="{{ $post->category->slug_url }}">{{ $post->category->name }}</a>
+                                @endif
+                                <time datetime="{{ $post->updated_at->toDateString() }}">
+                                    <i class="far fa-calendar-alt"></i>{{ $post->updated_at->format('d/m/Y') }}
+                                </time>
+                                <span><i class="far fa-user"></i>Admin</span>
+                            </div>
 
-                    {{-- Footer bài viết --}}
-                    <footer class="mt-10 pt-8 border-t border-gray-100 dark:border-gray-700">
-                        <div class="bg-blue-50 dark:bg-gray-700/50 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <p class="font-bold text-gray-900 dark:text-white mb-0">Bạn thấy bài viết hữu ích? Ủng hộ bằng cách chia sẻ!</p>
-                            <x-social-share :title="$post->title" />
+                            @if($postSummary)
+                                <p>{{ $postSummary }}</p>
+                            @endif
+                        </header>
+
+                        <div class="post-detail-prose">
+                            {!! $contentHtml !!}
                         </div>
-                    </footer>
+
+                        <footer class="post-article-footer">
+                            <div>
+                                <strong>Chia sẻ bài viết</strong>
+                                <span>Gửi nội dung này cho đội ngũ hoặc người quan tâm.</span>
+                            </div>
+                            <x-social-share :title="$post->title" />
+                        </footer>
+                    </div>
                 </article>
-                {{-- BÌNH LUẬN --}}
-                <div class="mt-12 bg-white dark:bg-gray-800 p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
+
+                <section class="post-comment-panel">
                     <x-comment-list :comments="$post->approvedComments" />
                     <x-comment-form :commentable="$post" type="post" />
-                </div>
-                {{-- BÀI VIẾT LIÊN QUAN --}}
+                </section>
+
                 @if ($relatedPosts->count())
-                <div class="mt-12 md:mt-16">
-                    <div class="flex items-center justify-between border-b-2 border-gray-100 dark:border-gray-700 mb-8 pb-2">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white uppercase relative inline-block">
-                            Bài viết liên quan
-                            <div class="absolute -bottom-[4px] left-0 w-16 h-1 bg-blue-600 rounded-r-full"></div>
-                        </h3>
-                    </div>
+                    <section class="post-related-section">
+                        <div class="post-section-heading">
+                            <span>Đọc thêm</span>
+                            <h2>Bài viết liên quan</h2>
+                        </div>
 
-                    <div class="swiper related-post-swiper overflow-hidden py-4 -my-4 px-2">
-                        <div class="swiper-wrapper">
-                            @foreach ($relatedPosts as $related)
-                                <div class="swiper-slide">
-                                    <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
-                                        <a href="{{ $related->slug_url }}" class="block relative aspect-video overflow-hidden">
-                                            <img src="{{ $related->image?->url ?? $related->banner?->url ?? ($related->image ? $related->image?->url : asset('images/setting/no-image.png')) }}"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                 alt="{{ $related->title }}" loading="lazy">
+                        <div class="swiper related-post-swiper post-related-swiper">
+                            <div class="swiper-wrapper">
+                                @foreach ($relatedPosts as $related)
+                                    @php
+                                        $relatedImage = $related->image?->url ?? $related->banner?->url ?? asset('images/setting/no-image.png');
+                                    @endphp
+                                    <div class="swiper-slide">
+                                        <a href="{{ $related->slug_url }}" class="post-related-card">
+                                            <span class="post-related-image">
+                                                <img src="{{ $relatedImage }}" alt="{{ $related->title }}" loading="lazy" decoding="async">
+                                            </span>
+                                            <span class="post-related-body">
+                                                @if($related->category)
+                                                    <em>{{ $related->category->name }}</em>
+                                                @endif
+                                                <strong>{{ $related->title }}</strong>
+                                                <small>Đọc tiếp <i class="fas fa-arrow-right"></i></small>
+                                            </span>
                                         </a>
-                                        <div class="p-4 flex flex-col flex-1">
-                                            <h4 class="font-bold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors text-base">
-                                                <a href="{{ $related->slug_url }}">
-                                                    {{ $related->title }}
-                                                </a>
-                                            </h4>
-                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
+                            <div class="post-related-pagination swiper-pagination"></div>
                         </div>
-                        <div class="swiper-pagination !bottom-0 mt-4 relative"></div>
-                    </div>
-                </div>
+                    </section>
                 @endif
+            </main>
 
-
-            </div>
-
-            {{-- Cột SIDEBAR (Phải) --}}
-            <div class="w-full lg:w-1/4">
-                <aside class="sticky-sidebar space-y-8">
-
-                    {{-- Widget Danh mục --}}
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white uppercase mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">
-                            Danh mục bài viết
-                        </h4>
-                        <ul class="space-y-3">
-                            @foreach($allCategories as $category)
-                            <li>
-                                <a href="{{ $category->slug_url }}"
-                                   class="flex items-center text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors group">
-                                    <span class="w-2 h-2 rounded-full bg-blue-100 group-hover:bg-blue-600 transition-colors mr-3"></span>
-                                    {{ $category->name }}
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-
-                    {{-- Widget Table of Contents (Mục lục tĩnh nếu có) --}}
-                    @if(isset($tocList) && count($tocList) > 0)
-                    <div class="bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                        <div class="p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                             <h4 class="text-base font-bold text-gray-900 dark:text-white flex items-center">
-                                 <i class="fas fa-list-ul text-blue-600 mr-2"></i> Mục lục nội dung
-                             </h4>
-                        </div>
-                        <div class="p-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <aside class="post-detail-sidebar">
+                @if(isset($tocList) && count($tocList) > 0)
+                    <section class="post-side-box post-toc-box">
+                        <h3><i class="fas fa-list-ul"></i>Mục lục nội dung</h3>
+                        <div class="post-toc-scroll">
                             <x-toc :list="$tocList" />
                         </div>
+                    </section>
+                @endif
+
+                <section class="post-side-box">
+                    <h3><i class="fas fa-folder-open"></i>Danh mục bài viết</h3>
+                    <div class="post-category-list">
+                        @foreach($allCategories as $category)
+                            <a href="{{ $category->slug_url }}">
+                                <span>{{ $category->name }}</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        @endforeach
                     </div>
-                    @endif
+                </section>
 
-                    {{-- Form Tư Vấn --}}
-                    <div class="hidden md:block">
-                        @include('partials.frontend.contact_register')
-                    </div>
-
-                </aside>
-            </div>
-
+                <div class="post-contact-box">
+                    @include('partials.frontend.contact_register')
+                </div>
+            </aside>
         </div>
     </div>
 </div>
@@ -232,23 +179,45 @@
 
 @push('js')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+(function () {
+    function initRelatedPostSwiper() {
         const relSlider = document.querySelector('.related-post-swiper');
-        if (relSlider) {
-            new Swiper(relSlider, {
-                slidesPerView: 2,
-                spaceBetween: 16,
-                pagination: {
-                    el: ".related-post-swiper .swiper-pagination",
-                    clickable: true
-                },
-                breakpoints: {
-                    640: { slidesPerView: 2, spaceBetween: 20 },
-                    768: { slidesPerView: 3, spaceBetween: 20 },
-                    1024: { slidesPerView: 3, spaceBetween: 24 }
-                }
-            });
+
+        if (!relSlider) return;
+
+        if (typeof Swiper === 'undefined') {
+            console.warn('Swiper chưa được load.');
+            return;
         }
-    });
+
+        const paginationEl = relSlider.querySelector('.post-related-pagination');
+
+        new Swiper(relSlider, {
+            slidesPerView: 1,
+            spaceBetween: 16,
+            watchOverflow: true,
+            pagination: {
+                el: paginationEl,
+                clickable: true
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 18
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 20
+                }
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRelatedPostSwiper);
+    } else {
+        initRelatedPostSwiper();
+    }
+})();
 </script>
 @endpush

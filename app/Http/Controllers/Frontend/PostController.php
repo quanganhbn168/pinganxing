@@ -95,7 +95,7 @@ class PostController extends Controller
             ->with(['image', 'category'])
             ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id))
             ->latest()
-            ->take(2)
+            ->take(4)
             ->get();
 
         $popularPosts = Post::where('status', 1)
@@ -132,7 +132,8 @@ class PostController extends Controller
 
     public function detail(Post $post)
     {
-        $post->load('category');
+        $post->load(['category', 'image', 'banner']);
+        $pageSettings = app(PageSettings::class);
         
         // Lấy danh mục cha để làm menu (nếu cần)
         $allCategories = PostCategory::select("name","id")->where('parent_id', 0)
@@ -141,7 +142,8 @@ class PostController extends Controller
             ->get();
 
         // Lấy bài viết liên quan (cùng danh mục)
-        $relatedPosts = Post::where('status', 1)
+        $relatedPosts = Post::with(['image', 'banner', 'category'])
+            ->where('status', 1)
             ->where('post_category_id', $post->post_category_id)
             ->where('id', '!=', $post->id)
             ->latest()
@@ -157,6 +159,7 @@ class PostController extends Controller
             "relatedPosts",
             "contentHtml",
             "tocList",
+            "pageSettings",
         ));
     }
 

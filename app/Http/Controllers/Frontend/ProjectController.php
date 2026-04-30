@@ -101,7 +101,7 @@ class ProjectController extends Controller
             ->when($categoryIds, fn ($query) => $query->whereIn('project_category_id', $categoryIds))
             ->when($projectFeature, fn ($query) => $query->where('id', '!=', $projectFeature->id))
             ->latest()
-            ->take(2)
+            ->take(4)
             ->get();
 
         $popularProjects = Project::with(['image', 'category', 'slugData'])

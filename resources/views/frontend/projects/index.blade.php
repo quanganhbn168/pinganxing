@@ -9,7 +9,7 @@
         $mainProject = $projectFeature ?: $popularProjects->first();
         $topProjects = $topProjects
             ->when($mainProject, fn($items) => $items->where('id', '!=', $mainProject->id))
-            ->take(2)
+            ->take(3)
             ->values();
         $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
     @endphp
@@ -124,7 +124,7 @@
                     <h2 class="project-block-title">
                         {{ $activeCategory ? 'Dự án thuộc ' . $activeCategory->name : 'Tất cả dự án' }}</h2>
 
-                    <div class="project-post-list">
+                    <div class="project-card-grid">
                         @forelse($projects as $project)
                             @php
                                 $projectImage =
@@ -149,9 +149,8 @@
                                     @if ($project->investor)
                                         <small>Chủ đầu tư: {{ Str::limit($project->investor, 60) }}</small>
                                     @endif
+                                    <a href="{{ $project->slug_url }}" class="project-grid-link">Xem chi tiết <i class="fas fa-arrow-right"></i></a>
                                 </div>
-                                <a href="{{ $project->slug_url }}" class="project-list-arrow"
-                                    aria-label="Xem {{ $project->name }}"><i class="fas fa-chevron-right"></i></a>
                             </article>
                         @empty
                             <div class="project-empty-state">

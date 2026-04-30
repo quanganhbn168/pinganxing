@@ -7,7 +7,7 @@
 @php
     $activeCategory = $categoryId ?: 'all';
     $mainPost = $featuredPost ?: $popularPosts->first();
-    $topPosts = $heroPosts->when($mainPost, fn ($items) => $items->where('id', '!=', $mainPost->id))->take(2)->values();
+    $topPosts = $heroPosts->when($mainPost, fn ($items) => $items->where('id', '!=', $mainPost->id))->take(3)->values();
     $mainPostImage = $mainPost?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
 @endphp
 
@@ -29,21 +29,24 @@
                 <button type="submit" aria-label="Tìm kiếm"><i class="fas fa-search"></i></button>
             </div>
 
-            <div class="news-category-pills">
-                <a href="{{ route('frontend.posts.index', request()->except(['category', 'page'])) }}" class="{{ $activeCategory === 'all' ? 'is-active' : '' }}">Tất cả</a>
-                @foreach($postCategories as $category)
-                    <a href="{{ $category->slug_url }}">
-                        {{ $category->name }}
-                    </a>
-                @endforeach
-            </div>
-
             <select name="sort" onchange="this.form.submit()" aria-label="Sắp xếp bài viết">
                 <option value="latest" @selected($sort === 'latest')>Mới nhất</option>
                 <option value="oldest" @selected($sort === 'oldest')>Cũ nhất</option>
                 <option value="featured" @selected($sort === 'featured')>Nổi bật</option>
             </select>
         </form>
+
+        <div class="news-category-pills">
+            <a href="{{ route('frontend.posts.index', request()->except(['category', 'page'])) }}" class="{{ $activeCategory === 'all' ? 'is-active' : '' }}">Tất cả</a>
+            @foreach($postCategories as $category)
+                <a
+                    href="{{ route('frontend.posts.index', array_merge(request()->except(['category', 'page']), ['category' => $category->id])) }}"
+                    class="{{ (string) $activeCategory === (string) $category->id ? 'is-active' : '' }}"
+                >
+                    {{ $category->name }}
+                </a>
+            @endforeach
+        </div>
 
         @if($mainPost)
         <div class="news-top-grid">
