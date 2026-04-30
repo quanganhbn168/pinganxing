@@ -345,7 +345,7 @@
                     ])->filter(fn ($item) => filled($item['value']))->take(3);
                 @endphp
                 <div class="home-project-layout">
-                    <a href="{{ route('frontend.project.bySlug', $featuredProject->slug_url) }}" class="home-project-featured">
+                    <a href="{{ $featuredProject->slug_url }}" class="home-project-featured">
                         <img src="{{ $featuredImage }}" alt="{{ $featuredProject->name }}" loading="lazy" decoding="async">
                         <span class="home-project-featured-shade"></span>
                         <span class="home-project-featured-content">
@@ -377,7 +377,7 @@
                             $projectImage = $projectImage ?: 'https://placehold.co/360x220/eaf4fb/0e4a86?text=Project';
                             $projectSummary = Str::limit(strip_tags($project->description ?? $project->content), 82);
                         @endphp
-                        <a href="{{ route('frontend.project.bySlug', $project->slug) }}" class="home-project-side-card">
+                        <a href="{{ $project->slug_url }}" class="home-project-side-card">
                             <span class="home-project-side-media">
                                 <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
                             </span>
