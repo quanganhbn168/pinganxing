@@ -21,6 +21,11 @@ class Project extends Model
         'gallery',
         'project_category_id',
         'description',
+        'project_overview',
+        'business_problems',
+        'implemented_solutions',
+        'implementation_process',
+        'achieved_results',
         'content',
         'status',
         'is_home',
@@ -33,6 +38,10 @@ class Project extends Model
 
     protected $casts = [
         'gallery'              => 'array',
+        'business_problems'    => 'array',
+        'implemented_solutions' => 'array',
+        'implementation_process' => 'array',
+        'achieved_results'     => 'array',
         'project_category_id'  => 'integer',
         'status'               => 'boolean',
         'is_home'              => 'boolean',

@@ -30,34 +30,6 @@
 </script>
 @endpush
 
-@push('css')
-<style>
-    /* Custom styles cho Swiper Thumbs */
-    .gallery-top {
-        background: #000;
-        border-radius: 0.5rem;
-    }
-    .gallery-thumbs .swiper-slide {
-        opacity: 0.4;
-        transition: opacity 0.3s;
-        border-radius: 0.25rem;
-        border: 2px solid transparent;
-        cursor: pointer;
-    }
-    .gallery-thumbs .swiper-slide-thumb-active {
-        opacity: 1;
-        border-color: #2563eb; /* blue-600 */
-    }
-    /* Formatto nội dung bài viết WYSIWYG */
-    .prose-custom img {
-        max-width: 100%;
-        height: auto !important;
-        border-radius: 0.5rem;
-        margin: 1.5rem auto;
-    }
-</style>
-@endpush
-
 @section('content')
 
 <x-frontend.leaderboard
@@ -70,216 +42,278 @@
         $project->year ? ['icon' => 'fas fa-calendar-check', 'value' => $project->year, 'label' => 'Năm triển khai'] : null,
         $project->investor ? ['icon' => 'fas fa-building', 'value' => Str::limit($project->investor, 18), 'label' => 'Chủ đầu tư'] : null,
         $project->address ? ['icon' => 'fas fa-location-dot', 'value' => Str::limit($project->address, 18), 'label' => 'Địa điểm'] : null,
-        $project->value ? ['icon' => 'fas fa-chart-line', 'value' => $project->value, 'label' => 'Quy mô'] : null,
+        $project->value ? ['icon' => 'fas fa-chart-line', 'value' => is_numeric($project->value) ? number_format((float) $project->value, 0, ',', '.') : $project->value, 'label' => 'Quy mô'] : null,
     ]))"
 />
 
-<div class="bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
+<div class="project-detail-page">
     <div class="max-w-screen-xl mx-auto px-4">
-        {{-- HEADER INFO --}}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-white dark:bg-gray-800 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700 p-8 md:p-12 mb-16">
-            {{-- Chi tiết --}}
-            <div class="flex flex-col justify-center order-2 lg:order-1">
-                <h1 class="text-3xl md:text-4xl font-black text-brand-700 dark:text-brand-500 mb-6 uppercase tracking-tight">
-                    {{$project->name}}
-                </h1>
-                <div class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed font-medium">
-                    {!! $project->description !!}
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-sm border border-gray-100 dark:border-gray-600 overflow-hidden text-sm">
-                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
-                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Tên dự án:</strong>
-                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->name}}</span>
-                    </div>
-                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
-                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Chủ đầu tư:</strong>
-                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->investor}}</span>
-                    </div>
-                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
-                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Địa chỉ:</strong>
-                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->address}}</span>
-                    </div>
-                    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-600 flex flex-col md:flex-row md:items-center gap-2">
-                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Năm thực hiện:</strong>
-                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{$project->year}}</span>
-                    </div>
-                    <div class="px-6 py-4 flex flex-col md:flex-row md:items-center gap-2">
-                        <strong class="w-40 text-gray-900 dark:text-white uppercase tracking-wider text-xs">Giá trị gói thầu:</strong>
-                        <span class="text-gray-700 dark:text-gray-300 flex-1">{{number_format((float)$project->value,0,',','.')}} VNĐ</span>
-                    </div>
-                </div>
-            </div>
-            
-            {{-- Ảnh nổi bật --}}
-            <div class="flex items-center justify-center order-1 lg:order-2">
-                <img src="{{ $project->image_id ? asset($project->image->url) : asset('images/setting/no-image.png') }}" 
-                     alt="{{$project->name}}" 
-                     class="w-full h-auto max-h-[500px] object-cover rounded-sm shadow-md">
-            </div>
-        </div>
+        <section class="project-detail-overview" data-aos="fade-up">
+            <div class="project-detail-copy">
+                <span class="project-detail-kicker">Tổng quan dự án</span>
+                <h2>{{ $project->name }}</h2>
 
-        {{-- GALLERY THƯ VIỆN ẢNH --}}
-        @if(isset($images) && $images->count() > 0)
-        <div class="mb-16">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                    Hình ảnh thi công chi tiết
-                </h2>
-                <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
-            </div>
-
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-sm p-4 md:p-8 border border-gray-200 dark:border-gray-700 w-full mx-auto max-w-4xl">
-                <div class="swiper gallery-top w-full h-[300px] md:h-[500px] mb-4">
-                    <div class="swiper-wrapper">
-                        @foreach($images as $img)
-                            <div class="swiper-slide flex items-center justify-center">
-                                <img src="{{ $img }}" alt="{{ $project->name }}" loading="lazy" class="max-w-full max-h-full object-contain rounded-sm mix-blend-multiply dark:mix-blend-normal">
-                                <div class="swiper-lazy-preloader swiper-lazy-preloader-brand"></div>
-                            </div>
-                        @endforeach
+                @if($projectOverview)
+                    <div class="project-detail-prose">
+                        {!! $projectOverview !!}
                     </div>
-                    <div class="gallery-custom-next absolute top-1/2 -translate-y-1/2 right-4 z-10 w-10 h-10 bg-white/80 border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-gray-600 transition-colors flex items-center justify-center cursor-pointer">
-                        <i class="fas fa-chevron-right text-sm"></i>
-                    </div>
-                    <div class="gallery-custom-prev absolute top-1/2 -translate-y-1/2 left-4 z-10 w-10 h-10 bg-white/80 border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-gray-600 transition-colors flex items-center justify-center cursor-pointer">
-                        <i class="fas fa-chevron-left text-sm"></i>
-                    </div>
-                </div>
-
-                @if($images->count() > 1)
-                <div class="swiper gallery-thumbs h-20 md:h-24 w-full relative">
-                    <div class="swiper-wrapper">
-                        @foreach($images as $img)
-                            <div class="swiper-slide bg-white dark:bg-gray-900 p-2 border-2 border-transparent hover:border-brand-500 rounded-sm overflow-hidden cursor-pointer">
-                                <img src="{{ $img }}" alt="Thumb" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal">
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
                 @endif
             </div>
-        </div>
+
+            <aside class="project-detail-info">
+                @foreach($projectInfo as $info)
+                    <div class="project-detail-info-row">
+                        <span><i class="{{ $info['icon'] }}"></i></span>
+                        <div>
+                            <small>{{ $info['label'] }}</small>
+                            <strong>{{ $info['value'] }}</strong>
+                        </div>
+                    </div>
+                @endforeach
+            </aside>
+        </section>
+
+        @if(isset($images) && $images->count() > 0)
+            <section class="project-gallery-section" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Hình ảnh dự án</span>
+                    <h2>Không gian triển khai thực tế</h2>
+                </div>
+
+                <div class="project-gallery-shell">
+                    <div class="swiper project-gallery-slider">
+                        <div class="swiper-wrapper">
+                            @foreach($images as $img)
+                                <div class="swiper-slide">
+                                    <img src="{{ $img }}" alt="{{ $project->name }}" loading="lazy" decoding="async">
+                                </div>
+                            @endforeach
+                        </div>
+
+                        @if($images->count() > 1)
+                            <button type="button" class="project-gallery-nav project-gallery-prev" aria-label="Ảnh trước">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button type="button" class="project-gallery-nav project-gallery-next" aria-label="Ảnh tiếp theo">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <div class="project-gallery-pagination swiper-pagination"></div>
+                        @endif
+                    </div>
+                </div>
+            </section>
         @endif
 
-        {{-- NỘI DUNG CHI TIẾT --}}
-        <div class="mb-16">
-            <div class="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="text-center mb-10">
-                    <h2 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                        Thông tin chi tiết
-                    </h2>
-                    <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
-                </div>
-                <div class="prose prose-lg max-w-none prose-blue dark:prose-invert prose-custom font-sans">
-                    @if(empty($project->content) || trim(strip_tags($project->content)) == '')
-                        <div class="flex flex-col items-center justify-center py-16 bg-gray-50 dark:bg-gray-700/50 rounded-sm border border-dashed border-gray-200 dark:border-gray-600">
-                            <i class="fa-solid fa-file-pen text-6xl mb-4 text-gray-300 dark:text-gray-500"></i>
-                            <p class="text-gray-500 dark:text-gray-400 font-medium">Nội dung đang được cập nhật...</p>
-                        </div>
-                    @else
-                        {!! $project->content !!}
-                    @endif
+        @if($businessProblems->isNotEmpty())
+            <section class="project-case-section project-case-problems" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Bài toán doanh nghiệp</span>
+                    <h2>Những thách thức trước triển khai</h2>
                 </div>
 
-                {{-- Nút Share --}}
-                <div class="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700">
+                <div class="project-case-grid">
+                    @foreach($businessProblems as $item)
+                        <article class="project-case-card">
+                            <i class="{{ $item['icon'] ?? 'fas fa-triangle-exclamation' }}"></i>
+                            <h3>{{ $item['title'] ?? '' }}</h3>
+                            @if(!empty($item['description']))
+                                <p>{{ $item['description'] }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if($implementedSolutions->isNotEmpty())
+            <section class="project-case-section project-case-solutions" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Giải pháp triển khai</span>
+                    <h2>CNETPOS đã triển khai như thế nào</h2>
+                </div>
+
+                <div class="project-solution-list">
+                    @foreach($implementedSolutions as $item)
+                        <article class="project-solution-item">
+                            <span><i class="{{ $item['icon'] ?? 'fas fa-screwdriver-wrench' }}"></i></span>
+                            <div>
+                                <h3>{{ $item['title'] ?? '' }}</h3>
+                                @if(!empty($item['description']))
+                                    <p>{{ $item['description'] }}</p>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if($implementationProcess->isNotEmpty())
+            <section class="project-process-section" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Quy trình triển khai</span>
+                    <h2>Các bước đưa hệ thống vào vận hành</h2>
+                </div>
+
+                <div class="project-process-grid">
+                    @foreach($implementationProcess as $item)
+                        <article class="project-process-card">
+                            <span class="project-process-number">{{ str_pad((string) ($loop->index + 1), 2, '0', STR_PAD_LEFT) }}</span>
+                            <i class="{{ $item['icon'] ?? 'fas fa-circle-check' }}"></i>
+                            <h3>{{ $item['title'] ?? '' }}</h3>
+                            @if(!empty($item['description']))
+                                <p>{{ $item['description'] }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if($achievedResults->isNotEmpty())
+            <section class="project-results-section" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Kết quả đạt được</span>
+                    <h2>Hiệu quả sau triển khai</h2>
+                </div>
+
+                <div class="project-results-grid">
+                    @foreach($achievedResults as $item)
+                        <article class="project-result-card">
+                            @if(!empty($item['value']))
+                                <strong>{{ $item['value'] }}</strong>
+                            @endif
+                            <h3>{{ $item['label'] ?? '' }}</h3>
+                            @if(!empty($item['description']))
+                                <p>{{ $item['description'] }}</p>
+                            @endif
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if(!empty($project->content) && trim(strip_tags($project->content)) !== '')
+            <section class="project-content-section" data-aos="fade-up">
+                <div class="project-section-heading">
+                    <span>Thông tin chi tiết</span>
+                    <h2>Nội dung triển khai bổ sung</h2>
+                </div>
+
+                <div class="project-detail-prose project-detail-prose-box">
+                    {!! $project->content !!}
+                </div>
+
+                <div class="project-share-row">
                     <x-social-share :title="$project->name" />
                 </div>
-            </div>
-        </div>
+            </section>
+        @endif
 
-        {{-- BÌNH LUẬN --}}
-        <div class="mb-16 bg-white dark:bg-gray-800 p-8 md:p-12 rounded-sm shadow-sm border border-gray-100 dark:border-gray-700">
+        <section class="project-comment-section" data-aos="fade-up">
             <x-comment-list :comments="$project->approvedComments" />
             <x-comment-form :commentable="$project" type="project" />
-        </div>
+        </section>
 
-        {{-- DỰ ÁN LIÊN QUAN --}}
         @if($relatedProjects && $relatedProjects->count() > 0)
-        <div class="mb-16">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
-                    Dự án tiêu biểu khác
-                </h2>
-                <div class="w-16 h-1 bg-brand-600 mx-auto mt-4"></div>
-            </div>
-            <div class="relative px-0 md:px-10">
-                <div class="swiper related-project-slider py-4 -my-4 overflow-hidden">
+            <section class="project-related-section" data-aos="fade-up">
+                <div class="project-section-heading project-section-heading-row">
+                    <div>
+                        <span>Dự án liên quan</span>
+                        <h2>Dự án tiêu biểu khác</h2>
+                    </div>
+                    <div class="project-related-controls">
+                        <button type="button" class="project-related-prev" aria-label="Dự án trước">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="project-related-next" aria-label="Dự án tiếp theo">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="swiper project-related-slider">
                     <div class="swiper-wrapper">
                         @foreach($relatedProjects as $other)
-                            <div class="swiper-slide h-auto">
-                                <x-frontend.card 
-                                    :href="$other->slug_url"
-                                    :image="$other->image ? asset($other->image->url) : asset('images/setting/no-image.png')"
-                                    :title="$other->name"
-                                    :description="$other->investor ? 'Chủ đầu tư: ' . $other->investor : ''"
-                                />
+                            @php
+                                $relatedImage = $other->image?->url ?: asset('images/setting/no-image.png');
+                                $relatedText = $other->description ?: ($other->investor ? 'Chủ đầu tư: ' . $other->investor : null);
+                            @endphp
+                            <div class="swiper-slide">
+                                <a href="{{ $other->slug_url }}" class="project-related-card">
+                                    <span class="project-related-image">
+                                        <img src="{{ $relatedImage }}" alt="{{ $other->name }}" loading="lazy" decoding="async">
+                                    </span>
+                                    <span class="project-related-body">
+                                        @if($other->category)
+                                            <em>{{ $other->category->name }}</em>
+                                        @endif
+                                        <strong>{{ $other->name }}</strong>
+                                        @if($relatedText)
+                                            <span>{{ Str::limit(strip_tags($relatedText), 90) }}</span>
+                                        @endif
+                                        <small>Xem chi tiết <i class="fas fa-arrow-right"></i></small>
+                                    </span>
+                                </a>
                             </div>
                         @endforeach
                     </div>
                 </div>
-                <div class="related-custom-prev absolute top-1/2 -translate-y-1/2 -left-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-brand-600 transition-colors hidden md:flex items-center justify-center cursor-pointer">
-                    <i class="fas fa-chevron-left text-sm"></i>
-                </div>
-                <div class="related-custom-next absolute top-1/2 -translate-y-1/2 -right-5 z-10 w-10 h-10 bg-white border border-gray-200 rounded-full shadow-md hover:bg-brand-600 focus:outline-none hover:text-white text-brand-600 transition-colors hidden md:flex items-center justify-center cursor-pointer">
-                    <i class="fas fa-chevron-right text-sm"></i>
-                </div>
-            </div>
-        </div>
+            </section>
         @endif
-
     </div>
+
+    <x-frontend.page-cta
+        :title="$pageSettings->projects_cta_title"
+        :description="$pageSettings->projects_cta_description"
+        :link="$pageSettings->projects_cta_link"
+        image="images/setting/cnetpos-partner.png"
+    />
 </div>
 @endsection
 
 @push('js')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Khởi tạo Gallery Swiper nếu có
-    if (document.querySelector('.gallery-thumbs') && document.querySelector('.gallery-top')) {
-        const galleryThumbs = new Swiper('.gallery-thumbs', {
-            spaceBetween: 10,
-            slidesPerView: 4,
-            freeMode: true,
-            watchSlidesProgress: true,
-            breakpoints: {
-                640: { slidesPerView: 5 },
-                1024: { slidesPerView: 6 },
-            }
-        });
+    if (typeof Swiper === 'undefined') {
+        return;
+    }
 
-        const galleryTop = new Swiper('.gallery-top', {
-            spaceBetween: 10,
+    const galleryEl = document.querySelector('.project-gallery-slider');
+    if (galleryEl) {
+        const slideCount = galleryEl.querySelectorAll('.swiper-slide').length;
+        new Swiper(galleryEl, {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: slideCount > 1,
+            speed: 650,
             navigation: {
-                nextEl: '.gallery-custom-next',
-                prevEl: '.gallery-custom-prev',
+                nextEl: '.project-gallery-next',
+                prevEl: '.project-gallery-prev',
             },
-            lazy: { loadPrevNext: true, loadOnTransitionStart: true },
-            preloadImages: false,
-            watchSlidesProgress: true,
-            thumbs: {
-                swiper: galleryThumbs,
+            pagination: {
+                el: '.project-gallery-pagination',
+                clickable: true,
             },
-            observer: true,
-            observeParents: true,
         });
     }
 
-    // Khởi tạo Related Project Swiper
-    if (document.querySelector('.related-project-slider')) {
-        const relatedEl = document.querySelector('.related-project-slider');
+    const relatedEl = document.querySelector('.project-related-slider');
+    if (relatedEl) {
+        const relatedCount = relatedEl.querySelectorAll('.swiper-slide').length;
         new Swiper(relatedEl, {
             slidesPerView: 1,
-            spaceBetween: 20,
+            spaceBetween: 18,
+            loop: relatedCount > 2,
+            speed: 650,
             navigation: {
-                nextEl: relatedEl.parentElement.querySelector('.related-custom-next'),
-                prevEl: relatedEl.parentElement.querySelector('.related-custom-prev'),
+                nextEl: '.project-related-next',
+                prevEl: '.project-related-prev',
             },
             breakpoints: {
-                640:  { slidesPerView: 2, spaceBetween: 20 },
-                1024: { slidesPerView: 3, spaceBetween: 30 }
-            }
+                768: { slidesPerView: 2, spaceBetween: 20 },
+                1180: { slidesPerView: 3, spaceBetween: 22 },
+            },
         });
     }
 });

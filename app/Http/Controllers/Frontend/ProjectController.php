@@ -150,14 +150,28 @@ class ProjectController extends Controller
         $project->loadMissing(['image', 'banner', 'category', 'slugData']);
 
         // Lấy các dự án liên quan (trừ dự án đang xem)
-        $relatedProjects = Project::with(['image', 'slugData'])
+        $relatedProjects = Project::with(['image', 'category', 'slugData'])
             ->where("status", 1)
             ->where("id", '!=', $project->id)
+            ->when($project->project_category_id, fn ($query) => $query->where('project_category_id', $project->project_category_id))
             ->latest()
             ->limit(6)
             ->get();
 
+        if ($relatedProjects->count() < 6) {
+            $fallbackProjects = Project::with(['image', 'category', 'slugData'])
+                ->where('status', 1)
+                ->where('id', '!=', $project->id)
+                ->whereNotIn('id', $relatedProjects->pluck('id'))
+                ->latest()
+                ->limit(6 - $relatedProjects->count())
+                ->get();
+
+            $relatedProjects = $relatedProjects->concat($fallbackProjects)->values();
+        }
+
         $setting = app(\App\Settings\GeneralSettings::class);
+        $pageSettings = app(PageSettings::class);
         $pageTitle = $project->name;
         $bannerUrl = $project->banner?->url
             ?? $project->image?->url
@@ -168,6 +182,17 @@ class ProjectController extends Controller
         ];
 
         $images = $this->projectGalleryImages($project);
+        $projectOverview = $project->project_overview ?: $project->description;
+        $businessProblems = $this->caseStudyItems($project->business_problems);
+        $implementedSolutions = $this->caseStudyItems($project->implemented_solutions);
+        $implementationProcess = $this->caseStudyItems($project->implementation_process);
+        $achievedResults = $this->caseStudyItems($project->achieved_results, ['value', 'label', 'description']);
+        $projectInfo = collect([
+            $project->investor ? ['label' => 'Chủ đầu tư', 'value' => $project->investor, 'icon' => 'fas fa-building'] : null,
+            $project->address ? ['label' => 'Địa điểm', 'value' => $project->address, 'icon' => 'fas fa-location-dot'] : null,
+            $project->year ? ['label' => 'Năm thực hiện', 'value' => $project->year, 'icon' => 'fas fa-calendar-check'] : null,
+            $project->value ? ['label' => 'Quy mô', 'value' => is_numeric($project->value) ? number_format((float) $project->value, 0, ',', '.') . ' VNĐ' : $project->value, 'icon' => 'fas fa-chart-line'] : null,
+        ])->filter()->values();
         $metaDescription = \Illuminate\Support\Str::limit(strip_tags($project->description ?? ''), 155);
 
         return view("frontend.projects.detail", compact(
@@ -177,9 +202,32 @@ class ProjectController extends Controller
             "bannerUrl",
             "breadcrumbs",
             "setting",
+            "pageSettings",
             "images",
+            "projectOverview",
+            "businessProblems",
+            "implementedSolutions",
+            "implementationProcess",
+            "achievedResults",
+            "projectInfo",
             "metaDescription"
         ));
+    }
+
+    private function caseStudyItems(mixed $items, array $keys = ['title', 'description', 'icon']): Collection
+    {
+        return collect($items ?? [])
+            ->filter(fn ($item) => is_array($item))
+            ->filter(function (array $item) use ($keys) {
+                foreach ($keys as $key) {
+                    if (filled($item[$key] ?? null)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->values();
     }
 
     private function projectGalleryImages(Project $project): Collection
