@@ -12,11 +12,10 @@ class MoneyInput extends TextInput
         parent::setUp();
 
         $this
-            ->prefix('₫')
+            ->suffix('₫')
             ->placeholder('0')
             ->inputMode('numeric')
             ->mask(RawJs::make('$money($input, \',\', \'.\', 0)'))
-            ->stripCharacters('.')
             ->minValue(0)
             ->dehydrateStateUsing(fn ($state) => static::normalizeMoney($state))
             ->formatStateUsing(fn ($state) => static::formatMoney($state));
@@ -37,8 +36,14 @@ class MoneyInput extends TextInput
             return null;
         }
 
-        $state = (string) $state;
+        $state = trim((string) $state);
 
+        // Nếu từ DB ra dạng decimal: 2180000.00
+        if (preg_match('/^\d+\.\d{2}$/', $state)) {
+            return (int) floor((float) $state);
+        }
+
+        // Nếu từ form nhập dạng VN: 2.180.000
         $state = str_replace(['.', ',', '₫', ' '], '', $state);
 
         return (int) $state;
