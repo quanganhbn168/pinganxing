@@ -25,7 +25,7 @@ class CategoryForm
                     ->schema([
                         ParentCategorySelect::make('parent_id')
                             ->treeModel(Category::class)
-                            ->rootAsZero('-- Danh mục gốc --'),
+                            ->rootAsNull('-- Danh mục gốc --'),
 
                         SlugInput::sourceField(TextInput::make('name'))
                             ->label('Tên danh mục')
