@@ -1,157 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-
-<url>
-  <loc>https://maynenkhi-saman.vn/</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>1.00</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/gioi-thieu</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-nen</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-khong-dau</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-di-dong</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-ly-tam</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/tin-tuc</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/lien-he</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-bien-tan-nam-cham-vinh-cuu-hai-cap</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-bien-tan-nam-cham-vinh-cuu-don-cap</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-khong-dau-boi-tron-bang-nuoc</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-ap-suat-thap</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-di-dong-diesel</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-di-dong</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-nen-hai-cap</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-nam-cham-vinh-cuu</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-truc-vit-bien-tan-khong-dau-vinh-cuu</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-ap-suat-thap</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-khong-dau-truc-vit</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-ap-suat-trung-binh-va-cao</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-dung-cho-may-cat-laser</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-nen-khi-bien-tan-nam-cham-vinh-cuu-dac-biet-dung-cho-may-cat-laser</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/may-say-lanh</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/danh-muc/chi-tiet/tuyen-dai-ly-phan-phoi-may-nen-khi-thuong-hieu-saman-toan-quoc</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/tuyen-dai-ly-phan-phoi-may-nen-khi-thuong-hieu-saman-toan-quoc</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/danh-muc/chi-tiet/top-5-nha-cung-cap-may-nen-khi-chat-luong-cao-tai-tpbac-ninh</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/top-5-nha-cung-cap-may-nen-khi-chat-luong-cao-tai-tpbac-ninh</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://maynenkhi-saman.vn/dich-vu</loc>
-  <lastmod>2025-07-23T02:08:23+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+    <url>
+    <loc>https://cnetpos.test</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/linh-vuc</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/ve-chung-toi</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.5</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tuyen-dung</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.5</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc/40</loc>
+    <lastmod>2026-04-30T14:36:11+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc/27</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc/28</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc/29</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/tin-tuc/30</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/25</loc>
+    <lastmod>2026-04-17T00:13:35+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/18</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/19</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/20</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/21</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/22</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/23</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/san-pham/24</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/2</loc>
+    <lastmod>2026-04-29T16:35:09+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/3</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/4</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/5</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/6</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/dich-vu/7</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/9</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/10</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/11</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/12</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/13</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/14</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/15</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
+    <url>
+    <loc>https://cnetpos.test/du-an/16</loc>
+    <lastmod>2026-04-14T18:33:52+07:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+            </url>
 </urlset>

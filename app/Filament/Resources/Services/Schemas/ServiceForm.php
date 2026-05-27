@@ -58,6 +58,9 @@ class ServiceForm
 
                         RichEditor::make('content')
                             ->label('Nội dung chi tiết')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('services/content')
+                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull(),
                     ])
                     ->columns(1)

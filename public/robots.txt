@@ -1,6 +1,13 @@
 User-agent: *
-Disallow: /admin/
-Disallow: /login
 Allow: /
 
-Sitemap: https://maynenkhi-saman.com/sitemap.xml
+Disallow: /cart
+Disallow: /gio-hang
+Disallow: /gio-hang/data
+Disallow: /thanh-toan
+Disallow: /order-success
+Disallow: /user
+Disallow: /tim-kiem
+Disallow: /san-pham/tim-kiem
+
+Sitemap: https://cnetpos.vn/sitemap.xml

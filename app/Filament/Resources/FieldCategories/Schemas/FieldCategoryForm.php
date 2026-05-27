@@ -57,6 +57,9 @@ class FieldCategoryForm
 
                         RichEditor::make('content')
                             ->label('Nội dung chi tiết')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('field-categories/content')
+                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull(),
                     ])
                     ->columnSpan([

@@ -54,6 +54,9 @@ class PostCategoryForm
 
                         RichEditor::make('content')
                             ->label('Nội dung chi tiết')
+                            ->fileAttachmentsDisk('public')
+                            ->fileAttachmentsDirectory('post-categories/content')
+                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull(),
                         HasSeo::seoSection(),
                     ])
