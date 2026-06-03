@@ -6,6 +6,12 @@ return [
     'source_directory' => 'product-imports/sources',
     'asset_directory' => 'product-imports/assets',
 
+    'queue' => [
+        'connection' => env('PRODUCT_IMPORT_QUEUE_CONNECTION', 'redis_product_import'),
+        'name' => env('PRODUCT_IMPORT_QUEUE', 'product-import'),
+        'status_ttl' => env('PRODUCT_IMPORT_STATUS_TTL', 3600),
+    ],
+
     'default_column_map' => [
         'default' => [
             'start_row' => 1,

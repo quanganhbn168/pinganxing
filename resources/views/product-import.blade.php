@@ -172,6 +172,7 @@
 <script>
     let sessionId = null;
     let allProducts = [];
+    let importPollTimer = null;
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -291,19 +292,74 @@
                 throw new Error(data.message || 'Lỗi import');
             }
 
-            const message = `Import xong: ${data.imported} sản phẩm. Tạo mới: ${data.created}. Cập nhật: ${data.updated}. Bỏ qua: ${data.skipped}. Lỗi: ${data.errors || 0}. Media mới: ${data.created_media || 0}. Ảnh thiếu file: ${data.missing_images}.`;
-            setStatus(message);
-            alert(message);
+            if (! data.queued) {
+                throw new Error(data.message || 'Không đưa được import vào hàng đợi');
+            }
+
+            setStatus(data.message || 'Đã đưa import vào hàng đợi.');
+            pollImportStatus(data.status_url);
 
         } catch (error) {
             alert(error.message);
             setStatus('Có lỗi khi import.');
-        } finally {
             importBtn.disabled = false;
         }
     });
 
+    async function pollImportStatus(statusUrl) {
+        if (importPollTimer) {
+            clearTimeout(importPollTimer);
+        }
+
+        try {
+            const res = await fetch(statusUrl, {
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+
+            const data = await res.json();
+
+            if (! res.ok) {
+                throw new Error(data.message || 'Không đọc được trạng thái import');
+            }
+
+            const processed = Number(data.processed || 0);
+            const total = Number(data.total || 0);
+            const progress = total > 0 ? ` (${processed}/${total})` : '';
+
+            setStatus(`${data.message || 'Đang import...'}${progress}`);
+
+            if (data.state === 'finished') {
+                const result = data.result || {};
+                const message = `Import xong: ${result.imported || 0} sản phẩm. Tạo mới: ${result.created || 0}. Cập nhật: ${result.updated || 0}. Bỏ qua: ${result.skipped || 0}. Lỗi: ${result.errors || 0}. Media mới: ${result.created_media || 0}. Ảnh thiếu file: ${result.missing_images || 0}.`;
+                setStatus(message);
+                alert(message);
+                importBtn.disabled = false;
+                return;
+            }
+
+            if (data.state === 'failed') {
+                const message = data.message || 'Import thất bại.';
+                setStatus(message);
+                alert(message);
+                importBtn.disabled = false;
+                return;
+            }
+
+            importPollTimer = setTimeout(() => pollImportStatus(statusUrl), 2500);
+        } catch (error) {
+            setStatus('Đang chờ worker xử lý hoặc chưa đọc được trạng thái. Thử lại sau 5 giây...');
+            importPollTimer = setTimeout(() => pollImportStatus(statusUrl), 5000);
+        }
+    }
+
     resetBtn.addEventListener('click', function () {
+        if (importPollTimer) {
+            clearTimeout(importPollTimer);
+            importPollTimer = null;
+        }
+
         sessionId = null;
         allProducts = [];
 

@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use ZipArchive;
+use App\Jobs\ImportProductsFromZipJob;
 use App\Models\ProductImportError;
+use App\Services\ProductImport\ZipProductImporter;
 use Illuminate\Database\QueryException;
 use Throwable;
 class ProductImportController extends Controller
@@ -145,167 +147,42 @@ class ProductImportController extends Controller
             ], 404);
         }
 
-        $payload = json_decode(File::get($previewPath), true);
+        app(ZipProductImporter::class)->putStatus($sessionId, [
+            'state' => 'queued',
+            'message' => 'Đã đưa import vào hàng đợi.',
+            'processed' => 0,
+            'total' => 0,
+            'result' => null,
+        ]);
 
-        if (! is_array($payload)) {
-            return response()->json([
-                'message' => 'File preview.json không hợp lệ.',
-            ], 422);
-        }
-
-        $products = $payload['products'] ?? [];
-
-        $imported = 0;
-        $updated = 0;
-        $created = 0;
-        $skipped = 0;
-        $missingImages = 0;
-        $createdMedia = 0;
-        $errors = 0;
-
-        foreach ($products as $index => $item) {
-            try {
-                $name = trim((string) ($item['name'] ?? ''));
-
-                if ($name === '') {
-                    $skipped++;
-
-                    $this->saveImportError(
-                        sessionId: $sessionId,
-                        brand: $brand,
-                        item: $item,
-                        errorType: 'missing_name',
-                        errorMessage: 'Sản phẩm thiếu tên.'
-                    );
-
-                    $errors++;
-                    continue;
-                }
-
-                $images = $item['images'] ?? [];
-                $specifications = $this->cleanValue($item['specifications'] ?? null);
-
-                if ($onlyHasImage && count($images) === 0) {
-                    $skipped++;
-                    continue;
-                }
-
-                if ($onlyHasSpecs && blank($specifications)) {
-                    $skipped++;
-                    continue;
-                }
-
-                $code = $this->cleanValue($item['code'] ?? null);
-
-                $mediaResult = $this->importImagesToCurator(
-                    $images,
-                    $basePath,
-                    $brand,
-                    $name
-                );
-
-                $mediaIds = $mediaResult['media_ids'];
-                $missingImages += $mediaResult['missing_images'];
-                $createdMedia += $mediaResult['created_media'];
-
-                $mainImageId = $mediaIds[0] ?? null;
-
-                $priceData = $this->normalizeProductPrices(
-                    $item['price'] ?? null,
-                    $item['retail_price'] ?? null
-                );
-
-                $lookup = $code
-                ? ['code' => $code, 'name' => $name]
-                : ['name' => $name];
-
-                $exists = Product::where($lookup)->exists();
-
-                $productData = [
-                    'type' => 'simple',
-
-                    'brand_id' => null,
-                    'category_id' => null,
-
-                    'name' => $name,
-                    'code' => $code,
-
-                    'description' => $this->makeShortDescription($item, $brand),
-                    'content' => $this->makeDescription($item, $brand),
-                    'specifications' => $specifications,
-
-                    'price' => $priceData['price'],
-                    'price_discount' => $priceData['price_discount'],
-
-                    'image_id' => $mainImageId,
-                    'gallery' => $mediaIds,
-
-                    'stock' => 0,
-                    'status' => true,
-                    'has_variants' => false,
-                    'is_featured' => false,
-                    'is_home' => false,
-                    'is_on_sale' => filled($priceData['price_discount']),
-
-                    'discount_type' => null,
-                    'discount_value' => null,
-
-            /*
-             * Chỗ này anh chỉnh đúng enum trong DB.
-             * Nếu DB cho simple thì để simple.
-             */
-            'product_type' => 'physical',
-        ];
-
-        $productData = $this->filterColumns(Product::class, $productData);
-
-        Product::updateOrCreate($lookup, $productData);
-
-        $imported++;
-
-        if ($exists) {
-            $updated++;
-        } else {
-            $created++;
-        }
-    } catch (QueryException $e) {
-        $errors++;
-        $skipped++;
-
-        $this->saveImportError(
+        ImportProductsFromZipJob::dispatch(
             sessionId: $sessionId,
             brand: $brand,
-            item: $item,
-            errorType: 'query_exception',
-            errorMessage: $e->getMessage()
-        );
-
-        continue;
-    } catch (Throwable $e) {
-        $errors++;
-        $skipped++;
-
-        $this->saveImportError(
-            sessionId: $sessionId,
-            brand: $brand,
-            item: $item,
-            errorType: get_class($e),
-            errorMessage: $e->getMessage()
-        );
-
-        continue;
-    }
-}
+            onlyHasImage: $onlyHasImage,
+            onlyHasSpecs: $onlyHasSpecs,
+        )
+            ->onConnection(config('product_import.queue.connection', config('queue.default')))
+            ->onQueue(config('product_import.queue.name', 'product-import'));
 
         return response()->json([
-    'imported' => $imported,
-    'created' => $created,
-    'updated' => $updated,
-    'skipped' => $skipped,
-    'missing_images' => $missingImages,
-    'created_media' => $createdMedia,
-    'errors' => $errors,
-]);
+            'queued' => true,
+            'session_id' => $sessionId,
+            'status_url' => route('product-import.status', $sessionId),
+            'message' => 'Đã đưa import vào hàng đợi. Trang sẽ tự cập nhật tiến độ.',
+        ]);
+    }
+
+    public function status(string $sessionId)
+    {
+        return response()->json(
+            cache()->get(ZipProductImporter::statusKey($sessionId), [
+                'state' => 'missing',
+                'message' => 'Chưa có trạng thái import.',
+                'processed' => 0,
+                'total' => 0,
+                'result' => null,
+            ])
+        );
     }
 
     public function previewImage(Request $request, string $sessionId)
@@ -819,5 +696,18 @@ class ProductImportController extends Controller
             'item' => $item,
         ]);
     }
+}
+
+private function safeShortText(mixed $value, int $limit): ?string
+{
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    if (is_array($value) || is_object($value)) {
+        $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+
+    return Str::limit(trim((string) $value), $limit, '');
 }
 }

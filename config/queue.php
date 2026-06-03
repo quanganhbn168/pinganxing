@@ -72,6 +72,15 @@ return [
             'after_commit' => false,
         ],
 
+        'redis_product_import' => [
+            'driver' => 'redis',
+            'connection' => env('PRODUCT_IMPORT_REDIS_CONNECTION', env('REDIS_QUEUE_CONNECTION', 'default')),
+            'queue' => env('PRODUCT_IMPORT_QUEUE', 'product-import'),
+            'retry_after' => env('PRODUCT_IMPORT_QUEUE_RETRY_AFTER', 1900),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
     ],
 
     /*

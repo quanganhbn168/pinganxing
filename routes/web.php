@@ -106,6 +106,9 @@ Route::post('/product-import/preview', [ProductImportController::class, 'preview
 Route::post('/product-import/confirm', [ProductImportController::class, 'confirm'])
     ->name('product-import.confirm');
 
+Route::get('/product-import/status/{sessionId}', [ProductImportController::class, 'status'])
+    ->name('product-import.status');
+
 Route::get('/product-import/preview-image/{sessionId}', [ProductImportController::class, 'previewImage'])
     ->name('product-import.preview-image');
 // ===================== CATCH-ALL (301 redirect cho URL c) =====================
