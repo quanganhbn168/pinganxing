@@ -262,7 +262,7 @@
                         ->filter()
                         ->take(3);
                 @endphp
-                <a href="{{ route('frontend.service.bySlug', $service->slug_url) }}" class="service-feature-card group" style="--service-card-image: url('{{ $serviceImage }}');" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
+                <a href="{{ $service->slug_url }}" class="service-feature-card group" style="--service-card-image: url('{{ $serviceImage }}');" data-aos="fade-up" data-aos-delay="{{ min($loop->index * 80, 240) }}">
                     <span class="service-feature-content">
                         <span class="service-feature-title">{{ $service->name }}</span>
                         @if($serviceSummary)

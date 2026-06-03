@@ -58,7 +58,7 @@ class Product extends Model
         'discount_value' => 'decimal:2',
     ];
 
-    const TYPE_PHYSICS  = 'physics';
+    const TYPE_PHYSICS  = 'physical';
     const TYPE_SERVICE  = 'services';
 
     // ─── Relationships ───

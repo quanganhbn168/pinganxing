@@ -15,7 +15,7 @@ class Aside extends Component
 
     public function __construct()
     {
-        $this->productCategories = Category::where('parent_id', 0)
+        $this->productCategories = Category::whereNull('parent_id')
                                 ->with('children')
                                 ->where('status', 1)
                                 ->orderBy('position')

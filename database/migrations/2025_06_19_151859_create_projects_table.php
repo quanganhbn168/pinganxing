@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('project_category_id');
             $table->text('description')->nullable();
+            $table->longText('project_overview')->nullable();
+            $table->json('business_problems')->nullable();
+            $table->json('implemented_solutions')->nullable();
+            $table->json('implementation_process')->nullable();
+            $table->json('achieved_results')->nullable();
             $table->text('content')->nullable();
             $table->string('investor')->nullable();
             $table->string('address')->nullable();

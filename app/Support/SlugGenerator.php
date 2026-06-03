@@ -26,10 +26,15 @@ class SlugGenerator
 
     public function syncModel(Model $model, string $source, ?int $ignoreSlugId = null): string
     {
+        if (! $ignoreSlugId && $model->exists && method_exists($model, 'slugData')) {
+            $ignoreSlugId = $model->slugData()->value('id');
+        }
+
         $slug = $this->generate($source, $model, $ignoreSlugId);
 
         if (method_exists($model, 'slugData')) {
             $model->slugData()->updateOrCreate([], ['slug' => $slug]);
+            $model->unsetRelation('slugData');
         }
 
         if (Schema::hasColumn($model->getTable(), 'slug') && $model->slug !== $slug) {
@@ -46,6 +51,10 @@ class SlugGenerator
 
         if ($ignoreSlugId) {
             $query->where('id', '!=', $ignoreSlugId);
+        }
+
+        if ($model) {
+            $query->whereIn('sluggable_type', $this->sluggableTypesForSamePrefix($model::class));
         }
 
         if ($query->exists()) {
@@ -65,5 +74,25 @@ class SlugGenerator
         }
 
         return false;
+    }
+
+    protected function sluggableTypesForSamePrefix(string $modelClass): array
+    {
+        if (! method_exists($modelClass, 'slugPrefixMap')) {
+            return [$modelClass];
+        }
+
+        $prefixMap = $modelClass::slugPrefixMap();
+        $prefix = $prefixMap[$modelClass] ?? null;
+
+        if ($prefix === null) {
+            return [$modelClass];
+        }
+
+        return collect($prefixMap)
+            ->filter(fn (?string $mappedPrefix) => $mappedPrefix === $prefix)
+            ->keys()
+            ->values()
+            ->all();
     }
 }

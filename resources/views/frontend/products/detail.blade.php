@@ -32,6 +32,37 @@
 
 @push('css')
 <style>
+    #product-detail .main-slider {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    #product-detail .main-slider .swiper-wrapper,
+    #product-detail .main-slider .swiper-slide {
+        height: 100%;
+    }
+
+    #product-detail .main-slider .swiper-slide {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #product-detail .main-slider .swiper-slide img {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    #product-detail .gallery-thumbs .swiper-wrapper,
+    #product-detail .gallery-thumbs .swiper-slide {
+        height: 100%;
+    }
+
     .gallery-thumbs .swiper-slide {
         opacity: 0.5;
         cursor: pointer;
@@ -48,6 +79,9 @@
 
 @section('content')
 @php
+    $productPrice = (float) ($product->price ?? 0);
+    $productIsPurchasable = ! $product->has_variants && $productPrice > 0;
+
     $productBreadcrumbs = [
         ['label' => 'Sản phẩm', 'url' => route('products.index')],
     ];
@@ -143,11 +177,12 @@
                 </div>
 
                 <div id="product-price-box" class="text-2xl md:text-3xl xl:text-4xl font-semibold text-blue-700 dark:text-blue-500 mb-8">
-                    @if($product->price > 0)
-                        <span id="product-current-price">{{ number_format($product->price) }}</span> <span class="text-lg md:text-xl xl:text-2xl font-normal underline">đ</span>
+                    @if($productPrice > 0)
+                        <span id="product-current-price">{{ number_format($productPrice) }}</span> <span id="product-price-currency" class="text-lg md:text-xl xl:text-2xl font-normal underline">đ</span>
 
                     @else
                         <span id="product-current-price" class="text-red-500">Liên hệ báo giá</span>
+                        <span id="product-price-currency" class="hidden text-lg md:text-xl xl:text-2xl font-normal underline">đ</span>
                     @endif
                     <div id="product-compare-price" class="text-base font-normal text-gray-500 line-through mt-1 hidden"></div>
                     <div class="text-sm font-normal text-gray-500 italic mt-1">
@@ -179,6 +214,8 @@
                         <div id="variant-status" class="text-sm text-gray-500 mb-4">Vui lòng chọn biến thể phù hợp.</div>
                     @endif
 
+                    @if($productIsPurchasable || $product->has_variants)
+                    <div id="product-purchase-controls" class="{{ $productIsPurchasable ? '' : 'hidden' }}">
                     <div class="flex items-center gap-3 mb-4">
                         <label for="product-qty" class="text-sm font-semibold text-gray-700 dark:text-gray-300">Số lượng</label>
                         <div class="inline-flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
@@ -197,6 +234,8 @@
                         <i class="fas fa-cart-plus mr-2"></i>
                         Thêm vào giỏ hàng
                     </button>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="prose prose-sm md:prose-base text-gray-600 dark:text-gray-300 dark:prose-invert mb-8">
@@ -366,7 +405,9 @@
         const variantButtons = Array.from(document.querySelectorAll('.variant-option'));
         const variantStatus = document.getElementById('variant-status');
         const priceEl = document.getElementById('product-current-price');
+        const priceCurrencyEl = document.getElementById('product-price-currency');
         const comparePriceEl = document.getElementById('product-compare-price');
+        const purchaseControls = document.getElementById('product-purchase-controls');
         const selectedOptions = {};
 
         const syncQuantity = () => {
@@ -394,6 +435,15 @@
 
         const formatMoney = (value) => Number(value || 0).toLocaleString('vi-VN');
 
+        const setPurchasable = (isPurchasable) => {
+            purchaseControls?.classList.toggle('hidden', !isPurchasable);
+            if (!addToCartBtn) return;
+
+            addToCartBtn.disabled = !isPurchasable;
+            addToCartBtn.classList.toggle('opacity-60', !isPurchasable);
+            addToCartBtn.classList.toggle('cursor-not-allowed', !isPurchasable);
+        };
+
         const updateVariantSelectionUI = () => {
             variantButtons.forEach((button) => {
                 const attributeId = button.dataset.attributeId;
@@ -420,23 +470,27 @@
 
             if (!variant) {
                 addToCartBtn.dataset.variantId = '';
-                addToCartBtn.disabled = true;
-                addToCartBtn.classList.add('opacity-60', 'cursor-not-allowed');
+                setPurchasable(false);
                 if (variantStatus) variantStatus.textContent = 'Biến thể chưa hợp lệ hoặc chưa có trong kho cấu hình.';
                 return;
             }
 
             addToCartBtn.dataset.variantId = String(variant.id);
-            addToCartBtn.disabled = false;
-            addToCartBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+            const variantPrice = Number(variant.price || 0);
+            const variantIsPurchasable = variantPrice > 0;
+            setPurchasable(variantIsPurchasable);
 
             if (priceEl) {
-                priceEl.textContent = formatMoney(variant.price);
-                priceEl.classList.remove('text-red-500');
+                priceEl.textContent = variantIsPurchasable ? formatMoney(variantPrice) : 'Liên hệ báo giá';
+                priceEl.classList.toggle('text-red-500', !variantIsPurchasable);
+            }
+
+            if (priceCurrencyEl) {
+                priceCurrencyEl.classList.toggle('hidden', !variantIsPurchasable);
             }
 
             if (comparePriceEl) {
-                if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
+                if (variantIsPurchasable && variant.compare_at_price && Number(variant.compare_at_price) > variantPrice) {
                     comparePriceEl.textContent = `${formatMoney(variant.compare_at_price)} đ`;
                     comparePriceEl.classList.remove('hidden');
                 } else {

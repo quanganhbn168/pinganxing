@@ -77,7 +77,7 @@ class ProductForm
                                             ->searchable()
                                             ->preload()
                                             ->live()
-                                            ->required()
+                                            ->nullable()
                                             ->afterStateUpdated(function (Set $set, ?int $state): void {
                                                 if (! static::categoryHasVariantAttributes($state)) {
                                                     $set('has_variants', false);

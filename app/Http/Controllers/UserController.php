@@ -6,6 +6,7 @@ use App\Http\Requests\UserProfileRequest;
 use App\Traits\UploadImageTrait;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -60,8 +61,19 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $recentOrders = $user->orders()->latest()->take(5)->get();
-        return view('frontend.dashboard.index', compact('recentOrders'));
+        $ordersQuery = $user->orders();
+        $recentOrders = (clone $ordersQuery)->with('orderItems.variant')->latest()->take(5)->get();
+        $orderStats = [
+            'total' => (clone $ordersQuery)->count(),
+            'pending' => (clone $ordersQuery)->where('status', 'pending')->count(),
+            'processing' => (clone $ordersQuery)->where('status', 'processing')->count(),
+            'completed' => (clone $ordersQuery)->where('status', 'completed')->count(),
+            'total_spent' => (clone $ordersQuery)->where('status', 'completed')->sum('total_price'),
+        ];
+        $wishlistCount = method_exists($user, 'wishlist') ? $user->wishlist()->count() : 0;
+        $cartCount = method_exists($user, 'cartItems') ? $user->cartItems()->sum('quantity') : 0;
+
+        return view('frontend.dashboard.index', compact('recentOrders', 'orderStats', 'wishlistCount', 'cartCount'));
     }
     /**
      * Hiển thị trang thông tin cá nhân và form chỉnh sửa.
@@ -90,6 +102,9 @@ class UserController extends Controller
             $user->avatar = $path;
         }
         $user->name = $validatedData['name'];
+        $user->phone = $validatedData['phone'];
+        $user->email = $validatedData['email'] ?? null;
+        $user->address = $validatedData['address'] ?? null;
         if (!empty($validatedData['password'])) {
             $user->password = Hash::make($validatedData['password']);
         }
@@ -101,7 +116,7 @@ class UserController extends Controller
      */
     public function orderHistory()
     {
-        $orders = Auth::user()->orders()->latest()->paginate(10);
+        $orders = Auth::user()->orders()->withCount('orderItems')->latest()->paginate(10);
         return view('frontend.dashboard.orders', compact('orders'));
     }
     /**
@@ -111,6 +126,7 @@ class UserController extends Controller
     {
         $order = Order::where('id', $orderId)
                       ->where('user_id', Auth::id())
+                      ->with('orderItems.variant')
                       ->firstOrFail();
         return view('frontend.dashboard.order_detail', compact('order'));
     }

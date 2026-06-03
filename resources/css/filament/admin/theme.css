@@ -18,3 +18,43 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+/* Curator media previews: show the whole image instead of cropping it. */
+.curator-media-picker img,
+.curator-panel img,
+.curator-grid-column img,
+.curator-column img,
+.fi-resource-media img,
+.curator-curation-form-component img {
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+.curator-media-picker img,
+.curator-panel img,
+.curator-grid-column img,
+.fi-resource-media .curator-grid-column img {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.curator-picker-list-preview img,
+.curator-panel-sidebar img,
+.curator-column img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+.fi-resource-media .fi-ta-record-content,
+.fi-resource-media .fi-ta-record-content > div:first-child,
+.curator-grid-column > div {
+    background-color: rgb(249 250 251);
+}
+
+.dark .fi-resource-media .fi-ta-record-content,
+.dark .fi-resource-media .fi-ta-record-content > div:first-child,
+.dark .curator-grid-column > div {
+    background-color: rgb(3 7 18 / 0.5);
+}

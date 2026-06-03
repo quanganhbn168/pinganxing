@@ -16,8 +16,18 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id')->nullable()->index();
             $table->string('description')->nullable();
             $table->string('content')->nullable();
+            $table->text('solution_overview')->nullable();
+            $table->json('business_challenges')->nullable();
+            $table->json('cnetpos_solutions')->nullable();
+            $table->json('key_features')->nullable();
+            $table->json('impact_stats')->nullable();
+            $table->json('implementation_steps')->nullable();
+            $table->json('related_product_ids')->nullable();
+            $table->json('related_project_ids')->nullable();
             $table->unsignedBigInteger('image_id')->nullable();
+            $table->unsignedBigInteger('banner_id')->nullable();
             $table->boolean('status')->default(1);
+            $table->boolean('is_home')->default(false);
             $table->integer('order')->default(0);
             $table->timestamps();
         });
@@ -30,4 +40,3 @@ return new class extends Migration
         Schema::dropIfExists('field_categories');
     }
 };
-

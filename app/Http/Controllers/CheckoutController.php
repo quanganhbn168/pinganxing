@@ -50,26 +50,21 @@ class CheckoutController extends Controller
         ]);
         try {
             $user = Auth::guard('web')->user();
-            $cartItems = $user ? $user->cartItems()->with('product')->get() : collect([]);
+            $cartItems = $user ? $user->cartItems()->with('product', 'variant')->get() : collect([]);
             $guestCart = !$user ? session()->get('guest_cart', []) : [];
             $order = $this->orderService->createFromCheckout($customerData, $cartItems, $guestCart);
             if (! $user) {
                 session()->forget('guest_cart');
             }
-            return redirect()->route('checkout.success', ['order' => $order->id])->with('clear_guest_cart', true);;
+            return redirect()->route('thank-you')
+                ->with('clear_guest_cart', true)
+                ->with('order_id', $order->id)
+                ->with('success', 'Đặt hàng thành công! Chúng tôi sẽ liên hệ xác nhận trong thời gian sớm nhất.');
         } catch (\Exception $e) {
             report($e);
             return back()->with('error', 'Đặt hàng thất bại, vui lòng thử lại sau ít phút.')->withInput();
         }
     }
-    /**
-     * Hiển thị trang đặt hàng thành công.
-     */
-    public function success(Order $order)
-    {
-        return view('checkout.success', ['order' => $order])->with('clear_guest_cart', true);;
-    }
-
     private function getGuestCheckoutItems(): array
     {
         $guestCart = session()->get('guest_cart', []);

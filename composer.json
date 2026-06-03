@@ -16,6 +16,7 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^4.2",
+        "phpoffice/phpspreadsheet": "^5.7",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-settings": "^3.7",
         "spatie/laravel-sitemap": "^8.0"

@@ -25,14 +25,21 @@ class CartController extends Controller
         $productId = (int) $request->input('product_id');
         $variantId = $request->filled('variant_id') ? (int) $request->input('variant_id') : null;
         $quantity = (int) $request->input('quantity');
+        $product = Product::query()->findOrFail($productId);
 
         if ($variantId) {
-            $variantValid = ProductVariant::where('id', $variantId)
+            $variant = ProductVariant::where('id', $variantId)
                 ->where('product_id', $productId)
-                ->exists();
-            if (! $variantValid) {
+                ->first();
+            if (! $variant) {
                 return response()->json(['success' => false, 'message' => 'Biến thể không hợp lệ.'], 422);
             }
+
+            if ((float) $variant->price <= 0) {
+                return response()->json(['success' => false, 'message' => 'Sản phẩm này cần liên hệ báo giá.'], 422);
+            }
+        } elseif ((float) ($product->price_discount ?: $product->price) <= 0) {
+            return response()->json(['success' => false, 'message' => 'Sản phẩm này cần liên hệ báo giá.'], 422);
         }
 
         if (Auth::check()) {
@@ -188,15 +195,22 @@ class CartController extends Controller
         $variantId   = $data['variant_id'] ? (int) $data['variant_id'] : null;
         $qty         = (int) $data['quantity'];
         $variantText = $data['variant_text'] ?? null;
+        $product = Product::query()->findOrFail($productId);
 
         // (Khuyến nghị) Nếu có Model, kiểm tra biến thể thuộc đúng product:
         if ($variantId) {
-            $ok = \App\Models\ProductVariant::where('id', $variantId)
+            $variant = \App\Models\ProductVariant::where('id', $variantId)
                     ->where('product_id', $productId)
-                    ->exists();
-            if (!$ok) {
+                    ->first();
+            if (!$variant) {
                 return back()->withErrors(['variant_id' => 'Biến thể không hợp lệ với sản phẩm này.']);
             }
+
+            if ((float) $variant->price <= 0) {
+                return back()->withErrors(['product_id' => 'Sản phẩm này cần liên hệ báo giá.']);
+            }
+        } elseif ((float) ($product->price_discount ?: $product->price) <= 0) {
+            return back()->withErrors(['product_id' => 'Sản phẩm này cần liên hệ báo giá.']);
         }
 
         if (Auth::check()) {
@@ -317,7 +331,7 @@ class CartController extends Controller
             return [];
         }
 
-        $cartItems = CartItem::where('user_id', $user->id)->with('product.slug', 'variant')->get();
+        $cartItems = CartItem::where('user_id', $user->id)->with('product.slug', 'product.image', 'variant.image')->get();
 
         return $cartItems->map(function (CartItem $item) {
             $product = $item->product;
@@ -331,9 +345,7 @@ class CartController extends Controller
                 ? (float) $variant->price
                 : (float) ($product->price_discount ?: $product->price);
 
-            $imagePath = $variant && $variant->image
-                ? $variant->image
-                : ($product->image_id ? $product->image : ($product->image ?? null));
+            $imagePath = $variant?->image ?: $product->image;
 
             return [
                 'id' => (string) $item->id,
@@ -344,6 +356,8 @@ class CartController extends Controller
                 'quantity' => (int) $item->quantity,
                 'image' => $this->resolveImageUrl($imagePath),
                 'slug' => $product->slug?->slug,
+                'url' => $product->slug?->slug ? url('/san-pham/' . $product->slug->slug) : '#',
+                'product_type' => (string) ($product->type ?? 'simple'),
                 'variant_text' => $variantText,
             ];
         })->filter()->values()->toArray();
@@ -359,8 +373,8 @@ class CartController extends Controller
         $productIds = collect($guestCart)->pluck('product_id')->filter()->map(fn ($id) => (int) $id)->unique()->values();
         $variantIds = collect($guestCart)->pluck('variant_id')->filter()->map(fn ($id) => (int) $id)->unique()->values();
 
-        $products = Product::with('slug')->whereIn('id', $productIds)->get()->keyBy('id');
-        $variants = ProductVariant::whereIn('id', $variantIds)->get()->keyBy('id');
+        $products = Product::with('slug', 'image')->whereIn('id', $productIds)->get()->keyBy('id');
+        $variants = ProductVariant::with('image')->whereIn('id', $variantIds)->get()->keyBy('id');
 
         return collect($guestCart)->map(function ($row) use ($products, $variants) {
             $productId = (int) ($row['product_id'] ?? 0);
@@ -385,8 +399,10 @@ class CartController extends Controller
                 'name' => (string) $product->name,
                 'price' => $price,
                 'quantity' => $quantity,
-                'image' => $this->resolveImageUrl($product->image ?? null),
+                'image' => $this->resolveImageUrl($variant?->image ?: $product->image),
                 'slug' => $product->slug?->slug,
+                'url' => $product->slug?->slug ? url('/san-pham/' . $product->slug->slug) : '#',
+                'product_type' => (string) ($product->type ?? 'simple'),
                 'variant_text' => $variantText,
             ];
         })->filter()->values()->toArray();
@@ -457,13 +473,19 @@ class CartController extends Controller
         }
 
         if (is_object($image)) {
-            if (method_exists($image, 'url')) {
-                $url = $image->url();
-                return filled($url) ? $url : $fallback;
+            if (isset($image->url) && is_string($image->url) && filled($image->url)) {
+                return (string) $image->url;
             }
 
-            if (isset($image->url) && filled($image->url)) {
-                return (string) $image->url;
+            if (isset($image->path) && is_string($image->path) && filled($image->path)) {
+                return asset($image->path);
+            }
+
+            if (method_exists($image, 'url')) {
+                $url = $image->url();
+                if (is_string($url) && filled($url)) {
+                    return $url;
+                }
             }
         }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Slug;
 use App\Models\Attribute;
@@ -21,7 +22,10 @@ class ProductController extends Controller
      */
     public function resolveBySlug(string $slug, Request $request)
     {
-        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->whereIn('sluggable_type', [Category::class, Product::class])
+            ->firstOrFail();
         $model = $slugData->sluggable;
 
         return match (true) {
@@ -31,6 +35,26 @@ class ProductController extends Controller
         };
     }
 
+    public function productBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Product::class)
+            ->firstOrFail();
+
+        return $this->show($slugData->sluggable);
+    }
+
+    public function categoryBySlug(string $slug, Request $request)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Category::class)
+            ->firstOrFail();
+
+        return $this->byCategory($slugData->sluggable, $request);
+    }
+
     /**
      * Hiển thị trang danh sách sản phẩm theo từng root category (Option A)
      */
@@ -38,17 +62,32 @@ class ProductController extends Controller
     {
         $pageSettings = app(PageSettings::class);
         $perCategoryLimit = (int) $request->input('limit', 12);
-        
-        $allCategories = Category::where(function($q) {
-                $q->whereNull('parent_id')->orWhere('parent_id', 0);
-            })
+        $allCategories = Category::query()
             ->where('status', 1)
             ->orderBy('name')
             ->get();
-        
-        $categories = Category::where('status', 1)
+        $allBrands = Brand::query()
+            ->where('status', 1)
             ->orderBy('name')
             ->get();
+        $hasFilters = $this->hasProductFilters($request);
+
+        if ($hasFilters) {
+            $products = $this->filteredProductsQuery($request)
+                ->with(['image', 'category', 'brand'])
+                ->paginate(20)
+                ->appends($request->query());
+
+            return view('frontend.products.index', compact(
+                'products',
+                'pageSettings',
+                'allCategories',
+                'allBrands',
+                'hasFilters'
+            ));
+        }
+        
+        $categories = $allCategories;
 
         
         $childrenMap = [];
@@ -72,7 +111,7 @@ class ProductController extends Controller
 
         
         $allProducts = Product::where('status', 1)
-            ->with(['category'])
+            ->with(['image', 'category', 'brand'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -106,13 +145,14 @@ class ProductController extends Controller
             $allCategoryAndProduct->push($obj);
         }
 
-        return view('frontend.products.index', compact('allCategoryAndProduct', 'pageSettings', 'allCategories'));
+        return view('frontend.products.index', compact('allCategoryAndProduct', 'pageSettings', 'allCategories', 'allBrands', 'hasFilters'));
     }
     /**
      * Route cho trang danh mục, sẽ chuyển hướng logic về hàm index.
      */
     public function byCategory(Category $category, Request $request)
     {
+        $pageSettings = app(PageSettings::class);
         
         $collectIds = function ($rootId) {
             $ids = [$rootId];
@@ -151,11 +191,11 @@ class ProductController extends Controller
             ->get();
 
         
-        $products = Product::where('status', 1)
+        $products = $this->filteredProductsQuery($request)
             ->whereIn('category_id', $categoryIds)
-            ->orderBy('created_at', 'desc')
+            ->with(['image', 'category', 'brand'])
             ->paginate(12)
-            ->appends($request->except('page')); 
+            ->appends($request->query()); 
         
         $featuredProducts = Product::where('status', 1)
             ->whereIn('category_id', $categoryIds)
@@ -163,13 +203,79 @@ class ProductController extends Controller
             ->inRandomOrder()
             ->get();
 
+        $allCategories = Category::query()
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
+        $allBrands = Brand::query()
+            ->where('status', 1)
+            ->orderBy('name')
+            ->get();
+
         return view('frontend.products.productByCate', compact(
             'category',
             'products',
             'otherCategories',
             'featuredProducts',
-            'childCategories'
+            'childCategories',
+            'pageSettings',
+            'allCategories',
+            'allBrands'
         ));
+    }
+
+    private function filteredProductsQuery(Request $request)
+    {
+        $query = Product::query()->where('status', 1);
+
+        if ($request->filled('q')) {
+            $keyword = trim((string) $request->input('q'));
+            $query->where(function ($query) use ($keyword) {
+                $query->where('name', 'like', "%{$keyword}%")
+                    ->orWhere('code', 'like', "%{$keyword}%")
+                    ->orWhere('description', 'like', "%{$keyword}%");
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $categoryIds = Category::getTreeIds((int) $request->input('category_id'));
+            $query->whereIn('category_id', $categoryIds);
+        }
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', (int) $request->input('brand_id'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', (string) $request->input('type'));
+        }
+
+        match ($request->input('price')) {
+            'under-2m' => $query->where('price', '>', 0)->where('price', '<', 2000000),
+            '2m-5m' => $query->whereBetween('price', [2000000, 5000000]),
+            '5m-10m' => $query->whereBetween('price', [5000000, 10000000]),
+            'over-10m' => $query->where('price', '>', 10000000),
+            'contact' => $query->where(function ($query) {
+                $query->whereNull('price')->orWhere('price', '<=', 0);
+            }),
+            default => null,
+        };
+
+        match ($request->input('sort')) {
+            'price-asc' => $query->orderByRaw('CASE WHEN price IS NULL OR price <= 0 THEN 1 ELSE 0 END')->orderBy('price'),
+            'price-desc' => $query->orderByDesc('price'),
+            'name-asc' => $query->orderBy('name'),
+            default => $query->latest(),
+        };
+
+        return $query;
+    }
+
+    private function hasProductFilters(Request $request): bool
+    {
+        return collect(['q', 'category_id', 'brand_id', 'type', 'price', 'sort'])
+            ->contains(fn (string $key) => filled($request->input($key)));
     }
 
     /**

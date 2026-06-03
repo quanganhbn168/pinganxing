@@ -18,12 +18,17 @@
                 @foreach($headerMenu as $menuItem)
                     @if($menuItem->children && $menuItem->children->count() > 0)
                         <li>
-                            <button type="button" class="flex items-center w-full p-3 text-base text-gray-900 uppercase font-bold transition duration-75 rounded-xl group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-800" aria-controls="dropdown-mobile-{{ $loop->index }}" data-collapse-toggle="dropdown-mobile-{{ $loop->index }}">
-                                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">{{ $menuItem->title }}</span>
-                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                                </svg>
-                            </button>
+                            <div class="flex items-center rounded-xl transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-800 {{ $menuItem->is_active_route ? 'bg-blue-50 text-blue-600' : 'text-gray-900 dark:text-white' }}">
+                                <a href="{{ $menuItem->link }}" target="{{ $menuItem->link_target }}" class="flex min-w-0 flex-1 items-center p-3 text-base uppercase font-bold">
+                                    @if($menuItem->icon)<i class="{{ $menuItem->icon }} mr-2 text-sm"></i>@endif
+                                    <span class="ms-3 truncate">{{ $menuItem->title }}</span>
+                                </a>
+                                <button type="button" class="mr-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-700" aria-controls="dropdown-mobile-{{ $loop->index }}" data-collapse-toggle="dropdown-mobile-{{ $loop->index }}" aria-label="Mở menu con {{ $menuItem->title }}">
+                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                                    </svg>
+                                </button>
+                            </div>
                             <ul id="dropdown-mobile-{{ $loop->index }}" class="hidden py-2 space-y-1">
                                 @foreach($menuItem->children as $childItem)
                                     <li>

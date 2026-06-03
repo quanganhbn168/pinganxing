@@ -16,12 +16,23 @@ class SlugController extends Controller
      */
     public function handle(Request $request, $slug)
     {
-        $slugData = Slug::where('slug', $slug)->first();
+        $matches = Slug::query()
+            ->where('slug', $slug)
+            ->with('sluggable')
+            ->get()
+            ->filter(fn (Slug $slugData) => $slugData->sluggable);
 
-        if (!$slugData || !$slugData->sluggable) {
+        if ($matches->isEmpty()) {
             abort(404);
         }
 
+        $pageSlug = $matches->first(fn (Slug $slugData) => $slugData->sluggable instanceof \App\Models\Page);
+
+        if (! $pageSlug && $matches->count() > 1) {
+            abort(404);
+        }
+
+        $slugData = $pageSlug ?? $matches->first();
         $model = $slugData->sluggable;
         $modelClass = get_class($model);
 

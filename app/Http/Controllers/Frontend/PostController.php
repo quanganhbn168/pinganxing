@@ -18,7 +18,10 @@ class PostController extends Controller
      */
     public function resolveBySlug(string $slug)
     {
-        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->whereIn('sluggable_type', [PostCategory::class, Post::class])
+            ->firstOrFail();
         $model = $slugData->sluggable;
 
         return match (true) {
@@ -26,6 +29,26 @@ class PostController extends Controller
             $model instanceof Post         => $this->detail($model),
             default => abort(404),
         };
+    }
+
+    public function postBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Post::class)
+            ->firstOrFail();
+
+        return $this->detail($slugData->sluggable);
+    }
+
+    public function categoryBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', PostCategory::class)
+            ->firstOrFail();
+
+        return $this->postByCate($slugData->sluggable);
     }
 
     public function index(Request $request)

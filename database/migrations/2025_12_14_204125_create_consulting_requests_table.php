@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->text('details')->nullable();
             $table->string('file_path')->nullable();
+            $table->unsignedBigInteger('file_id')->nullable();
             $table->string('budget')->nullable();
             $table->string('status')->default('new');
             $table->timestamps();

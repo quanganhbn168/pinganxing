@@ -12,7 +12,7 @@ return new class extends Migration {
 
             // --- Cột cấu trúc chính ---
             $table->string('type')->default('simple')->comment('Loại sản phẩm: simple hoặc variable');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('brand_id')->nullable()->constrained()->onDelete('set null');
 
             // --- Cột thông tin cơ bản ---
@@ -35,6 +35,8 @@ return new class extends Migration {
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_home')->default(false);
             $table->boolean('is_on_sale')->default(false);
+            $table->string('discount_type')->nullable();
+            $table->decimal('discount_value', 12, 2)->nullable();
             $table->boolean('has_variants')->default(false);
             $table->enum('product_type', ['physical', 'service']);
             // --- CÁC CỘT META CHO SEO ---

@@ -17,7 +17,10 @@ class ServiceController extends Controller
      */
     public function resolveBySlug(string $slug)
     {
-        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->whereIn('sluggable_type', [ServiceCategory::class, Service::class])
+            ->firstOrFail();
         $model = $slugData->sluggable;
 
         return match (true) {
@@ -25,6 +28,26 @@ class ServiceController extends Controller
             $model instanceof Service         => $this->detail($model),
             default => abort(404),
         };
+    }
+
+    public function serviceBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Service::class)
+            ->firstOrFail();
+
+        return $this->detail($slugData->sluggable);
+    }
+
+    public function categoryBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', ServiceCategory::class)
+            ->firstOrFail();
+
+        return $this->byCategory($slugData->sluggable);
     }
 
     /**

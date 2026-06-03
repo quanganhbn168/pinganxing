@@ -30,29 +30,34 @@
 <div class="bg-white dark:bg-gray-900 py-12">
     <div class="max-w-screen-xl mx-auto px-4">
 
-        {{-- Toolbar Lọc / Tìm kiếm --}}
-        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 mb-10 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="w-full md:w-1/3">
-                <select name="category" id="category-select" class="bg-white border text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500">
-                    <option value="">-- Chọn danh mục sản phẩm --</option>
-                    @foreach ($allCategoryAndProduct as $item)
-                        <option value="{{ $item->category->slug_url }}">
-                            {{ $item->category->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="w-full md:w-1/3">
-                <form action="{{ route('frontend.products.search') }}" method="GET" class="relative w-full">
-                    <input type="text" name="q" value="{{ request('q') }}" required placeholder="Tìm kiếm sản phẩm..."
-                           class="bg-white border text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 pr-10 dark:bg-gray-700 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                    <button type="submit" class="absolute inset-y-0 right-0 p-2.5 flex items-center text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500 transition-colors">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
+        @include('frontend.products.partials.filter-bar', [
+            'allCategories' => $allCategories,
+            'allBrands' => $allBrands,
+            'action' => route('products.index'),
+        ])
 
+        @if($hasFilters ?? false)
+            <div class="mb-5 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-950 dark:text-white">Kết quả lọc</h2>
+                <span class="text-sm font-semibold text-gray-500">{{ $products->total() }} sản phẩm</span>
+            </div>
+
+            @if($products->isEmpty())
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center dark:border-gray-700 dark:bg-gray-800">
+                    <p class="font-semibold text-gray-600 dark:text-gray-300">Không tìm thấy sản phẩm phù hợp.</p>
+                </div>
+            @else
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    @foreach($products as $product)
+                        @include('partials.frontend.product_item', ['product' => $product])
+                    @endforeach
+                </div>
+
+                <div class="mt-8">
+                    {{ $products->links('frontend.products.partials.pagination') }}
+                </div>
+            @endif
+        @else
         {{-- DANH SÁCH SẢN PHẨM THEO TỪNG CATEGORY --}}
         <div class="space-y-16">
             @foreach ($allCategoryAndProduct as $item)
@@ -102,6 +107,7 @@
                 </section>
             @endforeach
         </div>
+        @endif
 
     </div>
 </div>
@@ -117,14 +123,6 @@
 @push('js')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Redirect khi đổi danh mục
-        const categorySelect = document.getElementById('category-select');
-        if(categorySelect) {
-            categorySelect.addEventListener('change', function() {
-                if (this.value) window.location.href = this.value;
-            });
-        }
-
         // Khởi tạo Swiper cho từng danh mục
         const categorySections = document.querySelectorAll('.category-section');
         categorySections.forEach(section => {

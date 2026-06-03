@@ -55,6 +55,7 @@
     </main>
 
     @include('partials.frontend.footer')
+    <x-frontend.cart-drawer />
 
     {{-- KHỐI CÁC NÚT HÀNH ĐỘNG CỐ ĐỊNH Ở GÓC MÀN HÌNH --}}
     <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">

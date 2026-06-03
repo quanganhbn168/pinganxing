@@ -36,7 +36,7 @@ class SystemRouteScanner
     protected static array $excludePrefixes = [
         'admin', 'api', 'livewire', 'filament', '_debugbar',
         'sanctum', 'login', 'register', 'logout', 'password',
-        'user/', 'cart/', 'checkout', 'thanh-toan', 'order-success',
+        'user/', 'cart/', 'checkout', 'thanh-toan',
     ];
 
     /**

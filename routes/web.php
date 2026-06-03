@@ -17,26 +17,32 @@ use App\Http\Controllers\Frontend\CareerController;
 use App\Http\Controllers\Frontend\ConsultingController;
 use App\Http\Controllers\Frontend\AgencyController;
 use App\Http\Controllers\Frontend\CommentController;
+use App\Http\Controllers\ProductImportController;
 
 Route::get("/", [HomeController::class, "index"])->name("home");
 
 Route::group(['prefix' => 'san-pham'], function () {
     Route::get('/', [ProductController::class, 'index'])->name('products.index');
     Route::get('/tim-kiem', [ProductController::class, 'search'])->name('frontend.products.search');
-    Route::get('/{slug}', [ProductController::class, 'resolveBySlug'])->name('frontend.product.bySlug');
+    Route::get('/{slug}', [ProductController::class, 'productBySlug'])->name('frontend.product.bySlug');
 });
+Route::get('/danh-muc-san-pham/{slug}', [ProductController::class, 'categoryBySlug'])->name('frontend.product-category.bySlug');
 
 Route::get('/tin-tuc', [PostController::class, 'index'])->name('frontend.posts.index');
-Route::get('/tin-tuc/{slug}', [PostController::class, 'resolveBySlug'])->name('frontend.post.bySlug');
+Route::get('/tin-tuc/{slug}', [PostController::class, 'postBySlug'])->name('frontend.post.bySlug');
+Route::get('/danh-muc-tin-tuc/{slug}', [PostController::class, 'categoryBySlug'])->name('frontend.post-category.bySlug');
 
 Route::get('/dich-vu', [ServiceController::class, 'index'])->name('frontend.services.index');
-Route::get('/dich-vu/{slug}', [ServiceController::class, 'resolveBySlug'])->name('frontend.service.bySlug');
+Route::get('/dich-vu/{slug}', [ServiceController::class, 'serviceBySlug'])->name('frontend.service.bySlug');
+Route::get('/danh-muc-dich-vu/{slug}', [ServiceController::class, 'categoryBySlug'])->name('frontend.service-category.bySlug');
 
 Route::get('/linh-vuc', [FieldController::class, 'index'])->name('frontend.fields.index');
-Route::get('/linh-vuc/{slug}', [FieldController::class, 'resolveBySlug'])->name('frontend.field.bySlug');
+Route::get('/linh-vuc/{slug}', [FieldController::class, 'fieldBySlug'])->name('frontend.field.bySlug');
+Route::get('/danh-muc-linh-vuc/{slug}', [FieldController::class, 'categoryBySlug'])->name('frontend.field-category.bySlug');
 
 Route::get('/du-an', [ProjectController::class, 'index'])->name('frontend.projects.index');
-Route::get('/du-an/{slug}', [ProjectController::class, 'resolveBySlug'])->name('frontend.project.bySlug');
+Route::get('/du-an/{slug}', [ProjectController::class, 'projectBySlug'])->name('frontend.project.bySlug');
+Route::get('/danh-muc-du-an/{slug}', [ProjectController::class, 'categoryBySlug'])->name('frontend.project-category.bySlug');
 
 Route::get('/tim-kiem', [HomeController::class, 'search'])->name('frontend.search');
 
@@ -44,11 +50,11 @@ Route::get('/ve-chung-toi', [IntroController::class, 'index'])->name('frontend.i
 Route::get('lien-he', [ContactController::class, 'show'])->name('contact.show');
 Route::post('lien-he', [ContactController::class, 'store'])->name('contact.store');
 
-// T vn trin khai
+// tư vấn triển khai
 Route::get('tu-van-trien-khai', [ConsultingController::class, 'index'])->name('consulting.index');
 Route::post('tu-van-trien-khai', [ConsultingController::class, 'store'])->name('consulting.store');
 
-// i l
+// đại lý
 Route::get('dai-ly', [AgencyController::class, 'index'])->name('agency.index');
 Route::post('dai-ly', [AgencyController::class, 'store'])->name('agency.store');
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -71,10 +77,12 @@ Route::post('/gio-hang/buy-now', [CartController::class, 'buyNow'])->name('cart.
 Route::post('/gio-hang/merge', [CartController::class, 'merge']);
 Route::get('/thanh-toan', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/thanh-toan', [CheckoutController::class, 'placeOrder'])->name('checkout.place');
-Route::get('/order-success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-
 Route::get('thank-you', function () {
-    return view('page/thank-you');
+    $order = session('order_id')
+        ? \App\Models\Order::with('orderItems.variant')->find(session('order_id'))
+        : null;
+
+    return view('page/thank-you', compact('order'));
 })->name('thank-you');
 Route::middleware(['auth:web'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
@@ -89,6 +97,16 @@ Route::middleware(['auth:web'])->prefix('user')->name('user.')->group(function (
 // Route cho hnh ng thm/xa wishlist (c th t ngoi group trn)
 // Route::post('/wishlist/add/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
 // Route::post('/wishlist/remove/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+Route::get('/product-import', [ProductImportController::class, 'index'])
+    ->name('product-import.index');
 
+Route::post('/product-import/preview', [ProductImportController::class, 'preview'])
+    ->name('product-import.preview');
+
+Route::post('/product-import/confirm', [ProductImportController::class, 'confirm'])
+    ->name('product-import.confirm');
+
+Route::get('/product-import/preview-image/{sessionId}', [ProductImportController::class, 'previewImage'])
+    ->name('product-import.preview-image');
 // ===================== CATCH-ALL (301 redirect cho URL c) =====================
 Route::get('/{slug}', [SlugController::class, 'handle'])->where('slug', '.*')->name('frontend.slug.handle');

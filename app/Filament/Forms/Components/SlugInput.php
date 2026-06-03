@@ -25,7 +25,7 @@ class SlugInput extends TextInput
             }
 
             $ignoreSlugId = $record && method_exists($record, 'slugData')
-                ? optional($record->slugData)->id
+                ? $record->slugData()->value('id')
                 : null;
 
             $set($slugField, app(SlugGenerator::class)->generate($state, $record, $ignoreSlugId));
@@ -64,10 +64,7 @@ class SlugInput extends TextInput
                     return;
                 }
 
-                $ignoreSlugId = optional($record->slugData)->id;
-                $slug = app(SlugGenerator::class)->generate($state, $record, $ignoreSlugId);
-
-                $record->slugData()->updateOrCreate([], ['slug' => $slug]);
+                $slug = app(SlugGenerator::class)->syncModel($record, $state);
                 $component->state($slug);
             });
     }

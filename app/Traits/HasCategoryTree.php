@@ -135,7 +135,10 @@ trait HasCategoryTree
             ->orderBy('name');
 
         if ($parentId === null) {
-            $query->whereNull('parent_id');
+            $query->where(function ($query) {
+                $query->whereNull('parent_id')
+                    ->orWhere('parent_id', 0);
+            });
         } else {
             $query->where('parent_id', $parentId);
         }

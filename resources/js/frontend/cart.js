@@ -7,6 +7,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartCountSpan = document.querySelector('.cart-action .cart-count');
     const cartTotalSpan = document.querySelector('.cart-offcanvas-wrapper .total-price');
     const itemTemplate = document.getElementById('guest-cart-item-template'); 
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartDrawerOverlay = document.querySelector('.cart-drawer-overlay');
+
+    const openCartDrawer = () => {
+        if (!cartDrawer || !cartDrawerOverlay) return;
+
+        cartDrawerOverlay.classList.remove('hidden');
+        cartDrawer.classList.remove('translate-x-full');
+        cartDrawer.classList.add('translate-x-0');
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => cartDrawerOverlay.classList.remove('opacity-0'));
+    };
+
+    const closeCartDrawer = () => {
+        if (!cartDrawer || !cartDrawerOverlay) return;
+
+        cartDrawer.classList.add('translate-x-full');
+        cartDrawer.classList.remove('translate-x-0');
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        cartDrawerOverlay.classList.add('opacity-0');
+        window.setTimeout(() => cartDrawerOverlay.classList.add('hidden'), 220);
+    };
 
     const renderOffCanvasCart = (cartData) => {
         if (!offcanvasBody || !itemTemplate) return;
@@ -26,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .replace(/__PRICE__/g, Number(item.price).toLocaleString('vi-VN'))
                 .replace(/__QUANTITY__/g, item.quantity)
                 .replace(/__IMAGE__/g, item.image)
-                .replace(/__URL__/g, `/san-pham/${item.slug}`)
+                .replace(/__URL__/g, item.url || `/san-pham/${item.slug}`)
                 .replace(/__VARIANT__/g, item.variant_text || '');
                 html += itemHtml;
             });
@@ -53,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
             el.disabled = true;
             cartState
                 .addItem({ productId, variantId, quantity })
-                .then(() => {})
+                .then(() => openCartDrawer())
                 .catch((error) => cartState.handleError(error))
                 .finally(() => {
                     el.disabled = false;
@@ -69,6 +91,17 @@ document.addEventListener('DOMContentLoaded', function() {
             cartState.removeItem({ itemId }).catch((error) => {
                 cartState.handleError(error, 'Không thể xóa sản phẩm, vui lòng thử lại.');
             });
+        }
+
+        if (e.target.closest('[data-cart-drawer-close]')) {
+            e.preventDefault();
+            closeCartDrawer();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeCartDrawer();
         }
     });
 

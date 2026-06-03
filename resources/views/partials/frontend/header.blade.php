@@ -60,30 +60,39 @@
                     @foreach($headerMenu as $menuItem)
                         @if($menuItem->children && $menuItem->children->count() > 0)
                             <li class="relative group">
-                                <button id="dropdownNavbarLink-{{ $loop->index }}"
-                                    type="button"
+                                <div
                                     aria-haspopup="true"
-                                    class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-600 lg:p-0 lg:w-auto dark:text-white lg:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 lg:dark:hover:bg-transparent font-semibold uppercase tracking-wide text-sm transition-colors">
-                                    {{ $menuItem->title }}
-                                    <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 10 6">
+                                    aria-expanded="false"
+                                    class="flex items-center justify-between rounded px-3 py-2 text-sm font-semibold uppercase tracking-wide transition-colors lg:w-auto lg:p-0 {{ $menuItem->is_active_route ? 'text-blue-600' : 'text-gray-900 hover:text-blue-600 dark:text-white lg:dark:hover:text-blue-500' }}">
+                                    <a href="{{ $menuItem->link }}" target="{{ $menuItem->link_target }}"
+                                        class="inline-flex items-center gap-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-gray-900">
+                                        @if($menuItem->icon)<i class="{{ $menuItem->icon }} mr-1"></i>@endif
+                                        {{ $menuItem->title }}
+                                    </a>
+                                    <span class="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full text-gray-400 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:bg-blue-950"
+                                        aria-hidden="true">
+                                        <svg class="h-2.5 w-2.5 transition-transform duration-200 group-hover:rotate-180" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 10 6">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="m1 1 4 4 4-4" />
-                                    </svg>
-                                </button>
+                                        </svg>
+                                    </span>
+                                </div>
                                 <!-- Dropdown menu -->
                                 <div id="dropdownNavbar-{{ $loop->index }}"
-                                    class="absolute left-0 top-full z-50 hidden w-56 font-normal bg-white divide-y divide-gray-100 rounded-xl shadow-xl dark:bg-gray-800 dark:divide-gray-700 border border-gray-100 dark:border-gray-700 group-hover:block group-focus-within:block">
-                                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-300"
-                                        aria-labelledby="dropdownNavbarLink-{{ $loop->index }}">
+                                    class="invisible absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 translate-y-3 rounded-xl border border-gray-100 bg-white p-2 font-normal opacity-0 shadow-2xl shadow-gray-900/10 transition duration-150 dark:border-gray-700 dark:bg-gray-800 dark:shadow-black/30 group-hover:visible group-hover:translate-y-2 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-2 group-focus-within:opacity-100">
+                                    <div class="absolute -top-3 left-0 h-3 w-full"></div>
+                                    <ul class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                                         @foreach($menuItem->children as $childItem)
                                             <li>
                                                 <a href="{{ $childItem->link }}" target="{{ $childItem->link_target }}"
-                                                    class="block px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/40 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
-                                                    @if($childItem->icon)<i
-                                                    class="{{ $childItem->icon }} text-gray-400 text-xs mr-2"></i>@else<i
-                                                        class="fas fa-angle-right text-gray-400 text-xs mr-2"></i>@endif
-                                                    {{ $childItem->title }}
+                                                    class="flex items-start gap-3 rounded-lg px-3 py-2.5 font-semibold transition-colors hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:text-blue-300">
+                                                    <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gray-100 text-[11px] text-gray-500 dark:bg-gray-700 dark:text-gray-300">
+                                                        @if($childItem->icon)<i class="{{ $childItem->icon }}"></i>@else<i class="fas fa-angle-right"></i>@endif
+                                                    </span>
+                                                    <span class="min-w-0">
+                                                        <span class="block truncate">{{ $childItem->title }}</span>
+                                                    </span>
                                                 </a>
                                             </li>
                                         @endforeach

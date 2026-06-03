@@ -20,7 +20,10 @@ class FieldController extends Controller
      */
     public function resolveBySlug(string $slug)
     {
-        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->whereIn('sluggable_type', [FieldCategory::class, Field::class])
+            ->firstOrFail();
         $model = $slugData->sluggable;
 
         return match (true) {
@@ -28,6 +31,26 @@ class FieldController extends Controller
             $model instanceof Field         => $this->detail($model),
             default => abort(404),
         };
+    }
+
+    public function fieldBySlug(string $slug): View
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Field::class)
+            ->firstOrFail();
+
+        return $this->detail($slugData->sluggable);
+    }
+
+    public function categoryBySlug(string $slug): View
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', FieldCategory::class)
+            ->firstOrFail();
+
+        return $this->byCategory($slugData->sluggable);
     }
 
     public function index()

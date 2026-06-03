@@ -20,7 +20,10 @@ class ProjectController extends Controller
      */
     public function resolveBySlug(string $slug)
     {
-        $slugData = Slug::where('slug', $slug)->firstOrFail();
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->whereIn('sluggable_type', [ProjectCategory::class, Project::class])
+            ->firstOrFail();
         $model = $slugData->sluggable;
 
         return match (true) {
@@ -28,6 +31,26 @@ class ProjectController extends Controller
             $model instanceof Project         => $this->detail($model),
             default => abort(404),
         };
+    }
+
+    public function projectBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', Project::class)
+            ->firstOrFail();
+
+        return $this->detail($slugData->sluggable);
+    }
+
+    public function categoryBySlug(string $slug)
+    {
+        $slugData = Slug::query()
+            ->where('slug', $slug)
+            ->where('sluggable_type', ProjectCategory::class)
+            ->firstOrFail();
+
+        return $this->byCategory($slugData->sluggable);
     }
 
     public function byCategory(ProjectCategory $category)

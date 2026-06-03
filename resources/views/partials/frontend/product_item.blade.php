@@ -8,19 +8,19 @@
         @endif
     </a>
     
-    <div class="p-4 md:p-5 flex flex-col flex-1">
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
+    <div class="p-3 md:p-4 flex flex-col flex-1">
+        <h3 class="text-sm md:text-[15px] font-semibold leading-snug text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
             <a href="{{ $product->slug_url }}">
                 {{ $product->name }}
             </a>
         </h3>
         
         <div class="mt-auto border-t border-gray-100 dark:border-gray-700 pt-3 flex items-center justify-between">
-            <div class="text-blue-700 dark:text-blue-400 font-bold text-lg">
+            <div class="text-blue-700 dark:text-blue-400 font-bold text-base md:text-lg">
                 @if($product->price > 0)
                     {{ number_format($product->price) }}<span class="text-sm font-normal underline ml-0.5">đ</span>
                 @else
-                    <span class="text-red-500">Liên hệ</span>
+                    <span class="text-sm text-red-500">Liên hệ</span>
                 @endif
             </div>
             <a href="{{ $product->slug_url }}" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">

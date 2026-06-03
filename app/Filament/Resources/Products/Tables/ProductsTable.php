@@ -12,6 +12,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use App\Models\Category;
+use App\Models\Product;
+use Filament\Actions\BulkAction;
+use Filament\Forms\Components\Select;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductsTable
 {
@@ -104,9 +109,39 @@ class ProductsTable
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+    BulkActionGroup::make([
+        BulkAction::make('update_category')
+            ->label('Cập nhật danh mục')
+            ->icon('heroicon-o-folder')
+            ->color('info')
+            ->form([
+                Select::make('category_id')
+                    ->label('Danh mục mới')
+                    ->options(
+                        Category::query()
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+            ])
+            ->requiresConfirmation()
+            ->modalHeading('Cập nhật danh mục hàng loạt')
+            ->modalDescription('Các sản phẩm đã chọn sẽ được chuyển sang danh mục mới.')
+            ->modalSubmitActionLabel('Cập nhật')
+            ->action(function (Collection $records, array $data): void {
+                Product::query()
+                    ->whereKey($records->modelKeys())
+                    ->update([
+                        'category_id' => $data['category_id'],
+                    ]);
+            })
+            ->deselectRecordsAfterCompletion(),
+
+        DeleteBulkAction::make(),
+    ]),
+]);
     }
 }

@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('subtitle')->nullable();
             $table->text('description')->nullable();
             $table->string('button_text')->nullable();
+            $table->string('button_text_2')->nullable();
+            $table->string('link_2')->nullable();
             $table->unsignedBigInteger('image_id')->nullable();
-            $table->string('type')->default('home');
             $table->unsignedInteger('position')->default(0);
             $table->boolean('status')->default(true);
-            $table->boolean('is_home')->default(true);
             $table->timestamps();
         });
     }
