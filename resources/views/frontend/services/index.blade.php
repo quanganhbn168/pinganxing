@@ -1,115 +1,98 @@
 @extends('layouts.master')
-@section('title', $pageTitle ?? 'Dịch vụ')
-
+@section('title', 'Dịch vụ của chúng tôi')
 @section('content')
+    <div class="bg-slate-50 min-h-screen pt-24 pb-12">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <h1 class="text-4xl font-serif font-bold text-slate-900 mb-8" style="font-family: 'Playfair Display', serif;">
+                {{ isset($category) ? 'Dịch vụ ' . $category->name : 'Các dịch vụ của chúng tôi' }}
+            </h1>
 
-@php
-    $leaderboardTitle = $pageTitle ?? ($category->name ?? 'Dịch vụ');
-    $leaderboardBreadcrumbs = $breadcrumbItems ?? $breadcrumbs ?? [['label' => 'Dịch vụ']];
-    $leaderboardImage = isset($category)
-        ? ($category->banner?->url ?? $pageSettings->services_banner ?? ($setting->banner ?? null))
-        : ($pageSettings->services_banner ?? $bannerUrl ?? ($setting->banner ?? null));
-    $leaderboardDescription = isset($category)
-        ? ($category->description ?? null)
-        : ($pageSettings->services_leaderboard_description ?: ($pageSubtitle ?? 'Giải pháp công nghệ toàn diện cho doanh nghiệp'));
-@endphp
-
-<x-frontend.leaderboard
-    :image="$leaderboardImage"
-    :title="$leaderboardTitle"
-    :subline="isset($category) ? 'Danh mục dịch vụ' : $pageSettings->services_leaderboard_subline"
-    :description="$leaderboardDescription"
-    :breadcrumb="$leaderboardBreadcrumbs"
-    :actions="isset($category) ? [] : $pageSettings->services_leaderboard_actions"
-    :stats="isset($category) ? [] : $pageSettings->services_leaderboard_stats"
-/>
-
-<section class="py-16 bg-white dark:bg-gray-900">
-    <div class="max-w-screen-xl mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
-            
-            <div class="lg:col-span-3">
-                @if (isset($category))
-                    {{-- Trang danh mục cụ thể --}}
-                    <x-frontend.section-heading :title="$category->name" />
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @forelse($services as $service)
-                            <x-frontend.card 
-                                :href="$service->slug_url"
-                                :image="$service->image ? $service->image->url : null"
-                                :title="$service->name"
-                                :description="$service->description"
-                            >
-                                <span class="inline-flex items-center text-sm text-blue-600 font-medium mt-2">
-                                    Xem chi tiết <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                                </span>
-                            </x-frontend.card>
-                        @empty
-                            <div class="col-span-full text-center py-16 bg-gray-50 dark:bg-gray-800 rounded-2xl">
-                                <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
-                                <p class="text-gray-500 dark:text-gray-400">Chưa có dịch vụ nào trong danh mục này.</p>
-                            </div>
-                        @endforelse
-                    </div>
-
-                    @if(method_exists($services, 'links') && $services->hasPages())
-                        <div class="mt-10 flex justify-center">
-                            {{ $services->links('vendor.pagination.tailwind') }}
-                        </div>
-                    @endif
-
-                @else
-                    {{-- Trang dịch vụ tổng --}}
-                    <x-frontend.section-heading title="Dịch vụ của chúng tôi" subtitle="Đồng hành cùng doanh nghiệp trên hành trình chuyển đổi số" />
-
+            @if(!isset($category) && isset($serviceCategories) && $serviceCategories->count() > 0)
+                <div class="mb-10 flex flex-wrap gap-3">
+                    <a href="{{ route('frontend.services.index') }}"
+                        class="px-5 py-2 rounded-full bg-primary text-white text-sm font-bold shadow-md">
+                        Tất cả
+                    </a>
                     @foreach($serviceCategories as $cat)
-                        <div class="mt-10 first:mt-0">
-                            <h3 class="text-xl font-bold text-brand-900 mb-6 flex items-center border-l-4 border-brand-600 pl-3">
-                                <span class="w-8 h-8 rounded-sm bg-brand-50 flex items-center justify-center mr-3 text-brand-600">
-                                    <i class="fas fa-layer-group text-sm"></i>
-                                </span>
-                                <a href="{{ $cat->slug_url }}" class="hover:text-brand-600 transition-colors uppercase tracking-tight">{{ $cat->name }}</a>
-                            </h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                @forelse($cat->services as $service)
-                                    <x-frontend.card 
-                                        :href="$service->slug_url"
-                                        :image="$service->image ? $service->image->url : null"
-                                        :title="$service->name"
-                                        :description="$service->description"
-                                    >
-                                        <span class="inline-flex items-center text-sm text-blue-600 font-medium mt-2">
-                                            Xem chi tiết <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                                        </span>
-                                    </x-frontend.card>
-                                @empty
-                                    <div class="col-span-full bg-gray-50 dark:bg-gray-800 rounded-xl p-8 text-center">
-                                        <p class="text-gray-500 dark:text-gray-400">Chưa có dịch vụ nào.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
+                        <a href="{{ $cat->slug_url }}"
+                            class="px-5 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-primary hover:border-primary text-sm font-bold transition-all">
+                            {{ $cat->name }}
+                        </a>
                     @endforeach
-
-                @endif
-            </div>
-
-            {{-- Sidebar --}}
-            <div class="lg:col-span-1">
-                <div class="sticky top-24">
-                    <x-frontend.aside />
                 </div>
-            </div>
+            @elseif(isset($category))
+                <div class="mb-10 flex flex-wrap gap-3">
+                    <a href="{{ route('frontend.services.index') }}"
+                        class="px-5 py-2 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-primary hover:border-primary text-sm font-bold transition-all">
+                        Tất cả
+                    </a>
+                    <a href="{{ $category->slug_url }}"
+                        class="px-5 py-2 rounded-full bg-primary text-white text-sm font-bold shadow-md">
+                        {{ $category->name }}
+                    </a>
+                </div>
+            @endif
+
+            @if(isset($category))
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($services as $service)
+                        <a href="{{ $service->slug_url }}"
+                            class="group block bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                @if($service->image)
+                                    <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
+                                        class="w-10 h-10 object-contain">
+                                @else
+                                    <i class="fas fa-concierge-bell text-2xl text-slate-400"></i>
+                                @endif
+                            </div>
+                            <h3 class="font-extrabold text-slate-900 mb-2">{{ $service->name }}</h3>
+                            <p class="text-sm text-slate-500 leading-6">
+                                {{ Str::limit(strip_tags($service->description ?? $service->content), 80) }}</p>
+                            <div class="mt-4 text-sm font-bold text-primary">
+                                Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                <div class="mt-12">
+                    {{ $services->links() }}
+                </div>
+            @else
+                @foreach($serviceCategories as $cat)
+                    <div class="mb-16 last:mb-0">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold text-slate-900">{{ $cat->name }}</h2>
+                            <a href="{{ $cat->slug_url }}"
+                                class="text-sm font-bold text-primary hover:underline">Xem tất cả</a>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach($cat->services->take(6) as $service)
+                                <a href="{{ $service->slug_url }}"
+                                    class="group block bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
+                                    <div
+                                        class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                        @if($service->image)
+                                            <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
+                                                class="w-10 h-10 object-contain">
+                                        @else
+                                            <i class="fas fa-concierge-bell text-2xl text-slate-400"></i>
+                                        @endif
+                                    </div>
+                                    <h3 class="font-extrabold text-slate-900 mb-2">{{ $service->name }}</h3>
+                                    <p class="text-sm text-slate-500 leading-6">
+                                        {{ Str::limit(strip_tags($service->description ?? $service->content), 80) }}</p>
+                                    <div class="mt-4 text-sm font-bold text-primary">
+                                        Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
         </div>
     </div>
-</section>
-
-<x-frontend.page-cta 
-    :title="$pageSettings->services_cta_title" 
-    :description="$pageSettings->services_cta_description" 
-    :link="$pageSettings->services_cta_link" 
-/>
-
 @endsection

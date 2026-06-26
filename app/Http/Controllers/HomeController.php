@@ -20,18 +20,29 @@ use App\Models\Partner;
 use App\Models\Brand;
 use App\Settings\GeneralSettings;
 use App\Settings\HomeSettings;
+use App\Services\SearchService;
+
 class HomeController extends Controller
 {
+    protected $searchService;
+
+    public function __construct(SearchService $searchService)
+    {
+        $this->searchService = $searchService;
+    }
     public function index()
     {
         $slides = Slide::where("status", 1)->with('image')->orderBy('position')->get();
-        $homeProducts = Product::where("status", 1)->where("is_home", 1)
+        
+        $homeProducts = \App\Models\Tour::where("status", 1)->where("is_home", 1)
             ->with(['image', 'category'])
             ->get();
-        $homeCategories = Category::where("status", 1)->where("is_home", 1)
+            
+        $homeCategories = \App\Models\TourCategory::where("status", 1)->where("is_home", 1)
             ->with('image')
             ->orderBy('position')
             ->get();
+            
         $homeServicesCategories = ServiceCategory::where("status", 1)->where("is_home", 1)->with(['image', 'banner'])->get();
         $homeProjectCategories = ProjectCategory::where("status", 1)->where("is_home", 1)->with([
             "projects" => function ($query) {
@@ -110,6 +121,16 @@ class HomeController extends Controller
         return view('frontend.products.search_results', [
             'results' => $products,
             'keyword' => $keyword
+        ]);
+    }
+
+    public function postSearch(Request $request)
+    {
+        $results = $this->searchService->search($request->all());
+
+        return view('frontend.products.search_results', [
+            'results' => $results['products'] ?? collect(),
+            'keyword' => $request->input('destination', '')
         ]);
     }
 }

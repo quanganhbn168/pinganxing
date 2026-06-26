@@ -65,7 +65,7 @@ class ProjectController extends Controller
 
         $baseTitle = $pageSettings->projects_title ?: ($setting->projects_title ?? 'Dự án');
         $pageTitle = $category?->name ?: $baseTitle;
-        $pageSubtitle = $category?->description ?: ($pageSettings->projects_headline ?: 'Những dự án triển khai tiêu biểu, câu chuyện vận hành và hiệu quả chuyển đổi từ CNETPOS.');
+        $pageSubtitle = $category?->description ?: ($pageSettings->projects_headline ?: 'Những dự án tiêu biểu và câu chuyện đồng hành từ Ping An Xing.');
         $bannerUrl = $category?->banner?->url
             ?? $category?->image?->url
             ?? $this->resolveMediaUrl($pageSettings->projects_banner)

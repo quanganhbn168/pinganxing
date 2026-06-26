@@ -2,14 +2,14 @@
     'title' => null,
     'description' => null,
     'link' => null,
-    'image' => 'images/setting/cnetpos-partner.png',
+    'image' => 'images/setting/bat-tay.png',
     'imageAlt' => null,
     'buttonLabel' => 'Liên hệ chuyên gia tư vấn',
 ])
 
 @php
     $defaultTitle = 'Bạn cần tư vấn giải pháp chuyển đổi số?';
-    $defaultDescription = 'Hệ thống CNETPOS sở hữu lõi công nghệ linh hoạt, dễ tùy biến theo quy trình vận hành thực tế của doanh nghiệp.';
+    $defaultDescription = 'Đội ngũ Ping An Xing luôn sẵn sàng tư vấn phương án phù hợp với nhu cầu thực tế của anh/chị.';
 
     $finalTitle = filled($title) ? $title : $defaultTitle;
     $finalDescription = filled($description) ? $description : $defaultDescription;
@@ -28,7 +28,7 @@
         @endif
 
         <div class="frontend-cta-copy">
-            <span>Đồng hành cùng CNETPOS</span>
+            <span>Đồng hành cùng Ping An Xing</span>
             <h3>{{ $finalTitle }}</h3>
             <p>{!! $finalDescription !!}</p>
             <a href="{{ $finalLink }}">

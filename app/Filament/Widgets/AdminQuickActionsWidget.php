@@ -6,12 +6,12 @@ use App\Filament\Pages\ManageHomeSettings;
 use App\Filament\Pages\ManagePageSettings;
 use App\Filament\Pages\ManageSettings;
 use App\Filament\Resources\Brands\BrandResource;
-use App\Filament\Resources\Categories\CategoryResource;
 use App\Filament\Resources\Contacts\ContactResource;
 use App\Filament\Resources\Menus\MenuResource;
-use App\Filament\Resources\Products\ProductResource;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Filament\Resources\Services\ServiceResource;
+use App\Filament\Resources\TourCategories\TourCategoryResource;
+use App\Filament\Resources\Tours\TourResource;
 use Filament\Widgets\Widget;
 
 class AdminQuickActionsWidget extends Widget
@@ -26,8 +26,8 @@ class AdminQuickActionsWidget extends Widget
     {
         return [
             'actions' => [
-                ['label' => 'Thêm sản phẩm', 'description' => 'Tạo sản phẩm hoặc phần cứng mới', 'icon' => 'heroicon-o-cube', 'url' => ProductResource::getUrl('create')],
-                ['label' => 'Danh mục', 'description' => 'Chuẩn hóa cây danh mục sản phẩm', 'icon' => 'heroicon-o-folder', 'url' => CategoryResource::getUrl('index')],
+                ['label' => 'Thêm tour', 'description' => 'Tạo tour du lịch mới', 'icon' => 'heroicon-o-map', 'url' => TourResource::getUrl('create')],
+                ['label' => 'Danh mục tour', 'description' => 'Quản lý nhóm tour du lịch', 'icon' => 'heroicon-o-folder', 'url' => TourCategoryResource::getUrl('index')],
                 ['label' => 'Thương hiệu', 'description' => 'Quản lý hãng và logo', 'icon' => 'heroicon-o-tag', 'url' => BrandResource::getUrl('index')],
                 ['label' => 'Dịch vụ', 'description' => 'Cập nhật dịch vụ triển khai', 'icon' => 'heroicon-o-wrench-screwdriver', 'url' => ServiceResource::getUrl('index')],
                 ['label' => 'Dự án', 'description' => 'Hồ sơ dự án và case study', 'icon' => 'heroicon-o-star', 'url' => ProjectResource::getUrl('index')],

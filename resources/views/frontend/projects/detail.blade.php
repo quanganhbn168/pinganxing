@@ -164,7 +164,7 @@
                 <section class="project-case-section project-case-solutions" data-aos="fade-up">
                     <div class="project-section-heading">
                         <span>Giải pháp triển khai</span>
-                        <h2>CNETPOS đã triển khai như thế nào</h2>
+                        <h2>Giải pháp đã được triển khai như thế nào</h2>
                     </div>
 
                     <div class="project-solution-list">
@@ -392,7 +392,7 @@
         </div>
 
         <x-frontend.page-cta :title="$pageSettings->projects_cta_title" :description="$pageSettings->projects_cta_description" :link="$pageSettings->projects_cta_link"
-            image="images/setting/cnetpos-partner.png" />
+            image="images/setting/bat-tay.png" />
     </div>
 @endsection
 

@@ -10,57 +10,54 @@ class MenuSeeder extends Seeder
 {
     public function run(): void
     {
+        // Xóa menu cũ
+        MenuItem::truncate();
+        Menu::truncate();
+
         // Header Menu
         $header = Menu::firstOrCreate(
             ['location' => 'header'],
             ['name' => 'Menu chính', 'is_active' => true]
         );
 
-        if (MenuItem::where('menu_id', $header->id)->count() === 0) {
-            $headerItems = [
-                ['title' => 'Trang chủ', 'type' => 'system_route', 'url' => 'home'],
-                ['title' => 'Về chúng tôi', 'type' => 'system_route', 'url' => 'frontend.intro.index'],
-                ['title' => 'Dịch vụ', 'type' => 'system_route', 'url' => 'frontend.services.index'],
-                ['title' => 'Lĩnh vực', 'type' => 'system_route', 'url' => 'frontend.fields.index'],
-                ['title' => 'Dự án', 'type' => 'system_route', 'url' => 'frontend.projects.index'],
-                ['title' => 'Sản phẩm', 'type' => 'system_route', 'url' => 'products.index'],
-                ['title' => 'Tin tức', 'type' => 'system_route', 'url' => 'frontend.posts.index'],
-                ['title' => 'Liên hệ', 'type' => 'system_route', 'url' => 'contact.show'],
-            ];
+        $headerItems = [
+            ['title' => 'Trang chủ', 'type' => 'system_route', 'url' => 'home'],
+            ['title' => 'Tour du lịch', 'type' => 'system_route', 'url' => 'frontend.tours.index'],
+            ['title' => 'Dịch vụ', 'type' => 'system_route', 'url' => 'frontend.services.index'],
+            ['title' => 'Tin tức', 'type' => 'system_route', 'url' => 'frontend.posts.index'],
+            ['title' => 'Về chúng tôi', 'type' => 'system_route', 'url' => 'frontend.intro.index'],
+            ['title' => 'Liên hệ', 'type' => 'system_route', 'url' => 'contact.show'],
+        ];
 
-            foreach ($headerItems as $i => $item) {
-                MenuItem::create(array_merge($item, [
-                    'menu_id' => $header->id,
-                    'parent_id' => 0,
-                    'position' => $i,
-                    'target' => '_self',
-                ]));
-            }
+        foreach ($headerItems as $i => $item) {
+            MenuItem::create(array_merge($item, [
+                'menu_id' => $header->id,
+                'parent_id' => 0,
+                'position' => $i,
+                'target' => '_self',
+            ]));
         }
 
         // Footer Menu
         $footer = Menu::firstOrCreate(
-            ['location' => 'footer', 'name' => 'Footer - Về công ty'],
-            ['is_active' => true]
+            ['location' => 'footer'],
+            ['name' => 'Menu Footer', 'is_active' => true]
         );
 
-        if (MenuItem::where('menu_id', $footer->id)->count() === 0) {
-            $footerItems = [
-                ['title' => 'Trang chủ', 'type' => 'system_route', 'url' => 'home'],
-                ['title' => 'Về chúng tôi', 'type' => 'system_route', 'url' => 'frontend.intro.index'],
-                ['title' => 'Dự án', 'type' => 'system_route', 'url' => 'frontend.projects.index'],
-                ['title' => 'Tuyển dụng', 'type' => 'system_route', 'url' => 'frontend.careers.index'],
-                ['title' => 'Liên hệ', 'type' => 'system_route', 'url' => 'contact.show'],
-            ];
+        $footerItems = [
+            ['title' => 'Trang chủ', 'type' => 'system_route', 'url' => 'home'],
+            ['title' => 'Tour du lịch', 'type' => 'system_route', 'url' => 'frontend.tours.index'],
+            ['title' => 'Về chúng tôi', 'type' => 'system_route', 'url' => 'frontend.intro.index'],
+            ['title' => 'Liên hệ', 'type' => 'system_route', 'url' => 'contact.show'],
+        ];
 
-            foreach ($footerItems as $i => $item) {
-                MenuItem::create(array_merge($item, [
-                    'menu_id' => $footer->id,
-                    'parent_id' => 0,
-                    'position' => $i,
-                    'target' => '_self',
-                ]));
-            }
+        foreach ($footerItems as $i => $item) {
+            MenuItem::create(array_merge($item, [
+                'menu_id' => $footer->id,
+                'parent_id' => 0,
+                'position' => $i,
+                'target' => '_self',
+            ]));
         }
     }
 }

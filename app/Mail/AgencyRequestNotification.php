@@ -32,7 +32,7 @@ class AgencyRequestNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Đăng ký Đại lý Mới - CNETPOS',
+            subject: 'Đăng ký Đại lý Mới - Ping An Xing',
         );
     }
 

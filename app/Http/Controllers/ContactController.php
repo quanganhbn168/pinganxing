@@ -28,14 +28,19 @@ class ContactController extends Controller
     {
         $isNewsletter = $request->input('source') === 'newsletter';
 
+        if ($isNewsletter) {
+            $data = $request->validate([
+                'email' => ['required', 'email', 'max:255', 'unique:newsletters,email'],
+            ]);
+            \App\Models\Newsletter::create($data);
+            return back()->with('success', 'Đăng ký nhận tin thành công!');
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:255'],
-            'phone' => [
-                $isNewsletter ? 'nullable' : 'required',
-                'regex:/^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/'
-            ],
+            'phone' => ['required', 'regex:/^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/'],
             'address' => ['nullable', 'string', 'max:255'],
-            'email' => [$isNewsletter ? 'required' : 'nullable', 'email'],
+            'email' => ['nullable', 'email'],
             'subject' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string', 'max:1000'],
         ]);

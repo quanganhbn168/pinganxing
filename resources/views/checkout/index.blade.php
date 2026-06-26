@@ -59,7 +59,7 @@
 
                     <div class="mt-6 rounded-xl bg-blue-50 p-4 text-sm font-medium text-blue-900 dark:bg-blue-950 dark:text-blue-100">
                         <i class="fas fa-phone-alt mr-2"></i>
-                        CNETPOS sẽ liên hệ xác nhận trước khi xử lý đơn.
+                        Ping An Xing sẽ liên hệ xác nhận trước khi xử lý đơn.
                     </div>
                 </div>
 

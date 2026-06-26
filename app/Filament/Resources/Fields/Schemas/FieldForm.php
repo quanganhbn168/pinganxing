@@ -58,21 +58,9 @@ class FieldForm
 
                         RichEditor::make('content')
                             ->label('Nội dung chi tiết')
-                            ->toolbarButtons([
-                                ['bold', 'italic', 'underline', 'strike', 'link'],
-                                ['paragraph', 'h2', 'h3'],
-                                ['bulletList', 'orderedList'],
-                                ['attachFiles'],
-                                ['undo', 'redo'],
-                            ])
                             ->fileAttachmentsDisk('public')
                             ->fileAttachmentsDirectory('fields/content')
                             ->fileAttachmentsVisibility('public')
-                            ->floatingToolbars([
-                                'paragraph' => ['bold', 'italic', 'underline', 'strike', 'link'],
-                                'heading' => ['h2', 'h3'],
-                                'list' => ['bulletList', 'orderedList'],
-                            ])
                             ->columnSpanFull(),
                     ])
                     ->columns(1)

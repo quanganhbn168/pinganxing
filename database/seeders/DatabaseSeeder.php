@@ -3,30 +3,22 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use Spatie\Permission\Models\Role;
+
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tạo tài khoản admin mặc định
-        $user = User::firstOrCreate(
-            ['email' => 'admin@cnetpos.vn'],
-            [
-                'name' => 'Super Admin',
-                'password' => 'admin123',
-                'phone' => '0123456789',
-                'address' => 'Vietnam',
-            ]
-        );
-
-        // Gán role super_admin (dùng cho Filament Shield)
-        $role = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-        $user->assignRole($role);
-
         $this->call([
-            DemoHomepageSeeder::class,
-            // Thêm các seeder khác nếu cần
+            UserSeeder::class,
+            SettingSeeder::class,
+            MenuSeeder::class,
+            TourCategorySeeder::class,
+            TourSeeder::class,
+            ServiceCategorySeeder::class,
+            ServiceSeeder::class,
+            SlideSeeder::class,
+            TestimonialSeeder::class,
+            PartnerSeeder::class,
         ]);
     }
 }

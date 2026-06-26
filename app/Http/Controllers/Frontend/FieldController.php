@@ -103,7 +103,7 @@ class FieldController extends Controller
         }
 
         $businessChallenges = $this->landingItems($featuredFieldCategory?->business_challenges);
-        $cnetposSolutions = $this->landingItems($featuredFieldCategory?->cnetpos_solutions);
+        $brandSolutions = $this->landingItems($featuredFieldCategory?->brand_solutions);
         $keyFeatures = $this->landingItems($featuredFieldCategory?->key_features);
         $processSteps = $this->landingItems($featuredFieldCategory?->implementation_steps);
         $impactStats = $this->landingItems($featuredFieldCategory?->impact_stats, ['value', 'label']);
@@ -112,8 +112,8 @@ class FieldController extends Controller
             $businessChallenges = $showcaseBullets->take(4)->map(fn (string $title) => ['title' => $title, 'description' => null]);
         }
 
-        if ($cnetposSolutions->isEmpty()) {
-            $cnetposSolutions = $showcaseBullets->take(4)->map(fn (string $title) => ['title' => $title, 'description' => null]);
+        if ($brandSolutions->isEmpty()) {
+            $brandSolutions = $showcaseBullets->take(4)->map(fn (string $title) => ['title' => $title, 'description' => null]);
         }
 
         if ($keyFeatures->isEmpty()) {
@@ -154,10 +154,10 @@ class FieldController extends Controller
 
         if ($faqs->isEmpty()) {
             $faqs = collect([
-                ['question' => 'CNETPOS có phù hợp với doanh nghiệp nhỏ không?', 'answer' => 'Có. Giải pháp có thể cấu hình theo quy mô hiện tại và mở rộng khi doanh nghiệp phát triển.'],
+                ['question' => 'Ping An Xing có phù hợp với nhu cầu riêng không?', 'answer' => 'Có. Giải pháp và dịch vụ có thể tư vấn theo nhu cầu hiện tại và điều chỉnh theo quy mô thực tế.'],
                 ['question' => 'Chi phí triển khai được tính như thế nào?', 'answer' => 'Chi phí phụ thuộc vào phạm vi nghiệp vụ, số điểm vận hành, thiết bị và mức độ tích hợp cần triển khai.'],
                 ['question' => 'Thời gian triển khai giải pháp là bao lâu?', 'answer' => 'Thông thường từ vài tuần tùy mô hình vận hành, dữ liệu hiện có và mức độ tùy biến.'],
-                ['question' => 'Doanh nghiệp có được hướng dẫn sử dụng không?', 'answer' => 'Đội ngũ CNETPOS đào tạo, bàn giao tài liệu và hỗ trợ trong quá trình vận hành thực tế.'],
+                ['question' => 'Khách hàng có được tư vấn chi tiết không?', 'answer' => 'Đội ngũ Ping An Xing tư vấn, chuẩn bị thông tin và hỗ trợ trong suốt quá trình sử dụng dịch vụ.'],
             ]);
         }
 
@@ -205,7 +205,7 @@ class FieldController extends Controller
 
         $storyField = $showcaseFields->first();
         $storyFieldCard = $storyField ? $this->fieldCard($storyField, $featuredFieldCategory) : null;
-        $showcaseImage = $featuredFieldCategory?->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=CNETPOS';
+        $showcaseImage = $featuredFieldCategory?->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Ping+An+Xing';
         $showcaseDescription = Str::limit(strip_tags((string) ($featuredFieldCategory?->solution_overview ?: $featuredFieldCategory?->description ?: $featuredFieldCategory?->content ?: $overviewDescription)), 280);
 
         return view('frontend.fields.index', compact(
@@ -223,7 +223,7 @@ class FieldController extends Controller
             'showcaseDescription',
             'storyFieldCard',
             'businessChallenges',
-            'cnetposSolutions',
+            'brandSolutions',
             'keyFeatures',
             'processSteps',
             'impactStats',
@@ -266,11 +266,11 @@ class FieldController extends Controller
         ];
 
         $showcaseImage = $fieldCategory->banner?->url
-            ?: ($fieldCategory->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=CNETPOS');
+            ?: ($fieldCategory->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Ping+An+Xing');
         $showcaseDescription = Str::limit(strip_tags((string) ($fieldCategory->solution_overview ?: $fieldCategory->description ?: $fieldCategory->content)), 340);
 
         $businessChallenges = $this->landingItems($fieldCategory->business_challenges);
-        $cnetposSolutions = $this->landingItems($fieldCategory->cnetpos_solutions);
+        $brandSolutions = $this->landingItems($fieldCategory->brand_solutions);
         $keyFeatures = $this->landingItems($fieldCategory->key_features);
         $impactStats = $this->landingItems($fieldCategory->impact_stats, ['value', 'label']);
         $processSteps = $this->landingItems($fieldCategory->implementation_steps)
@@ -293,7 +293,7 @@ class FieldController extends Controller
             'showcaseImage',
             'showcaseDescription',
             'businessChallenges',
-            'cnetposSolutions',
+            'brandSolutions',
             'keyFeatures',
             'impactStats',
             'processSteps',
@@ -383,7 +383,7 @@ class FieldController extends Controller
 
         return [
             'url' => $field->slug_url,
-            'image' => $field->image?->url ?: ($category?->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=CNETPOS'),
+            'image' => $field->image?->url ?: ($category?->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=Ping+An+Xing'),
             'title' => $field->name,
             'badge' => $category?->name ?? 'Lĩnh vực',
         ];

@@ -99,17 +99,17 @@
             </section>
         @endif
 
-        @if($cnetposSolutions->isNotEmpty())
+        @if($brandSolutions->isNotEmpty())
             <section class="field-detail-band is-solution" data-aos="fade-up" data-aos-delay="100">
                 <div class="field-detail-band-media">
                     <img src="{{ $showcaseImage }}" alt="{{ $current_category->name }}" loading="lazy" decoding="async">
                 </div>
 
                 <div class="field-detail-band-copy">
-                    <span class="field-section-kicker">Giải pháp CNETPOS</span>
+                    <span class="field-section-kicker">Giải pháp phù hợp</span>
                     <h2>Giải pháp phù hợp cho {{ $current_category->name }}</h2>
                     <ul class="field-check-list">
-                        @foreach($cnetposSolutions as $solution)
+                        @foreach($brandSolutions as $solution)
                             <li>
                                 <i class="fas fa-check"></i>
                                 <span>

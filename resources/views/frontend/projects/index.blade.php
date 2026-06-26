@@ -11,7 +11,7 @@
             ->when($mainProject, fn($items) => $items->where('id', '!=', $mainProject->id))
             ->take(3)
             ->values();
-        $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
+        $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=Ping+An+Xing';
     @endphp
 
     <x-frontend.leaderboard

@@ -8,7 +8,6 @@ use App\Filament\Resources\ConsultingRequests\ConsultingRequestResource;
 use App\Models\AgencyRequest;
 use App\Models\Contact;
 use App\Models\ConsultingRequest;
-use App\Models\Order;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Collection;
 
@@ -68,23 +67,9 @@ class AdminRecentRequestsWidget extends Widget
                 'url' => AgencyRequestResource::getUrl('edit', ['record' => $request]),
             ]);
 
-        $orders = Order::latest()
-            ->take(5)
-            ->get()
-            ->map(fn (Order $order): array => [
-                'type' => 'Đơn hàng',
-                'title' => '#' . ($order->code ?: $order->id),
-                'description' => trim(($order->customer_name ?: 'Khách hàng') . ' · ' . number_format((float) $order->total_price) . 'đ'),
-                'time' => $order->created_at,
-                'badge' => $this->statusLabel($order->status),
-                'badge_color' => in_array($order->status, ['completed'], true) ? 'success' : 'warning',
-                'url' => null,
-            ]);
-
         return $contacts
             ->concat($consulting)
             ->concat($agency)
-            ->concat($orders)
             ->sortByDesc('time')
             ->take(10)
             ->values();

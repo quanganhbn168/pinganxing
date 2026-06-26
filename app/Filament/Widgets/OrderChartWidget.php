@@ -2,15 +2,17 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Order;
+use App\Models\AgencyRequest;
+use App\Models\Contact;
+use App\Models\ConsultingRequest;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
 class OrderChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Đơn hàng 7 ngày gần đây';
+    protected ?string $heading = 'Yêu cầu khách hàng 7 ngày gần đây';
 
-    protected ?string $description = 'Số đơn và doanh thu theo ngày';
+    protected ?string $description = 'Liên hệ, tư vấn và đăng ký đại lý theo ngày';
 
     protected static ?int $sort = 3;
 
@@ -19,29 +21,37 @@ class OrderChartWidget extends ChartWidget
     protected function getData(): array
     {
         $labels = [];
-        $orders = [];
-        $revenue = [];
+        $contacts = [];
+        $consulting = [];
+        $agency = [];
 
         foreach (range(6, 0) as $daysAgo) {
             $date = Carbon::today()->subDays($daysAgo);
             $labels[] = $date->format('d/m');
-            $orders[] = Order::whereDate('created_at', $date)->count();
-            $revenue[] = (int) round(Order::whereDate('created_at', $date)->sum('total_price') / 1000);
+            $contacts[] = Contact::whereDate('created_at', $date)->count();
+            $consulting[] = ConsultingRequest::whereDate('created_at', $date)->count();
+            $agency[] = AgencyRequest::whereDate('created_at', $date)->count();
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Số đơn',
-                    'data' => $orders,
+                    'label' => 'Liên hệ',
+                    'data' => $contacts,
                     'borderColor' => '#2563eb',
                     'backgroundColor' => '#2563eb',
                 ],
                 [
-                    'label' => 'Doanh thu (nghìn đ)',
-                    'data' => $revenue,
+                    'label' => 'Tư vấn',
+                    'data' => $consulting,
                     'borderColor' => '#16a34a',
                     'backgroundColor' => '#16a34a',
+                ],
+                [
+                    'label' => 'Đại lý',
+                    'data' => $agency,
+                    'borderColor' => '#f59e0b',
+                    'backgroundColor' => '#f59e0b',
                 ],
             ],
             'labels' => $labels,

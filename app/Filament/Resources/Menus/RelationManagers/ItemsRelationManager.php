@@ -36,8 +36,6 @@ class ItemsRelationManager extends RelationManager
                     ->options([
                         'system_route' => 'Trang hệ thống',
                         'page' => 'Trang đơn lẻ',
-                        'category' => 'Danh mục Hàng hóa',
-                        'product' => 'Sản phẩm',
                         'post_category' => 'Chuyên mục Tin tức',
                         'post' => 'Bài viết Đơn lẻ',
                         'project_category' => 'Danh mục Dự án',
@@ -63,8 +61,6 @@ class ItemsRelationManager extends RelationManager
                     ->options(function (callable $get) {
                         return match ($get('type')) {
                             'page' => \App\Models\Page::pluck('title', 'id'),
-                            'category' => \App\Models\Category::pluck('name', 'id'),
-                            'product' => \App\Models\Product::pluck('name', 'id'),
                             'post_category' => \App\Models\PostCategory::pluck('name', 'id'),
                             'post' => \App\Models\Post::pluck('title', 'id'),
                             'project_category' => \App\Models\ProjectCategory::pluck('name', 'id'),

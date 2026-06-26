@@ -57,7 +57,7 @@ class WorkOrder extends Model
      */
     public static function generateUniqueCode(): string
     {
-        $prefix = 'CNET';
+        $prefix = 'PAX';
         $datePart = now()->format('ymd'); // 241209
         $maxAttempts = 10;
 
@@ -337,4 +337,3 @@ class WorkOrder extends Model
         return $query->whereHas('assignees', fn($q) => $q->where('admin_id', $adminId));
     }
 }
-

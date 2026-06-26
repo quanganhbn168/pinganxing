@@ -2,155 +2,390 @@
 @section('title', 'Liên hệ')
 
 @section('content')
-@php
-    $contactTitle = $pageSettings->contact_title ?: 'Liên hệ';
-@endphp
 
-<x-frontend.leaderboard
-    :image="$pageSettings->contact_banner ?: ($setting->banner ?? 'images/setting/cover01.jpg')"
-    :title="$contactTitle"
-    :subline="$pageSettings->contact_leaderboard_subline"
-    :description="$pageSettings->contact_leaderboard_description ?: ($pageSettings->contact_headline ?: 'Kết nối với đội ngũ CNETPOS để được tư vấn giải pháp phù hợp.')"
-    :breadcrumb="[['label' => $contactTitle]]"
-    :actions="$pageSettings->contact_leaderboard_actions"
-    :stats="$pageSettings->contact_leaderboard_stats"
-/>
+<!-- Hero Section -->
+<section class="relative min-h-[500px] lg:min-h-[600px] flex flex-col justify-center pt-28 pb-32 bg-dark-primary">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0">
+        <img src="{{ $pageSettings->contact_banner ?: ($setting->banner ?? 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2200&auto=format&fit=crop') }}" alt="Liên hệ" class="w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-r from-dark-primary/95 via-dark-primary/70 to-black/40"></div>
+    </div>
 
-<div class="bg-gray-50 py-16 md:py-24">
-    <div class="max-w-screen-xl mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-            
-            {{-- Thông tin liên hệ & Bản đồ --}}
-            <div class="lg:col-span-5 flex flex-col gap-8">
-                <div class="bg-white border-t-4 border-t-brand-600 rounded-sm p-8 md:p-10 shadow-sm border border-gray-100 flex-1 flex flex-col hover:shadow-lg transition-shadow">
-                    <h2 class="text-2xl font-black text-gray-900 mb-6 uppercase tracking-tight">
-                        THÔNG TIN LIÊN HỆ
-                    </h2>
-                    <p class="text-gray-600 mb-8 leading-relaxed font-sans text-sm">
-                        Kênh tiếp nhận thông tin từ Quý khách hàng/Đối tác. Đội ngũ <strong>{{ $setting->site_name }}</strong> cam kết phản hồi và hỗ trợ chậm nhất trong vòng 24 giờ làm việc.
-                    </p>
-
-                    <ul class="space-y-6 flex-1 text-sm font-sans">
-                        <li class="flex items-start">
-                            <div class="w-10 h-10 bg-brand-50 rounded-sm flex items-center justify-center text-brand-600 mr-4 flex-shrink-0 mt-1">
-                                <i class="fas fa-map-marker-alt text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-900 mb-1 uppercase tracking-wider text-xs">Trụ sở chính</p>
-                                <p class="text-gray-600 leading-relaxed font-sans">
-                                    {{ $setting->address }}
-                                </p>
-                            </div>
-                        </li>
-                        
-                        @foreach($branches as $branch)
-                        <li class="flex items-start">
-                            <div class="w-10 h-10 bg-gray-50 border border-gray-100 rounded-sm flex items-center justify-center text-gray-500 mr-4 flex-shrink-0 mt-1">
-                                <i class="fas fa-building text-sm"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-900 mb-1 uppercase tracking-wider text-xs">{{ $branch->name }}</p>
-                                <p class="text-gray-600 leading-relaxed font-sans">
-                                    {{ $branch->address }}
-                                </p>
-                            </div>
-                        </li>
-                        @endforeach
-
-                        <li class="flex items-center">
-                            <div class="w-10 h-10 bg-brand-50 rounded-sm flex items-center justify-center text-brand-600 mr-4 flex-shrink-0">
-                                <i class="fas fa-phone-alt text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-900 mb-0 uppercase tracking-wider text-xs">Hotline</p>
-                                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone) }}" class="text-brand-600 hover:text-accent-500 font-bold text-lg transition-colors font-sans block mt-1">
-                                    {{ $setting->phone }}
-                                </a>
-                            </div>
-                        </li>
-
-                        <li class="flex items-center">
-                            <div class="w-10 h-10 bg-brand-50 rounded-sm flex items-center justify-center text-brand-600 mr-4 flex-shrink-0">
-                                <i class="fas fa-envelope text-lg"></i>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-900 mb-0 uppercase tracking-wider text-xs">Email</p>
-                                <a href="mailto:{{ trim($setting->email) }}" class="text-brand-600 hover:text-accent-500 font-medium transition-colors break-all font-sans block mt-1">
-                                    {{ $setting->email }}
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
+    <div class="max-w-7xl mx-auto px-4 lg:px-8 w-full relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Text -->
+            <div data-aos="fade-right">
+                <div class="font-script text-3xl md:text-4xl mb-4 text-yellow-brand" style="font-family: 'Pacifico', cursive;">
+                    Liên hệ với chúng tôi
                 </div>
-
-                {{-- Bản đồ --}}
-                @if($setting->map)
-                <div class="bg-white rounded-sm shadow-sm border border-gray-200 h-[300px] w-full relative group overflow-hidden">
-                    <style>.map-container iframe { width: 100% !important; height: 100% !important; border: 0; filter: grayscale(20%) contrast(1.1); transition: filter 0.3s ease; } .group:hover .map-container iframe { filter: none; }</style>
-                    <div class="map-container w-full h-full">
-                        {!! $setting->map !!}
-                    </div>
-                </div>
-                @endif
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+                    {{ config('app.name') }} luôn sẵn sàng đồng hành cùng bạn
+                </h1>
+                <p class="text-white/90 text-lg leading-relaxed max-w-lg">
+                    Nếu bạn có bất kỳ thắc mắc nào hoặc cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi. Đội ngũ tư vấn viên chuyên nghiệp của {{ config('app.name') }} luôn sẵn sàng hỗ trợ bạn 24/7.
+                </p>
             </div>
 
-            {{-- Form Liên hệ --}}
-            <div class="lg:col-span-7">
-                <div class="bg-white border-t-4 border-t-brand-600 rounded-sm p-8 md:p-12 shadow-sm border border-gray-100 h-full flex flex-col hover:shadow-lg transition-shadow">
-                    
-                    <div class="mb-10 lg:pl-4">
-                        <h2 class="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 mb-4 uppercase tracking-tight relative pb-4">
-                            Gửi yêu cầu <span class="text-brand-600">tư vấn</span>
-                            <div class="absolute bottom-0 left-0 w-16 h-1 bg-accent-500 rounded"></div>
-                        </h2>
-                        <p class="text-gray-500 font-sans text-sm max-w-lg mt-6">
-                            Đội ngũ chuyên gia của chúng tôi luôn sẵn lòng tư vấn giải pháp chuyển đổi số toàn diện và tối ưu nhất cho doanh nghiệp của bạn.
-                        </p>
+            <!-- Right Cards -->
+            <div data-aos="fade-left" class="bg-dark-primary/60 backdrop-blur-md rounded-2xl p-6 lg:p-8 border border-white/10 shadow-2xl">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Card 1 -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 text-2xl mt-1">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-base mb-1">Tư vấn tận tâm</h3>
+                            <p class="text-white/70 text-sm leading-relaxed">Đội ngũ chuyên nghiệp, hỗ trợ 24/7</p>
+                        </div>
                     </div>
-
-                    <form id="contact-form" action="{{ route('contact.store') }}" method="POST" class="flex-1 flex flex-col font-sans" x-data="contactForm" @submit.prevent="submitForm">
-                        @csrf
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label for="name" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Họ và tên đại diện <span class="text-accent-500">*</span></label>
-                                <input type="text" id="name" name="name" x-model="name" :class="errors.name ? 'border-accent-500 bg-red-50 focus:border-accent-500 focus:ring-accent-500' : 'border-gray-200 bg-gray-50 focus:border-brand-500 focus:ring-brand-500 hover:border-gray-300'" class="border text-gray-900 text-sm rounded-sm block w-full p-4 transition-colors">
-                                <p x-show="errors.name" x-text="errors.name" class="mt-1 text-xs font-bold text-accent-500 tracking-wide block" x-transition></p>
-                            </div>
-                            <div>
-                                <label for="phone" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Điện thoại liên hệ <span class="text-accent-500">*</span></label>
-                                <input type="tel" id="phone" name="phone" x-model="phone" :class="errors.phone ? 'border-accent-500 bg-red-50 focus:border-accent-500 focus:ring-accent-500' : 'border-gray-200 bg-gray-50 focus:border-brand-500 focus:ring-brand-500 hover:border-gray-300'" class="border text-gray-900 text-sm rounded-sm block w-full p-4 transition-colors">
-                                <p x-show="errors.phone" x-text="errors.phone" class="mt-1 text-xs font-bold text-accent-500 tracking-wide block" x-transition></p>
-                            </div>
+                    <!-- Card 2 -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 text-2xl mt-1">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label for="email" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Email (Tuỳ chọn)</label>
-                                <input type="email" id="email" name="email" x-model="email" :class="errors.email ? 'border-accent-500 bg-red-50 focus:border-accent-500 focus:ring-accent-500' : 'border-gray-200 bg-gray-50 focus:border-brand-500 focus:ring-brand-500 hover:border-gray-300'" class="border text-gray-900 text-sm rounded-sm block w-full p-4 transition-colors">
-                                <p x-show="errors.email" x-text="errors.email" class="mt-1 text-xs font-bold text-accent-500 tracking-wide block" x-transition></p>
-                            </div>
-                            <div>
-                                <label for="address" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Tên Doanh nghiệp / Cửa hàng</label>
-                                <input type="text" id="address" name="address" 
-                                       class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-sm focus:ring-brand-500 focus:border-brand-500 block w-full p-4 transition-colors hover:border-gray-300">
-                            </div>
+                        <div>
+                            <h3 class="text-white font-bold text-base mb-1">Thông tin chính xác</h3>
+                            <p class="text-white/70 text-sm leading-relaxed">Cung cấp thông tin rõ ràng, minh bạch</p>
                         </div>
-
-                        <div class="mb-10 flex-1 relative">
-                            <label for="message" class="block mb-2 text-xs font-bold text-gray-700 uppercase tracking-wider">Nội dung cần hỗ trợ <span class="text-accent-500">*</span></label>
-                            <textarea id="message" name="message" rows="5" x-model="message" :class="errors.message ? 'border-accent-500 bg-red-50 focus:border-accent-500 focus:ring-accent-500' : 'border-gray-200 bg-gray-50 focus:border-brand-500 focus:ring-brand-500 hover:border-gray-300'" class="border text-gray-900 text-sm rounded-sm block w-full p-4 h-full min-h-[160px] transition-colors resize-none"></textarea>
-                            <p x-show="errors.message" x-text="errors.message" class="absolute -bottom-6 mt-1 text-xs font-bold text-accent-500 tracking-wide block" x-transition></p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 text-2xl mt-1">
+                            <i class="fas fa-bolt"></i>
                         </div>
+                        <div>
+                            <h3 class="text-white font-bold text-base mb-1">Đặt tour nhanh chóng</h3>
+                            <p class="text-white/70 text-sm leading-relaxed">Quy trình đơn giản, xác nhận tức thì</p>
+                        </div>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 text-2xl mt-1">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-base mb-1">Hỗ trợ toàn hành trình</h3>
+                            <p class="text-white/70 text-sm leading-relaxed">Đồng hành cùng bạn trước, trong và sau chuyến đi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                        <button type="submit" class="w-full text-white bg-brand-600 hover:bg-brand-700 focus:ring-4 focus:outline-none focus:ring-brand-300 font-bold rounded-sm text-sm px-6 py-5 text-center transition-colors uppercase tracking-wider mt-auto group flex items-center justify-center gap-2">
-                            Gửi yêu cầu ngay <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform"></i>
-                        </button>
-                    </form>
+<!-- Stats / Quick Info -->
+<div class="max-w-7xl mx-auto px-4 lg:px-8 relative z-20 -mt-20">
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 lg:p-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+            <!-- Hotline -->
+            <div class="flex items-center gap-4 pt-4 sm:pt-0 sm:px-4">
+                <div class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-primary shrink-0 text-xl">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Hotline 24/7</p>
+                    <p class="text-xl font-extrabold text-gray-900">{{ $setting->phone ?? '1900 1234' }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Hỗ trợ tư vấn miễn phí</p>
+                </div>
+            </div>
+            <!-- Email -->
+            <div class="flex items-center gap-4 pt-4 sm:pt-0 sm:px-4">
+                <div class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-primary shrink-0 text-xl">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Email</p>
+                    <p class="text-xl font-extrabold text-gray-900">{{ $setting->email ?? 'info@vietjourney.vn' }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Phản hồi trong 24h</p>
+                </div>
+            </div>
+            <!-- Working Hours -->
+            <div class="flex items-center gap-4 pt-4 sm:pt-0 sm:px-4">
+                <div class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-primary shrink-0 text-xl">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Thời gian làm việc</p>
+                    <p class="text-xl font-extrabold text-gray-900">08:00 - 21:00</p>
+                    <p class="text-xs text-gray-500 mt-1">Thứ 2 - Chủ nhật</p>
+                </div>
+            </div>
+            <!-- Emergency -->
+            <div class="flex items-center gap-4 pt-4 sm:pt-0 sm:px-4">
+                <div class="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-primary shrink-0 text-xl">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] text-gray-500 font-bold uppercase tracking-wider mb-1">Hỗ trợ khẩn cấp</p>
+                    <p class="text-xl font-extrabold text-gray-900">0912 345 678</p>
+                    <p class="text-xs text-gray-500 mt-1">(Trong giờ và ngoài giờ)</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Main Content (Form & Info) -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <!-- Left: Form -->
+            <div data-aos="fade-up">
+                <div class="mb-8">
+                    <p class="text-yellow-brand font-extrabold text-xs uppercase tracking-wider mb-3">Gửi yêu cầu tư vấn</p>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+                        Chúng tôi sẽ liên hệ lại với bạn trong thời gian sớm nhất
+                    </h2>
+                </div>
+
+                <form id="contact-form" action="{{ route('contact.store') ?? '#' }}" method="POST" x-data="contactForm" @submit.prevent="submitForm">
+                    @csrf
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Họ và tên <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" x-model="name" placeholder="Nhập họ và tên của bạn" class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm" :class="errors.name ? 'border-red-500' : ''">
+                            <p x-show="errors.name" x-text="errors.name" class="mt-1 text-xs text-red-500"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Số điện thoại <span class="text-red-500">*</span></label>
+                            <input type="tel" name="phone" x-model="phone" placeholder="Nhập số điện thoại" class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm" :class="errors.phone ? 'border-red-500' : ''">
+                            <p x-show="errors.phone" x-text="errors.phone" class="mt-1 text-xs text-red-500"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Email</label>
+                            <input type="email" name="email" x-model="email" placeholder="Nhập email của bạn" class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm" :class="errors.email ? 'border-red-500' : ''">
+                            <p x-show="errors.email" x-text="errors.email" class="mt-1 text-xs text-red-500"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-2">Dịch vụ quan tâm</label>
+                            <select name="service" class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-gray-500 text-sm bg-white">
+                                <option value="">Chọn dịch vụ</option>
+                                <option value="Tour du lịch">Tour du lịch</option>
+                                <option value="Vé máy bay">Vé máy bay</option>
+                                <option value="Khách sạn">Khách sạn</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Nội dung yêu cầu</label>
+                        <textarea name="message" x-model="message" rows="5" placeholder="Nhập nội dung bạn cần tư vấn..." class="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors resize-none text-sm"></textarea>
+                        <p x-show="errors.message" x-text="errors.message" class="mt-1 text-xs text-red-500"></p>
+                    </div>
+
+                    <div class="mb-8 flex items-center gap-3">
+                        <input type="checkbox" id="policy" checked class="w-5 h-5 rounded border-gray-300 text-yellow-brand focus:ring-yellow-brand">
+                        <label for="policy" class="text-sm text-gray-500">Tôi đồng ý với <a href="#" class="text-primary font-bold">Chính sách bảo mật</a> của {{ config('app.name') }}</label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-yellow-brand text-slate-900 font-extrabold text-lg py-4 rounded-xl hover:bg-amber-400 transition-colors shadow-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Gửi yêu cầu tư vấn
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right: Info -->
+            <div data-aos="fade-up" data-aos-delay="100">
+                <div class="mb-8">
+                    <p class="text-yellow-brand font-extrabold text-xs uppercase tracking-wider mb-3">Thông tin liên hệ</p>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+                        {{ config('app.name') }} - Đồng hành cùng những hành trình đáng nhớ
+                    </h2>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Trụ sở chính -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Trụ sở chính</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed max-w-sm">{{ $setting->address ?? 'Tầng 11, 123 Nguyễn Văn Cừ, Long Biên, Hà Nội, Việt Nam' }}</p>
+                        </div>
+                    </div>
+                    
+                    @foreach($branches ?? [] as $branch)
+                    <!-- Chi nhánh -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">{{ $branch->name }}</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed max-w-sm">{{ $branch->address }}</p>
+                        </div>
+                    </div>
+                    @endforeach
+
+                    <!-- Chi nhánh mẫu nếu không có data branches -->
+                    @if(empty($branches) || (!isset($branches) && empty($branches)))
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Chi nhánh TP. Hồ Chí Minh</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed max-w-sm">Tầng 5, 456 Nguyễn Thị Minh Khai, Quận 3, TP. Hồ Chí Minh, Việt Nam</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Chi nhánh Đà Nẵng</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed max-w-sm">Tầng 3, 78 Bạch Đằng, Hải Châu, Đà Nẵng, Việt Nam</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Hotline -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Hotline</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                <span class="font-extrabold text-gray-900">{{ $setting->phone ?? '1900 1234' }}</span> (Miễn phí cước gọi)<br>
+                                <span class="font-extrabold text-gray-900">0912 345 678</span> (Hỗ trợ khẩn cấp)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Email</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                {{ $setting->email ?? 'info@vietjourney.vn' }}<br>
+                                booking@vietjourney.vn
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Website -->
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-brand shrink-0">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-gray-900 text-base mb-1">Website</h4>
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                                www.vietjourney.vn
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="relative h-[400px] lg:h-[450px] bg-gray-100 mt-8">
+    @if($setting->map)
+        <div class="absolute inset-0 w-full h-full [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0">
+            {!! $setting->map !!}
+        </div>
+    @else
+        <!-- Map placeholder based on image -->
+        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover opacity-50 grayscale mix-blend-multiply" alt="Map">
+    @endif
+    
+    <!-- Map Overlay Card -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none px-4">
+        <div class="bg-white rounded-2xl shadow-xl p-4 flex items-center gap-4 max-w-sm pointer-events-auto hover:shadow-2xl transition-shadow cursor-pointer">
+            <img src="{{ $pageSettings->contact_banner ?: ($setting->banner ?? 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=200&auto=format&fit=crop') }}" class="w-16 h-16 rounded-xl object-cover shrink-0" alt="HQ">
+            <div>
+                <h4 class="font-extrabold text-gray-900 text-sm mb-1">{{ config('app.name') }} - Trụ sở chính</h4>
+                <p class="text-xs text-gray-500 mb-2 line-clamp-1">{{ $setting->address ?? 'Tầng 11, 123 Nguyễn Văn Cừ, Long Biên, Hà Nội' }}</p>
+                <a href="#" class="text-primary text-xs font-bold flex items-center gap-1 hover:text-dark-primary">Chỉ đường <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Connect & Newsletter -->
+<section class="py-16 bg-white border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
+            <!-- Social -->
+            <div>
+                <p class="text-gray-500 font-extrabold text-xs uppercase tracking-wider mb-2">KẾT NỐI VỚI CHÚNG TÔI</p>
+                <h3 class="text-xl font-extrabold text-gray-900 mb-8">Theo dõi {{ config('app.name') }} trên các kênh mạng xã hội</h3>
+                
+                <div class="flex flex-wrap gap-4 sm:gap-6">
+                    <!-- Facebook -->
+                    <a href="#" class="flex flex-col items-center group">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#1877F2] text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <span class="text-xs font-bold text-gray-900">Facebook</span>
+                        <span class="text-[10px] text-gray-500 mt-0.5">@vietjourney.vn</span>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="#" class="flex flex-col items-center group">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#E4405F] text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <span class="text-xs font-bold text-gray-900">Instagram</span>
+                        <span class="text-[10px] text-gray-500 mt-0.5">@vietjourney.official</span>
+                    </a>
+                    <!-- YouTube -->
+                    <a href="#" class="flex flex-col items-center group">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#FF0000] text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <span class="text-xs font-bold text-gray-900">YouTube</span>
+                        <span class="text-[10px] text-gray-500 mt-0.5">{{ config('app.name') }} Channel</span>
+                    </a>
+                    <!-- TikTok -->
+                    <a href="#" class="flex flex-col items-center group">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-900 text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                            <i class="fab fa-tiktok"></i>
+                        </div>
+                        <span class="text-xs font-bold text-gray-900">TikTok</span>
+                        <span class="text-[10px] text-gray-500 mt-0.5">@vietjourney.vn</span>
+                    </a>
+                    <!-- Zalo -->
+                    <a href="#" class="flex flex-col items-center group">
+                        <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#0068FF] text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                            <img src="{{ asset('images/setting/icon_of_zalo.svg') }}" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg'" class="w-5 h-5" alt="Zalo">
+                        </div>
+                        <span class="text-xs font-bold text-gray-900">Zalo</span>
+                        <span class="text-[10px] text-gray-500 mt-0.5">{{ config('app.name') }} Official</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="md:pl-12 md:border-l border-gray-100">
+                <p class="text-gray-500 font-extrabold text-xs uppercase tracking-wider mb-2">ĐĂNG KÝ NHẬN TIN</p>
+                <h3 class="text-xl font-extrabold text-gray-900 mb-8">Nhận ưu đãi và thông tin du lịch hấp dẫn</h3>
+                
+                <form action="{{ route('contact.store') }}" method="POST" class="flex flex-col sm:flex-row gap-3 mb-4">
+                    @csrf
+                    <input type="hidden" name="source" value="newsletter">
+                    <input type="hidden" name="name" value="Khách đăng ký bản tin">
+                    <input type="email" name="email" required placeholder="Nhập email của bạn" class="flex-1 px-5 py-3.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-sm">
+                    <button type="submit" class="px-8 py-3.5 bg-yellow-brand text-slate-900 font-extrabold rounded-xl hover:bg-amber-400 transition-colors">Đăng ký</button>
+                </form>
+                <p class="text-xs text-gray-500 flex items-center gap-2"><i class="fas fa-check-circle text-gray-300"></i> Chúng tôi cam kết không spam. Bạn có thể hủy đăng ký bất kỳ lúc nào.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 @endsection
 
 @push('js')
@@ -165,17 +400,11 @@
             validate() {
                 this.errors = {};
                 if (!this.name || this.name.length < 2) {
-                    this.errors.name = 'Vui lòng cung cấp tên liên hệ';
+                    this.errors.name = 'Vui lòng cung cấp họ và tên';
                 }
                 const phoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$|^\+84[3|5|7|8|9][0-9]{8}$/;
                 if (!this.phone || !phoneRegex.test(this.phone)) {
-                    this.errors.phone = 'Số điện thoại chưa đúng định dạng';
-                }
-                if (this.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
-                    this.errors.email = 'Email không hợp lệ';
-                }
-                if (!this.message) {
-                    this.errors.message = 'Nội dung hỗ trợ không được để trống';
+                    this.errors.phone = 'Số điện thoại chưa hợp lệ';
                 }
                 return Object.keys(this.errors).length === 0;
             },

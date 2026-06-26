@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('content')->nullable();
             $table->text('solution_overview')->nullable();
             $table->json('business_challenges')->nullable();
-            $table->json('cnetpos_solutions')->nullable();
+            $table->json('brand_solutions')->nullable();
             $table->json('key_features')->nullable();
             $table->json('impact_stats')->nullable();
             $table->json('implementation_steps')->nullable();

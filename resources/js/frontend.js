@@ -1,9 +1,5 @@
 // Main Frontend JS Entry Point
 
-import './frontend/cartState.js';
-import './frontend/cart.js';
-import './frontend/cart-page.js';
-import './frontend/checkout-page.js';
 import './frontend/counter.js';
 import './frontend/TabbedSwiperHandler.js';
 

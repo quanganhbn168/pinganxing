@@ -48,11 +48,6 @@ class MenuItem extends Model
         return $this->belongsTo(Page::class, 'reference_id');
     }
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class, 'reference_id');
-    }
-
     public function fieldCategory()
     {
         return $this->belongsTo(FieldCategory::class, 'reference_id');
@@ -99,7 +94,6 @@ class MenuItem extends Model
             'system_route' => Route::has($this->url) ? route($this->url) : url('/'),
             'custom' => $this->url ?? '#',
             'page' => $this->page ? url($this->page->slug_value) : '#',
-            'category' => $this->category ? $this->category->slug_url : '#',
             'field_category' => $this->fieldCategory ? $this->fieldCategory->slug_url : '#',
             'project_category' => $this->projectCategory ? $this->projectCategory->slug_url : '#',
             'post_category' => $this->postCategory ? $this->postCategory->slug_url : '#',

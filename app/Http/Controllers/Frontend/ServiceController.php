@@ -65,7 +65,9 @@ class ServiceController extends Controller
         $breadcrumbs  = [['label' => $pageTitle]];
 
         $serviceCategories = ServiceCategory::where('status', 1)
-            ->where('parent_id', 0)
+            ->where(function($query) {
+                $query->whereNull('parent_id')->orWhere('parent_id', 0);
+            })
             ->with('services')
             ->get();
 
@@ -113,8 +115,7 @@ class ServiceController extends Controller
         ->limit(3)
         ->get();
 
-        // Nạp data Landing Page (Dự án, Sản phẩm, Bài viết)
-        $service->load(['projects.image', 'posts.image', 'products.image']);
+        // Removed data Landing Page load since the modules (projects, posts, products) pivot tables do not exist
 
         // Khởi tạo Breadcrumb
         $breadcrumbItems = [

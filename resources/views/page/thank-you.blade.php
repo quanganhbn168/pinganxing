@@ -21,7 +21,7 @@
         $accountNo = '105867163975';
         $accountName = 'TRAN QUANG ANH';
         $amount = (float) $order->total_price;
-        $note = 'CNETPOS ' . $order->code;
+        $note = 'PING AN XING ' . $order->code;
         $qrCodeUrl = "https://api.vietqr.io/image/{$bankId}-{$accountNo}-print.png?amount={$amount}&addInfo=" . urlencode($note) . '&accountName=' . urlencode($accountName);
     }
 @endphp

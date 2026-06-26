@@ -53,18 +53,4 @@ class Service extends Model
         return $this->belongsTo(Media::class, 'banner_id');
     }
 
-    public function projects()
-    {
-        return $this->belongsToMany(Project::class);
-    }
-
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class);
-    }
-
-    public function products()
-    {
-        return $this->belongsToMany(Product::class);
-    }
 }

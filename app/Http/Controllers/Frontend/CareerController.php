@@ -16,7 +16,7 @@ class CareerController extends Controller
         $pageSettings = app(PageSettings::class);
 
         $pageTitle    = $pageSettings->careers_title    ?: 'Tuyển dụng';
-        $pageSubtitle = $pageSettings->careers_headline ?: 'Cơ hội việc làm hấp dẫn tại CNETPos';
+        $pageSubtitle = $pageSettings->careers_headline ?: 'Cơ hội việc làm hấp dẫn tại Ping An Xing';
         $breadcrumbs  = [['label' => $pageTitle]];
 
         $careers = Career::where('status', true)

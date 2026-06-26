@@ -39,7 +39,7 @@ class ManageSettings extends SettingsPage
                             ->icon('heroicon-o-building-storefront')
                             ->schema([
                                 TextInput::make('site_name')
-                                    ->label('Tên thương hiệu ngắn (VD: CNETPos)')
+                                    ->label('Tên thương hiệu ngắn')
                                     ->required(),
                                 TextInput::make('company_name')
                                     ->label('Tên pháp nhân công ty đầy đủ')

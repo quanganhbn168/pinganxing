@@ -90,9 +90,9 @@
                             </div>
 
                             <div>
-                                <h3>Giải pháp CNETPOS</h3>
+                                <h3>Giải pháp phù hợp</h3>
                                 <ul class="field-check-list">
-                                    @foreach($cnetposSolutions->take(5) as $solution)
+                                    @foreach($brandSolutions->take(5) as $solution)
                                         <li>
                                             <i class="fas fa-check"></i>
                                             <span>

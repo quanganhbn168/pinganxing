@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title', $pageSettings->agency_title ?: 'Hợp tác Đại lý & Đối tác')
-@section('meta_description', $pageSettings->agency_description ?: 'Đăng ký trở thành đại lý, đối tác phân phối giải pháp của CNETPOS.')
+@section('meta_description', $pageSettings->agency_description ?: 'Đăng ký trở thành đại lý, đối tác phân phối giải pháp của Ping An Xing.')
 @section('meta_image', $pageSettings->agency_banner ?: ($setting->banner ?? asset('images/setting/cover01.jpg')))
 
 @section('content')
@@ -40,7 +40,7 @@
             <div>
                 <div class="mb-8 max-w-3xl">
                     <span class="text-sm font-bold uppercase tracking-wide text-blue-700 dark:text-blue-400">Chương trình hợp tác</span>
-                    <h2 class="mt-3 text-2xl font-bold text-gray-950 dark:text-white md:text-3xl">Mở rộng kinh doanh cùng {{ $setting->site_name ?? 'CNETPOS' }}</h2>
+                    <h2 class="mt-3 text-2xl font-bold text-gray-950 dark:text-white md:text-3xl">Mở rộng kinh doanh cùng {{ $setting->site_name ?? 'Ping An Xing' }}</h2>
                     <p class="mt-4 text-base leading-7 text-gray-600 dark:text-gray-300">{{ $agencyDescription }}</p>
                 </div>
 

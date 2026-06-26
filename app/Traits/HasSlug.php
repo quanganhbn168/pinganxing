@@ -67,10 +67,6 @@ trait HasSlug
 
     public function getSlugValueAttribute()
     {
-        if ($this->relationLoaded('slugData')) {
-            return $this->slugData?->slug;
-        }
-
         if ($this->slugData) {
             return $this->slugData->slug;
         }

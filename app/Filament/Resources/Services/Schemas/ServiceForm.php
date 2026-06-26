@@ -85,29 +85,6 @@ class ServiceForm
                             ])
                             ->columns(1),
 
-                        Section::make('Liên kết Landing Page')
-                            ->description('Chọn các thực thể liên quan để hiển thị ở đáy trang (dạng Mini-landing page).')
-                            ->schema([
-                                Select::make('projects')
-                                    ->label('Dự án đã triển khai')
-                                    ->multiple()
-                                    ->relationship('projects', 'name')
-                                    ->preload(),
-
-                                Select::make('products')
-                                    ->label('Sản phẩm / Phân hệ')
-                                    ->multiple()
-                                    ->relationship('products', 'name')
-                                    ->preload(),
-
-                                Select::make('posts')
-                                    ->label('Bài viết tham khảo')
-                                    ->multiple()
-                                    ->relationship('posts', 'title')
-                                    ->preload(),
-                            ])
-                            ->columns(1),
-
                         Section::make('Hiển thị')
                             ->schema([
                                 Toggle::make('status')

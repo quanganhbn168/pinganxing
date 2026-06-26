@@ -3,8 +3,9 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Post;
-use App\Models\Product;
 use App\Models\Project;
+use App\Models\Service;
+use App\Models\Tour;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -15,11 +16,17 @@ class DashboardStatsWidget extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Sản Phẩm & Phần Cứng', Product::count())
-                ->description('Tổng số lượng sản phẩm')
-                ->descriptionIcon('heroicon-m-cube')
+            Stat::make('Tour du lịch', Tour::count())
+                ->description('Tổng số tour trên hệ thống')
+                ->descriptionIcon('heroicon-m-map')
                 ->chart([7, 2, 10, 3, 15, 4, 17])
                 ->color('success'),
+
+            Stat::make('Dịch vụ', Service::count())
+                ->description('Tổng dịch vụ đang quản lý')
+                ->descriptionIcon('heroicon-m-wrench-screwdriver')
+                ->chart([3, 4, 5, 6, 7, 8, 9])
+                ->color('primary'),
                 
             Stat::make('Dự Án Đã Triển Khai', Project::count())
                 ->description('Hệ thống đối tác & khách hàng')

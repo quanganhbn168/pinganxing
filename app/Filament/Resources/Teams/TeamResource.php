@@ -31,12 +31,12 @@ class TeamResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Thành viên CNET';
+        return 'Thành viên';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Thành viên CNET';
+        return 'Thành viên';
     }
 
     public static function form(Schema $schema): Schema

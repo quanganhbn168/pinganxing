@@ -8,14 +8,14 @@
     $activeCategory = $categoryId ?: 'all';
     $mainPost = $featuredPost ?: $popularPosts->first();
     $topPosts = $heroPosts->when($mainPost, fn ($items) => $items->where('id', '!=', $mainPost->id))->take(3)->values();
-    $mainPostImage = $mainPost?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=CNETPOS';
+    $mainPostImage = $mainPost?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=Ping+An+Xing';
 @endphp
 
 <x-frontend.leaderboard
     :image="$postsBannerUrl ?: $pageSettings->posts_banner"
     :title="$pageTitle ?? 'Tin tức & Blog'"
     :subline="$pageSettings->posts_leaderboard_subline"
-    :description="$pageSettings->posts_leaderboard_description ?: ($pageSubtitle ?? 'Cập nhật những xu hướng công nghệ, câu chuyện chuyển đổi số, kinh nghiệm vận hành và tin tức mới nhất từ CNETPOS.')"
+    :description="$pageSettings->posts_leaderboard_description ?: ($pageSubtitle ?? 'Cập nhật những xu hướng du lịch, kinh nghiệm hành trình và tin tức mới nhất từ Ping An Xing.')"
     :breadcrumb="$breadcrumbs"
     :actions="$pageSettings->posts_leaderboard_actions"
     :stats="$pageSettings->posts_leaderboard_stats"
@@ -179,7 +179,7 @@
             </div>
             <div>
                 <h2>Đăng ký nhận bản tin</h2>
-                <p>Nhận những bài viết hữu ích về công nghệ, chuyển đổi số và giải pháp quản trị doanh nghiệp mới nhất từ CNETPOS.</p>
+                <p>Nhận những bài viết hữu ích về du lịch, dịch vụ và các chương trình mới nhất từ Ping An Xing.</p>
                 @error('email')
                     <div class="news-newsletter-message is-error">{{ $message }}</div>
                 @enderror

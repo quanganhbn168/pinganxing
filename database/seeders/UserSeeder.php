@@ -14,17 +14,29 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin mặc định
-        User::create([
-            'name' => 'Admin',
-            'phone' => '0965625210',
-            'email' => 'user@example.com',
-            'email_verified_at' => now(),
-            'password' => Hash::make('admin123'),
-            'remember_token' => \Str::random(10),
+        // Sinh quyền trước
+        \Artisan::call('shield:generate', [
+            '--all' => true,
+            '--option' => 'policies_and_permissions',
+            '--panel' => 'admin'
         ]);
 
-        // Thêm user ngẫu nhiên nếu muốn
-        // User::factory(5)->create();
+        // Tạo Admin
+        $user = User::updateOrCreate(
+            ['email' => 'admin@pinganxing.com'],
+            [
+                'name' => 'Super Admin',
+                'phone' => '0812161236',
+                'email_verified_at' => now(),
+                'password' => Hash::make('admin123'),
+                'remember_token' => \Str::random(10),
+            ]
+        );
+
+        // Gán quyền Super Admin cho user này thông qua lệnh của Shield
+        \Artisan::call('shield:super-admin', [
+            '--user' => $user->id,
+            '--panel' => 'admin'
+        ]);
     }
 }

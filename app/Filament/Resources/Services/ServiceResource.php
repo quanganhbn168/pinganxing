@@ -27,12 +27,12 @@ class ServiceResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return 'Dịch vụ CNET';
+        return 'Dịch vụ';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Dịch vụ CNET';
+        return 'Dịch vụ';
     }
 
     public static function form(Schema $schema): Schema
