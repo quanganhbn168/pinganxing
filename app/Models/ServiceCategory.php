@@ -21,6 +21,7 @@ class ServiceCategory extends Model
         'image_id',
         'banner_id',
         'parent_id',
+        'position',
         'status',
         'is_home',
         'is_menu',
