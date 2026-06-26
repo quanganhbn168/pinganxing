@@ -252,11 +252,18 @@
                             <i class="fas fa-paper-plane mr-2"></i> Gửi yêu cầu ngay
                         </a>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <a href="{{ $setting->zalo }}" target="_blank" class="flex items-center justify-center px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
+                    @php
+                        $productZaloLink = isset($setting->zalo) && filled($setting->zalo) && ! in_array(rtrim(trim((string) $setting->zalo), '/'), ['http://zalo.me', 'https://zalo.me'], true)
+                            ? trim((string) $setting->zalo)
+                            : null;
+                    @endphp
+                    <div class="{{ $productZaloLink ? 'grid grid-cols-2 gap-4' : 'grid grid-cols-1 gap-4' }}">
+                        @if($productZaloLink)
+                        <a href="{{ $productZaloLink }}" target="_blank" class="flex items-center justify-center px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
                             <img src="{{ asset('images/setting/Icon_of_Zalo.svg') }}" alt="Zalo" class="w-6 h-6 mr-2 group-hover:scale-110 transition-transform">
                             <span class="text-sm md:text-base font-medium text-gray-700 dark:text-gray-200">Chat Zalo</span>
                         </a>
+                        @endif
                         <a href="tel:{{ $setting->phone }}" class="flex items-center justify-center px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 transition-colors group">
                             <i class="fas fa-phone-alt text-lg text-blue-600 dark:text-blue-400 mr-2 group-hover:animate-bounce"></i>
                             <span class="text-sm md:text-base font-medium text-gray-700 dark:text-gray-200">{{ $setting->phone }}</span>

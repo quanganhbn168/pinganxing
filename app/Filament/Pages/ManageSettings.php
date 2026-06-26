@@ -108,10 +108,26 @@ class ManageSettings extends SettingsPage
                                     ->label('Link Bộ Công Thương')
                                     ->url()
                                     ->helperText('Bỏ trống nếu không có'),
+                                TextInput::make('facebook')
+                                    ->label('Link Facebook')
+                                    ->url()
+                                    ->helperText('Bỏ trống nếu không dùng'),
                                 TextInput::make('zalo')
-                                    ->label('Link Zalo'),
+                                    ->label('Link Zalo')
+                                    ->url()
+                                    ->helperText('Bỏ trống nếu không dùng'),
                                 TextInput::make('messenger')
-                                    ->label('Link Messenger'),
+                                    ->label('Link Messenger')
+                                    ->url()
+                                    ->helperText('Bỏ trống nếu không dùng'),
+                                TextInput::make('whatsapp')
+                                    ->label('Link WhatsApp')
+                                    ->url()
+                                    ->helperText('Bỏ trống nếu không dùng'),
+                                TextInput::make('wechat')
+                                    ->label('Link WeChat')
+                                    ->url()
+                                    ->helperText('Bỏ trống nếu không dùng'),
                                 TextInput::make('youtube')
                                     ->label('Link Youtube'),
                                 TextInput::make('tiktok')

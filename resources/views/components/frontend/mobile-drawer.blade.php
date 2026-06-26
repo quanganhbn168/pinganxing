@@ -64,9 +64,14 @@
                     <i class="fas fa-phone-alt mr-2"></i> {{ $setting->phone ?? 'Gọi điện ngay' }}
                 </a>
                 
-                @if($setting->zalo)
-                <a href="{{ $setting->zalo }}" target="_blank" class="flex items-center justify-center w-full p-3.5 text-blue-700 bg-white border border-blue-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 active:scale-[0.98] transition-all uppercase font-bold tracking-wide shadow-sm dark:bg-gray-800 dark:text-blue-400 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <i class="fas fa-comment-dots mr-2 text-blue-500"></i> Zalo Chat
+                @php
+                    $drawerZaloLink = isset($setting->zalo) && filled($setting->zalo) && ! in_array(rtrim(trim((string) $setting->zalo), '/'), ['http://zalo.me', 'https://zalo.me'], true)
+                        ? trim((string) $setting->zalo)
+                        : null;
+                @endphp
+                @if($drawerZaloLink)
+                <a href="{{ $drawerZaloLink }}" target="_blank" class="flex items-center justify-center w-full p-3.5 text-blue-700 bg-white border border-blue-100 rounded-xl hover:border-blue-300 hover:bg-blue-50 active:scale-[0.98] transition-all uppercase font-bold tracking-wide shadow-sm dark:bg-gray-800 dark:text-blue-400 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <img src="{{ asset('images/setting/Icon_of_Zalo.svg') }}" onerror="this.src='{{ asset('images/setting/zalo.png') }}'; this.onerror=null;" class="w-5 h-5 mr-2" alt="" aria-hidden="true"> Zalo Chat
                 </a>
                 @endif
             </div>

@@ -56,41 +56,20 @@
 
     @include('partials.frontend.footer')
 
-    {{-- KHỐI CÁC NÚT HÀNH ĐỘNG CỐ ĐỊNH Ở GÓC MÀN HÌNH --}}
-    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-        {{-- Nút gọi điện (với hiệu ứng rung bg-color Tailwind) --}}
-        <a href="tel:{{ $setting->phone ?? '' }}"
-            class="w-12 h-12 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg transition-transform hover:scale-110">
-            <i class="fas fa-phone-alt animate-pulse"></i>
-        </a>
-        {{-- Nút Zalo --}}
-        <a href="{{ $setting->zalo ?? '' }}" target="_blank"
-            class="w-12 h-12 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-transform hover:scale-110">
-            <i class="fas fa-comment-dots"></i>
-        </a>
-        {{-- Nút Lên đầu trang (Back to top) --}}
-        <a href="#"
-            class="w-12 h-12 hidden items-center justify-center bg-gray-800 hover:bg-gray-700 text-white rounded-full shadow-lg transition-transform hover:scale-110"
-            id="js-back-to-top">
-            <i class="fas fa-arrow-up"></i>
-        </a>
-    </div>
+    @include('partials.frontend.floating-actions')
 
     {{-- Bundle Frontend JS via Vite --}}
     @vite(['resources/js/frontend.js'])
 
     <script>
-        // Back to top logic
         document.addEventListener('DOMContentLoaded', function () {
             const backToTopButton = document.getElementById('js-back-to-top');
             if (backToTopButton) {
                 window.addEventListener('scroll', function () {
                     if (window.scrollY > 300) {
-                        backToTopButton.classList.remove('hidden');
-                        backToTopButton.classList.add('flex');
+                        backToTopButton.classList.add('is-visible');
                     } else {
-                        backToTopButton.classList.add('hidden');
-                        backToTopButton.classList.remove('flex');
+                        backToTopButton.classList.remove('is-visible');
                     }
                 });
                 backToTopButton.addEventListener('click', function (e) {

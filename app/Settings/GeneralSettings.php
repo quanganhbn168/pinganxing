@@ -26,8 +26,11 @@ class GeneralSettings extends Settings
     public ?string $working_hours;
 
     // ── Mạng xã hội ─────────────────────────────────────────────
+    public ?string $facebook;
     public ?string $zalo;
     public ?string $messenger;
+    public ?string $whatsapp;
+    public ?string $wechat;
     public ?string $youtube;
     public ?string $tiktok;
     public ?string $bct_link;

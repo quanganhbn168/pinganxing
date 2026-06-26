@@ -13,16 +13,44 @@
                     {{ $setting->description ?? 'VietJourney – Người bạn đồng hành trên mọi hành trình khám phá Việt Nam và thế giới.' }}
                 </p>
 
-                <div class="flex gap-3 mt-6">
-                    <a href="{{ $setting->facebook ?? '#' }}" target="_blank" class="w-10 h-10 rounded-full bg-white/10 hover:bg-[#1877F2] transition-colors grid place-items-center">
-                        <i class="fab fa-facebook-f text-white"></i>
-                    </a>
-                    <a href="{{ $setting->youtube ?? '#' }}" target="_blank" class="w-10 h-10 rounded-full bg-white/10 hover:bg-[#FF0000] transition-colors grid place-items-center">
-                        <i class="fab fa-youtube text-white"></i>
-                    </a>
-                    <a href="{{ $setting->zalo ?? '#' }}" target="_blank" class="w-10 h-10 rounded-full bg-white/10 hover:bg-[#0068FF] transition-colors flex items-center justify-center p-2.5">
-                        <img src="{{ asset('images/setting/icon_of_zalo.svg') }}" onerror="this.src='{{ asset('images/setting/icon_of_zalo.png') }}'; this.onerror=null;" alt="Zalo" class="w-full h-full object-contain filter brightness-0 invert">
-                    </a>
+                @php
+                    $footerPlaceholderSocialLinks = ['http://zalo.me', 'https://zalo.me', 'http://m.me', 'https://m.me'];
+
+                    $footerSocialValue = function (string|array $keys) use ($setting, $footerPlaceholderSocialLinks) {
+                        foreach ((array) $keys as $key) {
+                            if (isset($setting->{$key}) && filled($setting->{$key})) {
+                                $value = trim((string) $setting->{$key});
+
+                                if (! in_array(rtrim($value, '/'), $footerPlaceholderSocialLinks, true)) {
+                                    return $value;
+                                }
+                            }
+                        }
+
+                        return null;
+                    };
+
+                    $footerSocialLinks = collect([
+                        ['label' => 'Facebook', 'href' => $footerSocialValue('facebook'), 'class' => 'hover:bg-[#1877F2]', 'icon' => 'fab fa-facebook-f'],
+                        ['label' => 'Zalo', 'href' => $footerSocialValue('zalo'), 'class' => 'hover:bg-[#0068FF]', 'image' => asset('images/setting/Icon_of_Zalo.svg')],
+                        ['label' => 'Messenger', 'href' => $footerSocialValue(['messenger', 'mess']), 'class' => 'hover:bg-[#00B2FF]', 'icon' => 'fab fa-facebook-messenger'],
+                        ['label' => 'WhatsApp', 'href' => $footerSocialValue('whatsapp'), 'class' => 'hover:bg-[#25D366]', 'icon' => 'fab fa-whatsapp'],
+                        ['label' => 'WeChat', 'href' => $footerSocialValue('wechat'), 'class' => 'hover:bg-[#07C160]', 'icon' => 'fab fa-weixin'],
+                        ['label' => 'Youtube', 'href' => $footerSocialValue('youtube'), 'class' => 'hover:bg-[#FF0000]', 'icon' => 'fab fa-youtube'],
+                        ['label' => 'Tiktok', 'href' => $footerSocialValue('tiktok'), 'class' => 'hover:bg-black', 'icon' => 'fab fa-tiktok'],
+                    ])->filter(fn (array $link) => filled($link['href']))->values();
+                @endphp
+
+                <div class="flex flex-wrap gap-3 mt-6">
+                    @foreach($footerSocialLinks as $link)
+                        <a href="{{ $link['href'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $link['label'] }}" class="w-10 h-10 rounded-full bg-white/10 {{ $link['class'] }} transition-colors flex items-center justify-center p-2.5">
+                            @if(!empty($link['image']))
+                                <img src="{{ $link['image'] }}" onerror="this.src='{{ asset('images/setting/zalo.png') }}'; this.onerror=null;" alt="{{ $link['label'] }}" class="w-full h-full object-contain">
+                            @else
+                                <i class="{{ $link['icon'] }} text-white"></i>
+                            @endif
+                        </a>
+                    @endforeach
                 </div>
             </div>
 

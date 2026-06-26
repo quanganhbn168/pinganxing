@@ -360,7 +360,7 @@
                     <!-- Zalo -->
                     <a href="#" class="flex flex-col items-center group">
                         <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-[#0068FF] text-xl mb-2 group-hover:-translate-y-1 transition-all">
-                            <img src="{{ asset('images/setting/icon_of_zalo.svg') }}" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg'" class="w-5 h-5" alt="Zalo">
+                            <img src="{{ asset('images/setting/Icon_of_Zalo.svg') }}" onerror="this.src='{{ asset('images/setting/zalo.png') }}'; this.onerror=null;" class="w-5 h-5" alt="Zalo">
                         </div>
                         <span class="text-xs font-bold text-gray-900">Zalo</span>
                         <span class="text-[10px] text-gray-500 mt-0.5">{{ config('app.name') }} Official</span>

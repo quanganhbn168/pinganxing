@@ -5,17 +5,17 @@
 @section('content')
 
     <!-- Hero Slider -->
-    <section class="relative">
+    <section class="home-hero-section">
         @include('partials.frontend.slide')
 
         <!-- Search Box -->
-        <div id="booking" class="absolute left-0 right-0 -bottom-14 px-4 z-20">
-            <form action="{{ route('frontend.search.post') ?? '#' }}" method="POST" class="max-w-6xl mx-auto bg-white rounded-2xl shadow-[0_20px_60px_rgba(15,23,42,0.08)] p-4" data-aos="fade-up" data-aos-delay="150">
+        <div id="booking" class="home-booking-wrap">
+            <form action="{{ route('frontend.search.post') ?? '#' }}" method="POST" class="home-booking-form" data-aos="fade-up" data-aos-delay="150">
                 @csrf
-                <div class="grid md:grid-cols-5 gap-3">
-                    <div class="px-5 py-4 rounded-xl bg-slate-50">
-                        <label class="text-xs text-slate-400 font-semibold">Bạn muốn đi đâu?</label>
-                        <select name="destination" class="w-full bg-transparent mt-2 text-sm font-semibold outline-none border-none p-0 focus:ring-0 text-slate-700">
+                <div class="home-booking-grid">
+                    <div class="home-booking-field">
+                        <label>Bạn muốn đi đâu?</label>
+                        <select name="destination">
                             <option value="">Chọn điểm đến</option>
                             <option value="Hạ Long">Hạ Long</option>
                             <option value="Đà Nẵng">Đà Nẵng</option>
@@ -24,14 +24,14 @@
                         </select>
                     </div>
 
-                    <div class="px-5 py-4 rounded-xl bg-slate-50">
-                        <label class="text-xs text-slate-400 font-semibold">Ngày khởi hành</label>
-                        <input name="date" type="date" class="w-full bg-transparent mt-2 text-sm font-semibold outline-none border-none p-0 focus:ring-0 text-slate-700">
+                    <div class="home-booking-field">
+                        <label>Ngày khởi hành</label>
+                        <input name="date" type="date">
                     </div>
 
-                    <div class="px-5 py-4 rounded-xl bg-slate-50">
-                        <label class="text-xs text-slate-400 font-semibold">Số ngày</label>
-                        <select name="days" class="w-full bg-transparent mt-2 text-sm font-semibold outline-none border-none p-0 focus:ring-0 text-slate-700">
+                    <div class="home-booking-field">
+                        <label>Số ngày</label>
+                        <select name="days">
                             <option value="">Chọn số ngày</option>
                             <option value="2">2N1Đ</option>
                             <option value="3">3N2Đ</option>
@@ -39,9 +39,9 @@
                         </select>
                     </div>
 
-                    <div class="px-5 py-4 rounded-xl bg-slate-50">
-                        <label class="text-xs text-slate-400 font-semibold">Số khách</label>
-                        <select name="guests" class="w-full bg-transparent mt-2 text-sm font-semibold outline-none border-none p-0 focus:ring-0 text-slate-700">
+                    <div class="home-booking-field">
+                        <label>Số khách</label>
+                        <select name="guests">
                             <option value="2">2 khách</option>
                             <option value="4">4 khách</option>
                             <option value="6">6 khách</option>
@@ -49,7 +49,7 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="rounded-xl bg-yellow-brand hover:bg-amber-300 transition text-slate-900 font-extrabold flex items-center justify-center gap-2 text-[15px]">
+                    <button type="submit" class="home-booking-submit">
                         <i class="fas fa-search"></i> Tìm tour ngay
                     </button>
                 </div>
@@ -252,23 +252,23 @@
             </div>
 
             <!-- Video -->
-            <div class="mt-12 relative rounded-3xl overflow-hidden min-h-[300px] md:min-h-[400px] shadow-2xl" data-aos="fade-up">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover" alt="{{ config('app.name') }} Video">
-                <div class="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
-                <div class="absolute inset-0 bg-gradient-to-r from-dark-primary/90 to-transparent"></div>
+            <div class="home-video-showcase mt-12" data-aos="fade-up">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" class="home-video-bg" alt="{{ config('app.name') }} Video">
+                <div class="home-video-color"></div>
+                <div class="home-video-shade"></div>
                 
-                <div class="absolute inset-0 flex flex-col md:flex-row md:items-center px-8 md:px-16 py-12">
-                    <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="glightbox-video w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border-2 border-white/50 flex items-center justify-center text-white text-3xl shrink-0 transition-all hover:scale-110 mb-8 md:mb-0 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
-                        <i class="fas fa-play ml-1"></i>
+                <div class="home-video-content">
+                    <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="glightbox-video home-video-play" aria-label="Xem video giới thiệu">
+                        <i class="fas fa-play"></i>
                     </a>
-                    <div class="md:ml-12 text-white">
-                        <div class="text-xs uppercase tracking-[0.2em] font-bold text-yellow-brand mb-4">
+                    <div class="home-video-copy">
+                        <div class="home-video-eyebrow">
                             {{ config('app.name') }} - Hơn cả một chuyến đi
                         </div>
-                        <h3 class="text-3xl md:text-5xl font-serif font-bold max-w-2xl leading-tight mb-6" style="font-family: 'Playfair Display', serif;">
+                        <h3>
                             Cảm nhận vẻ đẹp Việt Nam qua từng thước phim
                         </h3>
-                        <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="inline-flex items-center gap-2 text-sm font-bold bg-white/10 px-5 py-2.5 rounded-full backdrop-blur-sm border border-white/20 hover:bg-white hover:text-primary transition-colors">
+                        <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="home-video-link">
                             Xem video giới thiệu <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
