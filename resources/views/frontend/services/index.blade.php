@@ -37,21 +37,24 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($services as $service)
                         <a href="{{ $service->slug_url }}"
-                            class="group block bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
-                            <div
-                                class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                            class="group block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
+                            <div class="relative aspect-video bg-slate-100 overflow-hidden">
                                 @if($service->image)
                                     <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
-                                        class="w-10 h-10 object-contain">
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @else
-                                    <i class="fas fa-concierge-bell text-2xl text-slate-400"></i>
+                                    <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                                        <i class="fas fa-concierge-bell text-4xl text-slate-400"></i>
+                                    </div>
                                 @endif
                             </div>
-                            <h3 class="font-extrabold text-slate-900 mb-2">{{ $service->name }}</h3>
-                            <p class="text-sm text-slate-500 leading-6">
-                                {{ Str::limit(strip_tags($service->description ?? $service->content), 80) }}</p>
-                            <div class="mt-4 text-sm font-bold text-primary">
-                                Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                            <div class="p-5">
+                                <h3 class="font-extrabold text-slate-900 mb-2 line-clamp-2">{{ $service->name }}</h3>
+                                <p class="text-sm text-slate-500 leading-6 line-clamp-2">
+                                    {{ Str::limit(strip_tags($service->description ?? $service->content), 96) }}</p>
+                                <div class="mt-4 text-sm font-bold text-primary">
+                                    Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                                </div>
                             </div>
                         </a>
                     @endforeach
@@ -70,21 +73,24 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             @foreach($cat->services->take(6) as $service)
                                 <a href="{{ $service->slug_url }}"
-                                    class="group block bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
-                                    <div
-                                        class="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                    class="group block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
+                                    <div class="relative aspect-video bg-slate-100 overflow-hidden">
                                         @if($service->image)
                                             <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
-                                                class="w-10 h-10 object-contain">
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         @else
-                                            <i class="fas fa-concierge-bell text-2xl text-slate-400"></i>
+                                            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                                                <i class="fas fa-concierge-bell text-4xl text-slate-400"></i>
+                                            </div>
                                         @endif
                                     </div>
-                                    <h3 class="font-extrabold text-slate-900 mb-2">{{ $service->name }}</h3>
-                                    <p class="text-sm text-slate-500 leading-6">
-                                        {{ Str::limit(strip_tags($service->description ?? $service->content), 80) }}</p>
-                                    <div class="mt-4 text-sm font-bold text-primary">
-                                        Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                                    <div class="p-5">
+                                        <h3 class="font-extrabold text-slate-900 mb-2 line-clamp-2">{{ $service->name }}</h3>
+                                        <p class="text-sm text-slate-500 leading-6 line-clamp-2">
+                                            {{ Str::limit(strip_tags($service->description ?? $service->content), 96) }}</p>
+                                        <div class="mt-4 text-sm font-bold text-primary">
+                                            Xem chi tiết <i class="fas fa-arrow-right text-xs ml-1"></i>
+                                        </div>
                                     </div>
                                 </a>
                             @endforeach

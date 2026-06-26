@@ -1,4 +1,9 @@
 
+@php
+    $brandName = $setting->site_name ?? config('app.name');
+    $brandLogoUrl = !empty($globalLogoUrl) ? $globalLogoUrl : null;
+@endphp
+
 <header
     @if(request()->is('/'))
     x-data="{ 
@@ -24,63 +29,63 @@
     }"
     x-init="initHeader()"
     :class="{
-        'bg-dark-primary/95 shadow-lg backdrop-blur-xl': scrolled, 
-        'glass-header': !scrolled,
+        'site-header--scrolled': scrolled,
         '-translate-y-full': hidden,
         'translate-y-0': !hidden
     }"
-    class="fixed top-0 left-0 right-0 z-[100] transition-transform duration-300"
-    style="top: auto;" 
+    class="site-header fixed top-0 left-0 right-0 z-[100] transition-transform duration-300"
     @else
     x-data="{ mobileMenu: false }"
-    class="bg-dark-primary shadow-lg z-[100] sticky top-0"
+    class="site-header site-header--static z-[100] sticky top-0"
     @endif
     id="main-header"
 >
     <div class="max-w-7xl mx-auto px-4 lg:px-8">
-        <div class="h-20 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-3">
-                <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/setting/no-image.png') }}" class="h-12 md:h-14 object-contain" alt="{{ $setting->site_name ?? config('app.name') }}" />
-                <div class="leading-tight hidden sm:block">
-                    <div class="text-white text-2xl font-extrabold tracking-tight">{{ $setting->site_name ?? config('app.name') }}</div>
-                    <div class="text-white/70 text-xs">Tận hưởng từng khoảnh khắc</div>
-                </div>
+        <div class="site-header__inner flex items-center justify-between">
+            <a href="{{ url('/') }}" class="site-header__brand flex items-center">
+                @if($brandLogoUrl)
+                    <span class="site-header__logo-frame">
+                        <img src="{{ $brandLogoUrl }}" class="site-header__logo" alt="{{ $brandName }}" />
+                    </span>
+                @else
+                    <span class="site-header__name">{{ $brandName }}</span>
+                @endif
             </a>
 
-            <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-white/90">
+            <nav class="site-header__nav hidden lg:flex items-center gap-8 text-sm font-semibold">
                 @if(isset($headerMenu) && count($headerMenu) > 0)
                     @foreach($headerMenu as $menuItem)
-                        <a href="{{ $menuItem->link }}" class="hover:text-yellow-brand transition-colors {{ $menuItem->is_active_route ? 'text-yellow-brand' : '' }}">{{ $menuItem->title }}</a>
+                        <a href="{{ $menuItem->link }}" class="transition-colors {{ $menuItem->is_active_route ? 'is-active' : '' }}">{{ $menuItem->title }}</a>
                     @endforeach
                 @else
-                    <a href="/" class="hover:text-yellow-brand transition-colors {{ request()->is('/') ? 'text-yellow-brand' : '' }}">Trang chủ</a>
-                    <a href="#tours" class="hover:text-yellow-brand transition-colors">Tour</a>
-                    <a href="#services" class="hover:text-yellow-brand transition-colors">Dịch vụ</a>
-                    <a href="#destinations" class="hover:text-yellow-brand transition-colors">Điểm đến</a>
-                    <a href="#blog" class="hover:text-yellow-brand transition-colors">Kinh nghiệm</a>
-                    <a href="#about" class="hover:text-yellow-brand transition-colors">Giới thiệu</a>
-                    <a href="#contact" class="hover:text-yellow-brand transition-colors">Liên hệ</a>
+                    <a href="/" class="transition-colors {{ request()->is('/') ? 'is-active' : '' }}">Trang chủ</a>
+                    <a href="#tours" class="transition-colors">Tour</a>
+                    <a href="#services" class="transition-colors">Dịch vụ</a>
+                    <a href="#destinations" class="transition-colors">Điểm đến</a>
+                    <a href="#blog" class="transition-colors">Kinh nghiệm</a>
+                    <a href="#about" class="transition-colors">Giới thiệu</a>
+                    <a href="#contact" class="transition-colors">Liên hệ</a>
                 @endif
             </nav>
 
             <div class="hidden lg:flex items-center gap-5">
-                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '19001234') }}" class="flex items-center gap-3 text-white group">
-                    <div class="w-10 h-10 rounded-full border border-white/30 grid place-items-center group-hover:bg-white/10 transition">
+                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '19001234') }}" class="site-header__phone flex items-center gap-3 group">
+                    <div class="site-header__phone-icon w-10 h-10 rounded-full grid place-items-center transition">
                         <i class="fas fa-phone-alt"></i>
                     </div>
                     <div class="leading-tight">
                         <div class="font-bold">{{ $setting->phone_display ?? $setting->phone ?? '1900 1234' }}</div>
-                        <div class="text-xs text-white/70">Hỗ trợ 24/7</div>
+                        <div class="site-header__phone-subtitle text-xs">Hỗ trợ 24/7</div>
                     </div>
                 </a>
 
-                <a href="#booking" class="px-6 py-3 rounded-xl bg-yellow-brand text-slate-900 font-bold hover:bg-amber-300 transition shadow-lg shadow-yellow-brand/20">
+                <a href="#booking" class="site-header__cta px-6 py-3 rounded-xl bg-yellow-brand text-slate-900 font-bold hover:bg-amber-300 transition shadow-lg shadow-yellow-brand/20">
                     Đặt tour ngay
                 </a>
             </div>
 
             <!-- Hamburger Button -->
-            <button @click="mobileMenu = !mobileMenu" class="lg:hidden w-11 h-11 rounded-xl bg-white/10 text-white border border-white/20 grid place-items-center hover:bg-white/20 transition">
+            <button @click="mobileMenu = !mobileMenu" class="site-header__toggle lg:hidden w-11 h-11 rounded-xl grid place-items-center transition">
                 <i class="fas" :class="mobileMenu ? 'fa-times' : 'fa-bars'"></i>
             </button>
         </div>
@@ -94,12 +99,12 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 translate-y-0"
          x-transition:leave-end="opacity-0 -translate-y-4"
-         class="lg:hidden bg-dark-primary border-t border-white/10 absolute w-full shadow-2xl" 
+         class="site-header__mobile-menu lg:hidden absolute w-full shadow-2xl"
          style="display: none;">
-        <div class="px-5 py-5 space-y-4 text-white font-semibold">
+        <div class="px-5 py-5 space-y-4 font-semibold">
             @if(isset($headerMenu) && count($headerMenu) > 0)
                 @foreach($headerMenu as $menuItem)
-                    <a href="{{ $menuItem->link }}" class="block {{ $menuItem->is_active_route ? 'text-yellow-brand' : '' }}">{{ $menuItem->title }}</a>
+                    <a href="{{ $menuItem->link }}" class="block {{ $menuItem->is_active_route ? 'is-active' : '' }}">{{ $menuItem->title }}</a>
                 @endforeach
             @else
                 <a href="/" class="block">Trang chủ</a>
@@ -109,7 +114,7 @@
                 <a href="#blog" class="block">Kinh nghiệm</a>
                 <a href="#contact" class="block">Liên hệ</a>
             @endif
-            <a href="#booking" class="block text-center bg-yellow-brand text-slate-900 rounded-xl py-3 mt-4 shadow-lg">Đặt tour ngay</a>
+            <a href="#booking" class="site-header__mobile-cta block text-center rounded-xl py-3 mt-4 shadow-lg">Đặt tour ngay</a>
         </div>
     </div>
 </header>

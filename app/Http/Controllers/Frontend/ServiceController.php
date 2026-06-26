@@ -68,7 +68,13 @@ class ServiceController extends Controller
             ->where(function($query) {
                 $query->whereNull('parent_id')->orWhere('parent_id', 0);
             })
-            ->with('services')
+            ->with([
+                'services' => fn ($query) => $query
+                    ->where('status', 1)
+                    ->latest(),
+            ])
+            ->orderBy('position')
+            ->orderBy('id')
             ->get();
 
         return view('frontend.services.index', compact(
@@ -87,7 +93,10 @@ class ServiceController extends Controller
     public function byCategory(ServiceCategory $category)
     {
         // Lấy các dịch vụ chỉ thuộc về danh mục đã cho
-        $services = $category->services()->where('status', 1)->latest()->paginate(10);
+        $services = $category->services()
+            ->where('status', 1)
+            ->latest()
+            ->paginate(10);
         
         $pageTitle = $category->name;
         $breadcrumbItems = [

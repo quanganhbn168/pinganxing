@@ -1,17 +1,26 @@
+@php
+    $brandName = $setting->site_name ?? config('app.name');
+    $brandLogoUrl = !empty($globalLogoUrl) ? $globalLogoUrl : null;
+@endphp
+
 <footer id="contact" class="bg-dark-primary text-white pt-16 border-t border-white/10">
     <div class="max-w-7xl mx-auto px-4 lg:px-8">
         <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12">
             <div class="lg:col-span-2">
-                <a href="{{ url('/') }}" class="flex items-center gap-3 mb-5">
-                    <img src="{{ !empty($globalLogoUrl) ? $globalLogoUrl : asset('images/setting/no-image.png') }}" class="h-12 md:h-14 object-contain" alt="{{ $setting->site_name ?? config('app.name') }}" />
-                    <div class="hidden sm:block">
-                        <div class="text-2xl font-extrabold">{{ $setting->site_name ?? config('app.name') }}</div>
-                        <div class="text-white/60 text-xs">Tận hưởng từng khoảnh khắc</div>
-                    </div>
+                <a href="{{ url('/') }}" class="footer-brand flex items-center mb-5">
+                    @if($brandLogoUrl)
+                        <span class="footer-brand__logo-frame">
+                            <img src="{{ $brandLogoUrl }}" class="footer-brand__logo" alt="{{ $brandName }}" />
+                        </span>
+                    @else
+                        <span class="footer-brand__name">{{ $brandName }}</span>
+                    @endif
                 </a>
-                <p class="text-white/65 leading-7 max-w-md">
-                    {{ $setting->description ?? 'VietJourney – Người bạn đồng hành trên mọi hành trình khám phá Việt Nam và thế giới.' }}
-                </p>
+                @if(filled($setting->description ?? null))
+                    <p class="text-white/65 leading-7 max-w-md">
+                        {{ $setting->description }}
+                    </p>
+                @endif
 
                 @php
                     $footerPlaceholderSocialLinks = ['http://zalo.me', 'https://zalo.me', 'http://m.me', 'https://m.me'];
@@ -125,7 +134,7 @@
         </div>
 
         <div class="border-t border-white/10 py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-white/50 text-sm">
-            <div>© {{ date('Y') }} {{ $setting->company_name ?? ($setting->site_name ?? 'VietJourney') }}. All rights reserved.</div>
+            <div>© {{ date('Y') }} {{ $setting->company_name ?? ($setting->site_name ?? config('app.name')) }}. All rights reserved.</div>
             <div class="flex gap-3">
                 <span class="px-3 py-1 rounded bg-white/10 font-bold text-xs flex items-center">VISA</span>
                 <span class="px-3 py-1 rounded bg-white/10 font-bold text-xs flex items-center">MASTER</span>
