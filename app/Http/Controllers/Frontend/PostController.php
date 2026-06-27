@@ -74,25 +74,22 @@ class PostController extends Controller
             ->withCount(['posts' => fn ($query) => $query->where('status', 1)])
             ->get();
 
-        // 2. Gán bài viết theo cây danh mục
-        foreach ($postCategories as $category) {
-            $childIds = PostCategory::getTreeIds($category->id);
-            $catPosts = Post::whereIn('post_category_id', $childIds)
-                ->where('status', 1)
-                ->latest()
-                ->take(9)
-                ->get();
-            $category->setRelation('posts', $catPosts);
-        }
+        $showEditorial = $keyword === ''
+            && (! $categoryId || $categoryId === 'all')
+            && $sort === 'latest';
 
-        // 3. Bài nổi bật
+        // Bài nổi bật; nếu chưa đánh dấu thì dùng bài mới nhất để bố cục không bị trống.
         $featuredPost = Post::where('status', 1)
             ->where('is_featured', 1)
             ->with(['image', 'category'])
             ->latest('updated_at')
-            ->first();
+            ->first()
+            ?: Post::where('status', 1)
+                ->with(['image', 'category'])
+                ->latest()
+                ->first();
 
-        // 4. Danh sách bài (loại trừ bài nổi bật)
+        // Danh sách bài viết theo bộ lọc.
         $postsQuery = Post::where('status', 1)->with(['image', 'category']);
         if ($keyword !== '') {
             $postsQuery->where(function ($query) use ($keyword) {
@@ -110,28 +107,31 @@ class PostController extends Controller
             'featured' => $postsQuery->orderByDesc('is_featured')->latest(),
             default => $postsQuery->latest(),
         };
-        if ($featuredPost) {
+        if ($showEditorial && $featuredPost) {
             $postsQuery->where('id', '!=', $featuredPost->id);
         }
-        $posts = $postsQuery->paginate(8)->withQueryString();
+        $posts = $postsQuery->paginate(9)->withQueryString();
 
         $heroPosts = Post::where('status', 1)
             ->with(['image', 'category'])
             ->when($featuredPost, fn ($query) => $query->where('id', '!=', $featuredPost->id))
             ->latest()
-            ->take(4)
+            ->take(3)
             ->get();
 
-        $popularPosts = Post::where('status', 1)
-            ->with(['image', 'category'])
-            ->latest('updated_at')
-            ->take(5)
-            ->get();
+        $featuredPostImageUrl = $this->resolveMediaUrl($featuredPost?->image);
+        $heroPostImageUrls = $heroPosts->mapWithKeys(fn (Post $post) => [
+            $post->id => $this->resolveMediaUrl($post->image),
+        ]);
+        $postImageUrls = collect($posts->items())->mapWithKeys(fn (Post $post) => [
+            $post->id => $this->resolveMediaUrl($post->image),
+        ]);
 
         return view('frontend.post.index', compact(
             'pageSettings', 'pageTitle', 'pageSubtitle', 'breadcrumbs',
             'postCategories', 'posts', 'featuredPost', 'heroPosts',
-            'popularPosts', 'keyword', 'categoryId', 'sort', 'postsBannerUrl'
+            'featuredPostImageUrl', 'heroPostImageUrls', 'postImageUrls',
+            'keyword', 'categoryId', 'sort', 'showEditorial', 'postsBannerUrl'
         ));
     }
 
