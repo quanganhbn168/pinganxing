@@ -9,6 +9,9 @@ use App\Models\ServiceCategory;
 use App\Models\Slug;
 use App\Settings\GeneralSettings;
 use App\Settings\PageSettings;
+use Awcodes\Curator\Models\Media;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
@@ -116,13 +119,22 @@ class ServiceController extends Controller
 
     public function detail(Service $service)
     {
+        $service->loadMissing(['category', 'image', 'banner']);
+
         // Danh sách dịch vụ cùng cấp
         $relatedServices = Service::where("status", 1)
         ->where("id", '!=', $service->id)
         ->where('service_category_id', $service->service_category_id)
+        ->with('image')
         ->orderBy("updated_at", "DESC")
         ->limit(3)
         ->get();
+
+        $serviceCoverImage = $this->resolveMediaUrl($service->image);
+        $serviceImages = $this->serviceGalleryImages($service);
+        $relatedServiceImageUrls = $relatedServices->mapWithKeys(fn (Service $relatedService) => [
+            $relatedService->id => $this->resolveMediaUrl($relatedService->image),
+        ]);
 
         // Removed data Landing Page load since the modules (projects, posts, products) pivot tables do not exist
 
@@ -140,11 +152,94 @@ class ServiceController extends Controller
         $bannerUrl = !empty($service->banner) ? $service->banner : (!empty($setting->banner) ? $setting->banner : asset('images/setting/no-banner.png'));
 
         return view("frontend.services.detail", compact(
-            "service", 
+            "service",
+            "serviceCoverImage",
+            "serviceImages",
             "relatedServices",
+            "relatedServiceImageUrls",
             "breadcrumbItems",
             "bannerUrl",
             "setting"
         ));
+    }
+
+    /**
+     * Chỉ hiển thị gallery khi quản trị viên đã chọn ảnh trong trường thư viện.
+     */
+    private function serviceGalleryImages(Service $service): Collection
+    {
+        $images = collect();
+
+        $push = function (?string $url) use ($images): void {
+            if (blank($url)) {
+                return;
+            }
+
+            $normalizedUrl = $this->normalizeImageUrl($url);
+
+            if ($normalizedUrl && ! $images->contains($normalizedUrl)) {
+                $images->push($normalizedUrl);
+            }
+        };
+
+        foreach (collect($service->gallery)->filter() as $item) {
+            $push($this->resolveGalleryItemUrl($item));
+        }
+
+        return $images->values();
+    }
+
+    private function resolveGalleryItemUrl(mixed $item): ?string
+    {
+        if ($item instanceof Media) {
+            return $this->resolveMediaUrl($item);
+        }
+
+        if (is_numeric($item)) {
+            return $this->resolveMediaUrl(Media::find((int) $item));
+        }
+
+        if (is_string($item)) {
+            return $item;
+        }
+
+        if (is_array($item)) {
+            $id = $item['id'] ?? $item['media_id'] ?? null;
+
+            if (is_numeric($id)) {
+                $mediaUrl = $this->resolveMediaUrl(Media::find((int) $id));
+
+                if ($mediaUrl) {
+                    return $mediaUrl;
+                }
+            }
+
+            return $item['url'] ?? $item['path'] ?? null;
+        }
+
+        return null;
+    }
+
+    private function resolveMediaUrl(?Media $media): ?string
+    {
+        if (! $media) {
+            return null;
+        }
+
+        // Một số dữ liệu cũ lưu URL tuyệt đối ngay trong cột path.
+        if (Str::startsWith($media->path, ['http://', 'https://', '//'])) {
+            return $media->path;
+        }
+
+        return $media->url;
+    }
+
+    private function normalizeImageUrl(string $url): string
+    {
+        if (Str::startsWith($url, ['http://', 'https://', '//'])) {
+            return $url;
+        }
+
+        return asset(ltrim($url, '/'));
     }
 }

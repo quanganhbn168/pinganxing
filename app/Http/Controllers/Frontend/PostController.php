@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\PostCategory;
 use App\Settings\PageSettings;
 use Awcodes\Curator\Models\Media;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -140,6 +141,14 @@ class PostController extends Controller
             return null;
         }
 
+        if ($settingValue instanceof Media) {
+            if (Str::startsWith($settingValue->path, ['http://', 'https://', '//'])) {
+                return $settingValue->path;
+            }
+
+            return $settingValue->url;
+        }
+
         if (is_string($settingValue) && str_starts_with($settingValue, '[') && str_ends_with($settingValue, ']')) {
             $decoded = json_decode($settingValue, true);
             if (is_array($decoded)) {
@@ -147,20 +156,35 @@ class PostController extends Controller
             }
         }
 
-        $id = is_array($settingValue) ? ($settingValue[0] ?? null) : $settingValue;
-        $media = is_numeric($id) ? Media::find((int) $id) : null;
+        $value = is_array($settingValue) ? ($settingValue[0] ?? null) : $settingValue;
 
-        return $media?->url ? url($media->url) : null;
+        if (is_numeric($value)) {
+            return $this->resolveMediaUrl(Media::find((int) $value));
+        }
+
+        if (! is_string($value) || blank($value)) {
+            return null;
+        }
+
+        if (Str::startsWith($value, ['http://', 'https://', '//'])) {
+            return $value;
+        }
+
+        return asset(ltrim($value, '/'));
     }
 
     public function detail(Post $post)
     {
         $post->load(['category', 'image', 'banner']);
         $pageSettings = app(PageSettings::class);
+        $postImageUrl = $this->resolveMediaUrl($post->image);
+        $postBannerUrl = $this->resolveMediaUrl($post->banner);
         
         // Lấy danh mục cha để làm menu (nếu cần)
-        $allCategories = PostCategory::select("name","id")->where('parent_id', 0)
-            ->orWhereNull('parent_id') // Handle cả trường hợp null cho chắc
+        $allCategories = PostCategory::select('name', 'id')
+            ->where(function ($query) {
+                $query->where('parent_id', 0)->orWhereNull('parent_id');
+            })
             ->where('status', 1)
             ->get();
 
@@ -172,14 +196,22 @@ class PostController extends Controller
             ->latest()
             ->take(6)
             ->get();
+
+        $relatedPostImageUrls = $relatedPosts->mapWithKeys(fn (Post $relatedPost) => [
+            $relatedPost->id => $this->resolveMediaUrl($relatedPost->image)
+                ?: $this->resolveMediaUrl($relatedPost->banner),
+        ]);
         
         $processedData = TocHelper::process($post->content);
         $contentHtml = $processedData['html'];
         $tocList = $processedData['toc'];
         return view('frontend.post.detail', compact(
             "post",
+            "postImageUrl",
+            "postBannerUrl",
             "allCategories",
             "relatedPosts",
+            "relatedPostImageUrls",
             "contentHtml",
             "tocList",
             "pageSettings",
