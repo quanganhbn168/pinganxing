@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contact;
-use App\Models\Setting;
 use App\Models\Branch;
+use App\Settings\GeneralSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ContactConfirmationToCustomer; 
@@ -49,15 +49,11 @@ class ContactController extends Controller
 
         // --- BẮT ĐẦU PHẦN GỬI EMAIL ---
         try {
-            // Lấy email của admin từ setting
-            // Chúng ta dùng cache để tối ưu, giống như trong Service Provider
-            $setting = cache()->rememberForever('global_setting', function () {
-                return Setting::first();
-            });
+            $adminEmail = app(GeneralSettings::class)->email;
 
             // Gửi email thông báo cho Admin (nếu setting có email)
-            if ($setting && $setting->email) {
-                Mail::to($setting->email)->send(new NewContactNotificationToAdmin($contact));
+            if (filled($adminEmail)) {
+                Mail::to($adminEmail)->send(new NewContactNotificationToAdmin($contact));
             }
 
             // Gửi email cảm ơn cho khách hàng (nếu họ có nhập email)
@@ -77,7 +73,7 @@ class ContactController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Contact $contact)
+    public function show()
     {
         $branches = Branch::where('status',1)->get();
         return view('frontend.contact',compact('branches'));

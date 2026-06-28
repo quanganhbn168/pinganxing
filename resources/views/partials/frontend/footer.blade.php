@@ -106,22 +106,30 @@
             <div>
                 <h3 class="font-extrabold text-yellow-brand mb-5">Thông tin liên hệ</h3>
                 <ul class="space-y-3 text-white/65 text-sm">
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-map-marker-alt mt-1 text-yellow-brand"></i>
-                        <span>{{ $setting->address ?? '123 Trần Phú, Ba Đình, Hà Nội' }}</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-phone-alt mt-1 text-yellow-brand"></i>
-                        <span>{{ $setting->phone_display ?? $setting->phone ?? '1900 1234' }}</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-envelope mt-1 text-yellow-brand"></i>
-                        <span>{{ $setting->email ?? 'info@vietjourney.vn' }}</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <i class="fas fa-clock mt-1 text-yellow-brand"></i>
-                        <span>{{ $setting->working_hours ?? '08:00 - 22:00' }}</span>
-                    </li>
+                    @if(filled($setting->address))
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-map-marker-alt mt-1 text-yellow-brand"></i>
+                            <span>{{ $setting->address }}</span>
+                        </li>
+                    @endif
+                    @if(filled($setting->phone_display) || filled($setting->phone))
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-phone-alt mt-1 text-yellow-brand"></i>
+                            <span>{{ $setting->phone_display ?: $setting->phone }}</span>
+                        </li>
+                    @endif
+                    @if(filled($setting->email))
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-envelope mt-1 text-yellow-brand"></i>
+                            <span>{{ $setting->email }}</span>
+                        </li>
+                    @endif
+                    @if(filled($setting->working_hours))
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-clock mt-1 text-yellow-brand"></i>
+                            <span>{{ $setting->working_hours }}</span>
+                        </li>
+                    @endif
                 </ul>
                 @if(!empty($setting->bct_link))
                 <div class="mt-4">

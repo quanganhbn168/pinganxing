@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@section('title', $setting->company_name ?? 'VietJourney')
+@section('title', $setting->company_name ?: ($setting->site_name ?: config('app.name')))
 @section('meta_description', $setting->meta_description ?? '')
 
 @section('content')
