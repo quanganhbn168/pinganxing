@@ -70,7 +70,7 @@ class ManageHomeSettings extends SettingsPage
                                                         'fas fa-lock'            => 'Khóa — An toàn',
                                                         'fas fa-rocket'          => 'Tên lửa — Khởi động',
                                                         'fas fa-users'           => 'Nhóm người — Đội ngũ',
-                                                        'fas fa-headset'         => 'Tai nghe — Hỗ trợ 24/7',
+                                                        'fas fa-headset'         => 'Tai nghe — Hỗ trợ',
                                                         'fas fa-award'           => 'Huy chương — Giải thưởng',
                                                         'fas fa-check-circle'    => 'Dấu tích — Đảm bảo',
                                                         'fas fa-globe'           => 'Quả cầu — Toàn cầu',
@@ -205,7 +205,7 @@ class ManageHomeSettings extends SettingsPage
                                             ->label('Mô tả')
                                             ->rows(2),
                                     ])->columns(2),
-                                Section::make('Khối Sản phẩm')
+                                Section::make('Khối Tour nổi bật')
                                     ->schema([
                                         TextInput::make('products_title')
                                             ->label('Tiêu đề'),

@@ -42,6 +42,12 @@ class IntroController extends Controller
 
         // Đối tác — lấy active, sắp xếp theo sort_order
         $partners = Partner::where('status', 1)
+            ->with('image')
+            ->whereHas('image', function ($query) {
+                $query->where('path', 'not like', '%placehold.co%')
+                    ->where('path', 'not like', '%picsum.photos%')
+                    ->where('path', 'not like', '%images.unsplash.com%');
+            })
             ->orderBy('sort_order')
             ->get();
 

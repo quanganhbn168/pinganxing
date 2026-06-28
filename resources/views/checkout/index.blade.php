@@ -96,15 +96,17 @@
                                 </span>
                             </label>
 
-                            <label class="group relative block cursor-pointer">
-                                <input type="radio" name="payment_method" value="bank_transfer" class="peer sr-only" {{ old('payment_method') === 'bank_transfer' ? 'checked' : '' }}>
-                                <span class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 text-sm font-semibold text-gray-700 transition-colors peer-checked:border-blue-300 peer-checked:bg-blue-50 peer-checked:text-blue-900 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300 dark:peer-checked:border-blue-800 dark:peer-checked:bg-blue-950 dark:peer-checked:text-blue-100">
-                                    <span class="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 transition-colors group-has-[:checked]:border-blue-700 dark:border-gray-600">
-                                        <span class="h-2.5 w-2.5 rounded-full bg-blue-700 opacity-0 transition-opacity group-has-[:checked]:opacity-100"></span>
+                            @if($bankTransferEnabled)
+                                <label class="group relative block cursor-pointer">
+                                    <input type="radio" name="payment_method" value="bank_transfer" class="peer sr-only" {{ old('payment_method') === 'bank_transfer' ? 'checked' : '' }}>
+                                    <span class="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 text-sm font-semibold text-gray-700 transition-colors peer-checked:border-blue-300 peer-checked:bg-blue-50 peer-checked:text-blue-900 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-300 dark:peer-checked:border-blue-800 dark:peer-checked:bg-blue-950 dark:peer-checked:text-blue-100">
+                                        <span class="flex h-5 w-5 items-center justify-center rounded-full border border-gray-300 transition-colors group-has-[:checked]:border-blue-700 dark:border-gray-600">
+                                            <span class="h-2.5 w-2.5 rounded-full bg-blue-700 opacity-0 transition-opacity group-has-[:checked]:opacity-100"></span>
+                                        </span>
+                                        <span>Chuyển khoản ngân hàng (VietQR)</span>
                                     </span>
-                                    <span>Chuyển khoản ngân hàng (VietQR)</span>
-                                </span>
-                            </label>
+                                </label>
+                            @endif
                         </div>
                     </div>
 

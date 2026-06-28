@@ -11,7 +11,7 @@
             ->when($mainProject, fn($items) => $items->where('id', '!=', $mainProject->id))
             ->take(3)
             ->values();
-        $mainProjectImage = $mainProject?->image?->url ?? 'https://placehold.co/900x520/0b3762/ffffff?text=Ping+An+Xing';
+        $mainProjectImage = $mainProject?->image?->url ?? asset('images/setting/no-image.png');
     @endphp
 
     <x-frontend.leaderboard
@@ -86,7 +86,7 @@
                         @foreach ($topProjects as $project)
                             @php
                                 $projectImage =
-                                    $project->image?->url ?? 'https://placehold.co/360x240/eaf4fb/0e4a86?text=Project';
+                                    $project->image?->url ?? asset('images/setting/no-image.png');
                             @endphp
                             <article class="project-top-card">
                                 <a href="{{ $project->slug_url }}" class="project-top-image">
@@ -128,7 +128,7 @@
                         @forelse($projects as $project)
                             @php
                                 $projectImage =
-                                    $project->image?->url ?? 'https://placehold.co/360x220/eaf4fb/0e4a86?text=Project';
+                                    $project->image?->url ?? asset('images/setting/no-image.png');
                             @endphp
                             <article class="project-list-card">
                                 <a href="{{ $project->slug_url }}" class="project-list-image">
@@ -175,7 +175,7 @@
                                 @php
                                     $projectImage =
                                         $project->image?->url ??
-                                        'https://placehold.co/140x110/eaf4fb/0e4a86?text=Project';
+                                        asset('images/setting/no-image.png');
                                 @endphp
                                 <a href="{{ $project->slug_url }}">
                                     <img src="{{ $projectImage }}" alt="{{ $project->name }}" loading="lazy"

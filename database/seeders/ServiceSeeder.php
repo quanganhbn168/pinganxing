@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Service;
 use App\Models\ServiceCategory;
-use Awcodes\Curator\Models\Media;
 use Illuminate\Support\Str;
 
 class ServiceSeeder extends Seeder
@@ -26,20 +25,6 @@ class ServiceSeeder extends Seeder
             ['name' => 'Kịch bản Gala Dinner & Team Building Doanh Nghiệp', 'category' => 'Team Building'],
         ];
 
-        // Dùng 1 ảnh minh họa chung
-        $media = Media::firstOrCreate(
-            ['name' => 'dummy-service-image'],
-            [
-                'disk' => 'public',
-                'directory' => 'media',
-                'visibility' => 'public',
-                'path' => 'https://picsum.photos/1280/720',
-                'type' => 'image/jpeg',
-                'ext' => 'jpg',
-                'alt' => 'Service image',
-            ]
-        );
-
         foreach ($services as $srvData) {
             $cat = ServiceCategory::where('name', $srvData['category'])->first();
             if ($cat) {
@@ -47,7 +32,6 @@ class ServiceSeeder extends Seeder
                 $service = Service::create([
                     'service_category_id' => $cat->id,
                     'name' => $srvData['name'],
-                    'image_id' => $media->id,
                     'is_home' => true,
                     'status' => true,
                     'description' => 'Mô tả ngắn gọn cho dịch vụ ' . $srvData['name'],

@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Models\Order; 
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -33,6 +34,7 @@ class CheckoutController extends Controller
         }
         return view('checkout.index', [
             'cartItems'  => $cartItems,
+            'bankTransferEnabled' => $this->bankTransferEnabled(),
         ]);
     }
     /**
@@ -44,7 +46,7 @@ class CheckoutController extends Controller
             'customer_name'    => 'required|string|max:255',
             'customer_phone'   => 'required|string|max:15',
             'customer_address' => 'required|string|max:255',
-            'payment_method'   => 'required|in:cod,bank_transfer',
+            'payment_method'   => ['required', Rule::in($this->bankTransferEnabled() ? ['cod', 'bank_transfer'] : ['cod'])],
             'note'             => 'nullable|string',
             'cart_data'        => 'nullable|json', 
         ]);
@@ -116,5 +118,11 @@ class CheckoutController extends Controller
                 'variant_text' => $variantText,
             ];
         })->filter()->values()->toArray();
+    }
+
+    private function bankTransferEnabled(): bool
+    {
+        return collect(['bank_id', 'account_no', 'account_name'])
+            ->every(fn (string $key): bool => filled(config("vietqr.{$key}")));
     }
 }

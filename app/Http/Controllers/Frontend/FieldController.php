@@ -131,7 +131,7 @@ class FieldController extends Controller
                 ['title' => 'Ký kết & Chuẩn bị', 'description' => 'Thống nhất phương án, kế hoạch triển khai.', 'icon' => 'fas fa-file-signature'],
                 ['title' => 'Triển khai & Đào tạo', 'description' => 'Cài đặt, cấu hình và đào tạo đội ngũ sử dụng.', 'icon' => 'fas fa-chalkboard-user'],
                 ['title' => 'Chạy thử & Nghiệm thu', 'description' => 'Kiểm thử, tối ưu và nghiệm thu giải pháp.', 'icon' => 'fas fa-circle-check'],
-                ['title' => 'Vận hành & Hỗ trợ', 'description' => 'Đồng hành, hỗ trợ 24/7 và phát triển lâu dài.', 'icon' => 'fas fa-headset'],
+                ['title' => 'Vận hành & Hỗ trợ', 'description' => 'Đồng hành, hỗ trợ trong quá trình vận hành và phát triển lâu dài.', 'icon' => 'fas fa-headset'],
             ]);
         }
 
@@ -205,7 +205,7 @@ class FieldController extends Controller
 
         $storyField = $showcaseFields->first();
         $storyFieldCard = $storyField ? $this->fieldCard($storyField, $featuredFieldCategory) : null;
-        $showcaseImage = $featuredFieldCategory?->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Ping+An+Xing';
+        $showcaseImage = $featuredFieldCategory?->image?->url ?: asset('images/setting/no-image.png');
         $showcaseDescription = Str::limit(strip_tags((string) ($featuredFieldCategory?->solution_overview ?: $featuredFieldCategory?->description ?: $featuredFieldCategory?->content ?: $overviewDescription)), 280);
 
         return view('frontend.fields.index', compact(
@@ -266,7 +266,7 @@ class FieldController extends Controller
         ];
 
         $showcaseImage = $fieldCategory->banner?->url
-            ?: ($fieldCategory->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Ping+An+Xing');
+            ?: ($fieldCategory->image?->url ?: asset('images/setting/no-image.png'));
         $showcaseDescription = Str::limit(strip_tags((string) ($fieldCategory->solution_overview ?: $fieldCategory->description ?: $fieldCategory->content)), 340);
 
         $businessChallenges = $this->landingItems($fieldCategory->business_challenges);
@@ -370,7 +370,7 @@ class FieldController extends Controller
     {
         return [
             'url' => $category->slug_url,
-            'image' => $category->image?->url ?: 'https://placehold.co/720x720/eaf4fb/0e4a86?text=Industry',
+            'image' => $category->image?->url ?: asset('images/setting/no-image.png'),
             'title' => $category->name,
             'description' => Str::limit(strip_tags((string) ($category->description ?: $category->content)), 110),
             'delay' => min($index * 80, 320),
@@ -383,7 +383,7 @@ class FieldController extends Controller
 
         return [
             'url' => $field->slug_url,
-            'image' => $field->image?->url ?: ($category?->image?->url ?? 'https://placehold.co/420x420/eaf4fb/0e4a86?text=Ping+An+Xing'),
+            'image' => $field->image?->url ?: ($category?->image?->url ?? asset('images/setting/no-image.png')),
             'title' => $field->name,
             'badge' => $category?->name ?? 'Lĩnh vực',
         ];
@@ -394,7 +394,7 @@ class FieldController extends Controller
         return collect($projects)
             ->map(fn (Project $project) => [
                 'url' => $project->slug_url,
-                'image' => $project->image?->url ?: 'https://placehold.co/520x360/eaf4fb/0e4a86?text=Project',
+                'image' => $project->image?->url ?: asset('images/setting/no-image.png'),
                 'title' => $project->name,
                 'badge' => $project->category?->name ?? 'Dự án',
                 'description' => Str::limit(strip_tags((string) $project->description), 90),
@@ -461,7 +461,7 @@ class FieldController extends Controller
         return collect($products)
             ->map(fn (Product $product) => [
                 'url' => $product->slug_url,
-                'image' => $product->image?->url ?: 'https://placehold.co/520x360/eaf4fb/0e4a86?text=Product',
+                'image' => $product->image?->url ?: asset('images/setting/no-image.png'),
                 'title' => $product->name,
                 'badge' => $product->category?->name ?? 'Sản phẩm',
                 'description' => Str::limit(strip_tags((string) $product->description), 90),

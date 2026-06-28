@@ -579,7 +579,7 @@
     $feedTitle = $keyword !== ''
         ? 'Kết quả tìm kiếm'
         : ($activeCategoryModel ? $activeCategoryModel->name : 'Tất cả bài viết');
-    $placeholderImage = 'https://placehold.co/720x460/eaf4fb/0e4a86?text=Ping+An+Xing';
+    $placeholderImage = asset('images/setting/no-image.png');
 @endphp
 
 <x-frontend.leaderboard

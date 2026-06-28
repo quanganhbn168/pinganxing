@@ -10,4 +10,4 @@ Disallow: /user
 Disallow: /tim-kiem
 Disallow: /san-pham/tim-kiem
 
-Sitemap: https://cnetpos.vn/sitemap.xml
+Sitemap: https://pinganxing.test/sitemap.xml

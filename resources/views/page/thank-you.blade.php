@@ -3,23 +3,16 @@
 @section('title', $order ? 'Đặt hàng thành công' : 'Cảm ơn bạn đã liên hệ')
 @section('meta_robots', 'noindex, nofollow')
 
-@push('conversion_script')
-    <script>
-        if (typeof gtag === 'function') {
-            gtag('event', 'conversion', {'send_to': 'AW-833638621/dioGCP6HwZIYEN2hwY0D'});
-        }
-    </script>
-@endpush
-
 @section('content')
 @php
     $isBankTransfer = $order?->payment_method === 'bank_transfer';
+    $bankId = config('vietqr.bank_id');
+    $accountNo = config('vietqr.account_no');
+    $accountName = config('vietqr.account_name');
+    $hasBankConfig = filled($bankId) && filled($accountNo) && filled($accountName);
     $qrCodeUrl = null;
 
-    if ($isBankTransfer) {
-        $bankId = '970436';
-        $accountNo = '105867163975';
-        $accountName = 'TRAN QUANG ANH';
+    if ($isBankTransfer && $hasBankConfig) {
         $amount = (float) $order->total_price;
         $note = 'PING AN XING ' . $order->code;
         $qrCodeUrl = "https://api.vietqr.io/image/{$bankId}-{$accountNo}-print.png?amount={$amount}&addInfo=" . urlencode($note) . '&accountName=' . urlencode($accountName);

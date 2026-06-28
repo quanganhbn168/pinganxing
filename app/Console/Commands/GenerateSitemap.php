@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Category;
-use App\Models\FieldCategory;
 use App\Models\Page;
-use App\Models\Field;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Product;
@@ -14,6 +12,8 @@ use App\Models\ProjectCategory;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Slug;
+use App\Models\Tour;
+use App\Models\TourCategory;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Sitemap\Sitemap;
@@ -30,9 +30,11 @@ class GenerateSitemap extends Command
         $sitemap = Sitemap::create();
 
         $this->addStaticPages($sitemap);
+        $this->addTours($sitemap);
         $this->addDynamicSlugs($sitemap);
 
         $sitemap->writeToFile(public_path('sitemap.xml'));
+        $this->updateRobotsSitemapUrl();
 
         $this->info('Sitemap generated successfully.');
 
@@ -44,9 +46,8 @@ class GenerateSitemap extends Command
         $pages = [
             ['url' => route('home'), 'priority' => 1.0],
             ['url' => route('frontend.posts.index'), 'priority' => 0.9],
-            ['url' => route('products.index'), 'priority' => 0.9],
+            ['url' => route('frontend.tours.index'), 'priority' => 0.9],
             ['url' => route('frontend.services.index'), 'priority' => 0.8],
-            ['url' => route('frontend.fields.index'), 'priority' => 0.8],
             ['url' => route('frontend.projects.index'), 'priority' => 0.8],
             ['url' => route('frontend.intro.index'), 'priority' => 0.5],
             ['url' => route('frontend.careers.index'), 'priority' => 0.5],
@@ -62,6 +63,51 @@ class GenerateSitemap extends Command
                     ->setChangeFrequency(Url::CHANGE_FREQUENCY_DAILY)
             );
         }
+    }
+
+    protected function addTours(Sitemap $sitemap): void
+    {
+        TourCategory::query()
+            ->where('status', 1)
+            ->whereNotNull('slug')
+            ->get()
+            ->each(function (TourCategory $category) use ($sitemap) {
+                $sitemap->add(
+                    Url::create(route('frontend.tours.category', ['slug' => $category->slug_value]))
+                        ->setLastModificationDate($category->updated_at)
+                        ->setPriority(0.8)
+                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                );
+            });
+
+        Tour::query()
+            ->where('status', 1)
+            ->whereNotNull('slug')
+            ->with('category')
+            ->get()
+            ->filter(fn (Tour $tour) => $tour->category?->status && filled($tour->category?->slug_value))
+            ->each(function (Tour $tour) use ($sitemap) {
+                $sitemap->add(
+                    Url::create(route('frontend.tours.show', [
+                        'categorySlug' => $tour->category->slug_value,
+                        'slug' => $tour->slug_value,
+                    ]))
+                        ->setLastModificationDate($tour->updated_at)
+                        ->setPriority(0.8)
+                        ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                );
+            });
+    }
+
+    protected function updateRobotsSitemapUrl(): void
+    {
+        $path = public_path('robots.txt');
+        $content = file_exists($path) ? file_get_contents($path) : "User-agent: *\nAllow: /\n";
+        $content = preg_replace('/^Sitemap:.*$/mi', '', $content);
+        $content = rtrim((string) $content) . PHP_EOL . PHP_EOL
+            . 'Sitemap: ' . url('/sitemap.xml') . PHP_EOL;
+
+        file_put_contents($path, $content);
     }
 
     protected function addDynamicSlugs(Sitemap $sitemap): void
@@ -109,8 +155,6 @@ class GenerateSitemap extends Command
             $model instanceof Product => route('frontend.product.bySlug', $slug),
             $model instanceof ServiceCategory => route('frontend.service-category.bySlug', $slug),
             $model instanceof Service => route('frontend.service.bySlug', $slug),
-            $model instanceof FieldCategory => route('frontend.field-category.bySlug', $slug),
-            $model instanceof Field => route('frontend.field.bySlug', $slug),
             $model instanceof ProjectCategory => route('frontend.project-category.bySlug', $slug),
             $model instanceof Project => route('frontend.project.bySlug', $slug),
 
@@ -125,8 +169,6 @@ class GenerateSitemap extends Command
             $model instanceof Product => 0.8,
             $model instanceof ServiceCategory => 0.8,
             $model instanceof Service => 0.8,
-            $model instanceof FieldCategory => 0.8,
-            $model instanceof Field => 0.8,
             $model instanceof PostCategory => 0.7,
             $model instanceof Post => 0.7,
             $model instanceof ProjectCategory => 0.7,
@@ -143,8 +185,6 @@ class GenerateSitemap extends Command
             $model instanceof Product => Url::CHANGE_FREQUENCY_WEEKLY,
             $model instanceof ServiceCategory => Url::CHANGE_FREQUENCY_WEEKLY,
             $model instanceof Service => Url::CHANGE_FREQUENCY_WEEKLY,
-            $model instanceof FieldCategory => Url::CHANGE_FREQUENCY_WEEKLY,
-            $model instanceof Field => Url::CHANGE_FREQUENCY_WEEKLY,
             $model instanceof PostCategory => Url::CHANGE_FREQUENCY_WEEKLY,
             $model instanceof Post => Url::CHANGE_FREQUENCY_WEEKLY,
             $model instanceof ProjectCategory => Url::CHANGE_FREQUENCY_MONTHLY,

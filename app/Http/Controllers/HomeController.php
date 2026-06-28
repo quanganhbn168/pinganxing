@@ -18,30 +18,31 @@ use App\Models\Career;
 use App\Models\ProjectCategory;
 use App\Models\Partner;
 use App\Models\Brand;
+use App\Models\TourCategory;
 use App\Settings\GeneralSettings;
 use App\Settings\HomeSettings;
-use App\Services\SearchService;
 
 class HomeController extends Controller
 {
-    protected $searchService;
-
-    public function __construct(SearchService $searchService)
-    {
-        $this->searchService = $searchService;
-    }
     public function index()
     {
         $slides = Slide::where("status", 1)->with('image')->orderBy('position')->get();
         
         $homeProducts = \App\Models\Tour::where("status", 1)->where("is_home", 1)
-            ->with(['image', 'category'])
+            ->with(['image', 'category.image', 'tags'])
             ->get();
             
         $homeCategories = \App\Models\TourCategory::where("status", 1)->where("is_home", 1)
             ->with('image')
             ->orderBy('position')
             ->get();
+
+        $destinationCategories = TourCategory::query()
+            ->where('status', 1)
+            ->whereHas('tours', fn ($query) => $query->where('status', 1))
+            ->orderBy('position')
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug']);
             
         $homeServicesCategories = ServiceCategory::where("status", 1)
             ->where("is_home", 1)
@@ -93,6 +94,7 @@ class HomeController extends Controller
             "allPosts",
             "homeProducts",
             "homeCategories",
+            "destinationCategories",
             "homeServicesCategories",
             "homeProjectCategories",
             "homeFields",
@@ -130,11 +132,23 @@ class HomeController extends Controller
 
     public function postSearch(Request $request)
     {
-        $results = $this->searchService->search($request->all());
+        $destination = trim((string) $request->input('destination'));
 
-        return view('frontend.products.search_results', [
-            'results' => $results['products'] ?? collect(),
-            'keyword' => $request->input('destination', '')
-        ]);
+        if ($destination === '') {
+            return redirect()->route('frontend.tours.index');
+        }
+
+        $category = TourCategory::query()
+            ->where('status', 1)
+            ->whereHas('tours', fn ($query) => $query->where('status', 1))
+            ->where(function ($query) use ($destination) {
+                $query->where('slug', $destination)
+                    ->orWhere('name', $destination);
+            })
+            ->first();
+
+        return $category
+            ? redirect()->route('frontend.tours.category', ['slug' => $category->slug_value])
+            : redirect()->route('frontend.tours.index');
     }
 }

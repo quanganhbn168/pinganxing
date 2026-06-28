@@ -17,8 +17,6 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             ServiceSeeder::class,
             SlideSeeder::class,
-            TestimonialSeeder::class,
-            PartnerSeeder::class,
         ]);
     }
 }

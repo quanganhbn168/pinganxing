@@ -69,15 +69,17 @@
             </nav>
 
             <div class="hidden lg:flex items-center gap-5">
-                <a href="tel:{{ preg_replace('/\s+/', '', $setting->phone ?? '19001234') }}" class="site-header__phone flex items-center gap-3 group">
+                @if(filled($setting->phone))
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $setting->phone) }}" class="site-header__phone flex items-center gap-3 group">
                     <div class="site-header__phone-icon w-10 h-10 rounded-full grid place-items-center transition">
                         <i class="fas fa-phone-alt"></i>
                     </div>
                     <div class="leading-tight">
-                        <div class="font-bold">{{ $setting->phone_display ?? $setting->phone ?? '1900 1234' }}</div>
-                        <div class="site-header__phone-subtitle text-xs">Hỗ trợ 24/7</div>
+                        <div class="font-bold">{{ $setting->phone_display ?: $setting->phone }}</div>
+                        <div class="site-header__phone-subtitle text-xs">{{ $setting->working_hours ?: 'Hỗ trợ tư vấn' }}</div>
                     </div>
                 </a>
+                @endif
 
                 <a href="#booking" class="site-header__cta px-6 py-3 rounded-xl bg-yellow-brand text-slate-900 font-bold hover:bg-amber-300 transition shadow-lg shadow-yellow-brand/20">
                     Đặt tour ngay

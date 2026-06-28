@@ -3,10 +3,16 @@
     <div class="swiper-wrapper h-full">
         @if(isset($slides) && $slides->count())
             @foreach($slides as $slide)
+            @php
+                $slideImagePath = trim((string) ($slide->image?->path ?? ''));
+                $slideImageUrl = $slideImagePath !== '' && ! preg_match('~(?:picsum\.photos|placehold\.co|images\.unsplash\.com)~i', $slideImagePath)
+                    ? (filter_var($slideImagePath, FILTER_VALIDATE_URL) ? $slideImagePath : $slide->image->url)
+                    : asset('images/setting/cover01.jpg');
+            @endphp
             <div class="swiper-slide relative h-full">
                 <!-- Background Image & Overlay -->
                 <div class="absolute inset-0 z-0">
-                    <img src="{{ $slide->image?->url ?? 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2200&auto=format&fit=crop' }}" alt="{{ $slide->title }}" class="w-full h-full object-cover" />
+                    <img src="{{ $slideImageUrl }}" alt="{{ $slide->title }}" class="w-full h-full object-cover" />
                     <div class="absolute inset-0 bg-gradient-to-r from-dark-primary/95 via-dark-primary/60 to-black/30"></div>
                 </div>
 
@@ -56,7 +62,7 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="w-8 h-8 rounded-full bg-yellow-brand/20 text-yellow-brand grid place-items-center"><i class="fas fa-check"></i></span>
-                                    Hỗ trợ 24/7
+                                    Hỗ trợ tận tâm
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="w-8 h-8 rounded-full bg-yellow-brand/20 text-yellow-brand grid place-items-center"><i class="fas fa-check"></i></span>

@@ -75,9 +75,9 @@
 		
 					<div class="social-share">
 						<span class="social-share_label">Chia sẻ:</span>
-						<a href="#" class="social-share_item facebook" title="Chia sẻ Facebook"><i class="fab fa-facebook-f"></i></a>
-						<a href="#" class="social-share_item twitter" title="Chia sẻ Twitter"><i class="fab fa-twitter"></i></a>
-						<a href="#" class="social-share_item linkedin" title="Chia sẻ LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+						<a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" rel="noopener noreferrer" class="social-share_item facebook" title="Chia sẻ Facebook"><i class="fab fa-facebook-f"></i></a>
+						<a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($service->name) }}" target="_blank" rel="noopener noreferrer" class="social-share_item twitter" title="Chia sẻ Twitter"><i class="fab fa-twitter"></i></a>
+						<a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(request()->url()) }}&title={{ urlencode($service->name) }}" target="_blank" rel="noopener noreferrer" class="social-share_item linkedin" title="Chia sẻ LinkedIn"><i class="fab fa-linkedin-in"></i></a>
 					</div>
 
 				</div>

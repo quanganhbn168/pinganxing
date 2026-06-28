@@ -17,10 +17,9 @@
                         <label>Bạn muốn đi đâu?</label>
                         <select name="destination">
                             <option value="">Chọn điểm đến</option>
-                            <option value="Hạ Long">Hạ Long</option>
-                            <option value="Đà Nẵng">Đà Nẵng</option>
-                            <option value="Phú Quốc">Phú Quốc</option>
-                            <option value="Sapa">Sapa</option>
+                            @foreach($destinationCategories as $destination)
+                                <option value="{{ $destination->slug_value }}">{{ $destination->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -66,19 +65,25 @@
                     Dịch vụ của chúng tôi
                 </div>
                 <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900 max-w-xl" style="font-family: 'Playfair Display', serif;">
-                    Chúng tôi mang đến cho bạn trải nghiệm trọn vẹn
+                    {{ $homeSettings->services_title ?: 'Chúng tôi mang đến cho bạn trải nghiệm trọn vẹn' }}
                 </h2>
+                @if(filled($homeSettings->services_description))
+                    <p class="mt-3 max-w-2xl text-slate-500">{{ $homeSettings->services_description }}</p>
+                @endif
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-6 gap-5">
                 @php
                     $bgColors = ['bg-teal-50', 'bg-sky-50', 'bg-violet-50', 'bg-emerald-50', 'bg-orange-50', 'bg-fuchsia-50'];
-                    $icons = ['fa-suitcase-rolling text-teal-600', 'fa-plane text-sky-600', 'fa-hotel text-violet-600', 'fa-passport text-emerald-600', 'fa-car text-orange-600', 'fa-users text-fuchsia-600'];
                 @endphp
                 @foreach($homeServicesCategories->take(6) as $index => $service)
                     <a href="{{ $service->slug_url ?? '#' }}" class="service-card rounded-2xl p-6 min-h-[180px] {{ $bgColors[$index % 6] }} block" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
-                        <div class="text-4xl mb-5">
-                            <i class="fas {{ $icons[$index % 6] }}"></i>
+                        <div class="h-12 mb-5 flex items-center">
+                            @if($service->image)
+                                <img src="{{ $service->image->url }}" alt="" class="h-11 w-11 object-contain" aria-hidden="true">
+                            @else
+                                <i class="fas fa-concierge-bell text-4xl text-primary"></i>
+                            @endif
                         </div>
                         <h3 class="font-extrabold text-slate-900 mb-2">{{ $service->name }}</h3>
                         <p class="text-sm text-slate-500 leading-6">{{ Str::limit(strip_tags($service->description ?? $service->content), 60) }}</p>
@@ -102,7 +107,7 @@
                         Tour nổi bật
                     </div>
                     <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900" style="font-family: 'Playfair Display', serif;">
-                        Những hành trình được yêu thích nhất
+                        {{ $homeSettings->products_title ?: 'Những hành trình được yêu thích nhất' }}
                     </h2>
                 </div>
                 <div class="hidden md:flex items-center gap-3">
@@ -131,7 +136,7 @@
             </div>
             
             <div class="mt-4 text-center md:hidden">
-                <a href="{{ route('products.index') ?? '#' }}" class="inline-flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 px-6 py-3 rounded-full">
+                <a href="{{ route('frontend.tours.index') }}" class="inline-flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 px-6 py-3 rounded-full">
                     Xem tất cả <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -142,51 +147,60 @@
     <!-- Why Choose -->
     <section id="about" class="py-16">
         <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            @php
+                $aboutCounters = collect($homeSettings->counters ?? [])
+                    ->filter(fn ($counter) => filled($counter['value'] ?? null) && filled($counter['label'] ?? null))
+                    ->take(6)
+                    ->values();
+                $counterIcons = [
+                    'clock' => 'fa-clock',
+                    'check-circle' => 'fa-check-circle',
+                    'users' => 'fa-users',
+                    'briefcase' => 'fa-briefcase',
+                    'building-office' => 'fa-building',
+                    'globe-alt' => 'fa-globe-asia',
+                    'trophy' => 'fa-trophy',
+                    'star' => 'fa-star',
+                    'heart' => 'fa-heart',
+                    'rocket-launch' => 'fa-rocket',
+                ];
+                $counterStyles = [
+                    'blue' => 'bg-blue-50 text-blue-700',
+                    'emerald' => 'bg-emerald-50 text-emerald-700',
+                    'amber' => 'bg-amber-50 text-amber-700',
+                    'violet' => 'bg-violet-50 text-violet-700',
+                    'rose' => 'bg-rose-50 text-rose-700',
+                    'cyan' => 'bg-cyan-50 text-cyan-700',
+                    'orange' => 'bg-orange-50 text-orange-700',
+                ];
+            @endphp
             <div class="grid lg:grid-cols-4 gap-5">
-                <div class="lg:row-span-2 bg-slate-50 rounded-3xl p-8 md:p-10" data-aos="fade-right">
+                <div class="{{ $aboutCounters->isEmpty() ? 'lg:col-span-4' : 'lg:col-span-2' }} bg-slate-50 rounded-3xl p-8 md:p-10" data-aos="fade-right">
                     <div class="text-xs uppercase tracking-[0.2em] font-extrabold text-yellow-brand mb-4">
-                        Vì sao chọn {{ $setting->company_name ?? config('app.name') }}?
+                        Vì sao chọn {{ $setting->site_name ?: config('app.name') }}?
                     </div>
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-5 leading-tight" style="font-family: 'Playfair Display', serif;">
-                        Uy tín tạo nên thương hiệu
+                        {{ $homeSettings->intro_title ?: 'Uy tín tạo nên thương hiệu' }}
                     </h2>
-                    <p class="text-slate-500 leading-7">
-                        Với hơn 15 năm kinh nghiệm, chúng tôi cam kết mang đến hành trình chân thực, an toàn và đáng nhớ nhất cho mỗi khách hàng.
-                    </p>
+                    <div class="text-slate-500 leading-7">
+                        {!! $homeSettings->intro_description ?: 'Chúng tôi cam kết mang đến những hành trình rõ ràng, an toàn và đáng nhớ cho mỗi khách hàng.' !!}
+                    </div>
                     <a href="{{ route('frontend.intro.index') ?? '#' }}" class="inline-flex items-center gap-2 mt-8 px-6 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-dark-primary transition shadow-lg shadow-primary/30">
                         Tìm hiểu thêm <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
-                <div class="bg-primary text-white rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up">
-                    <div class="text-4xl md:text-5xl font-extrabold mb-2">15+</div>
-                    <p class="text-white/80 text-sm font-medium">Năm kinh nghiệm trong lĩnh vực du lịch</p>
-                </div>
-
-                <div class="bg-orange-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="50">
-                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">10K+</div>
-                    <p class="text-slate-600 text-sm font-medium">Khách hàng tin tưởng</p>
-                </div>
-
-                <div class="bg-teal-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="100">
-                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">98%</div>
-                    <p class="text-slate-600 text-sm font-medium">Khách hàng hài lòng</p>
-                </div>
-
-                <div class="bg-teal-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up">
-                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">100+</div>
-                    <p class="text-slate-600 text-sm font-medium">Điểm đến hấp dẫn trong và ngoài nước</p>
-                </div>
-
-                <div class="bg-slate-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center border border-slate-100" data-aos="fade-up" data-aos-delay="50">
-                    <div class="text-4xl mb-3 text-primary"><i class="fas fa-user-tie"></i></div>
-                    <p class="font-bold text-slate-900">Đội ngũ HDV chuyên nghiệp</p>
-                </div>
-
-                <div class="bg-yellow-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="100">
-                    <div class="text-4xl mb-3 text-yellow-brand"><i class="fas fa-headset"></i></div>
-                    <p class="font-bold text-slate-900">Hỗ trợ 24/7 mọi lúc mọi nơi</p>
-                </div>
+                @foreach($aboutCounters as $counter)
+                    @php
+                        $counterStyle = $counterStyles[$counter['color'] ?? 'blue'] ?? $counterStyles['blue'];
+                        $counterIcon = $counterIcons[$counter['icon'] ?? 'star'] ?? 'fa-star';
+                    @endphp
+                    <div class="{{ $counterStyle }} rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
+                        <div class="text-2xl mb-3"><i class="fas {{ $counterIcon }}"></i></div>
+                        <div class="text-4xl md:text-5xl font-extrabold mb-2">{{ $counter['value'] }}</div>
+                        <p class="text-sm font-medium opacity-80">{{ $counter['label'] }}</p>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
@@ -244,36 +258,42 @@
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 @foreach($homeCategories->take(8) as $category)
                     <a href="{{ $category->slug_url ?? '#' }}" class="destination-card relative h-36 md:h-40 rounded-2xl overflow-hidden group block" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                        <img src="{{ $category->image?->url ?? 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=400&auto=format&fit=crop' }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
+                        <img src="{{ $category->image?->url ?? asset('images/setting/no-image.png') }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
                         <div class="absolute left-3 bottom-3 right-3 text-white font-extrabold text-sm leading-tight text-shadow-sm">{{ $category->name }}</div>
                     </a>
                 @endforeach
             </div>
 
+            @php
+                $homeVideoUrl = $homeSettings->video_file ?: $homeSettings->video_url;
+                $homeVideoPoster = $homeSettings->intro_image ?: asset('images/setting/cover02.jpg');
+            @endphp
+            @if($homeVideoUrl)
             <!-- Video -->
             <div class="home-video-showcase mt-12" data-aos="fade-up">
-                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" class="home-video-bg" alt="{{ config('app.name') }} Video">
+                <img src="{{ $homeVideoPoster }}" class="home-video-bg" alt="Video giới thiệu {{ $setting->site_name ?: config('app.name') }}">
                 <div class="home-video-color"></div>
                 <div class="home-video-shade"></div>
                 
                 <div class="home-video-content">
-                    <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="glightbox-video home-video-play" aria-label="Xem video giới thiệu">
+                    <a href="{{ $homeVideoUrl }}" data-fancybox class="glightbox-video home-video-play" aria-label="Xem video giới thiệu">
                         <i class="fas fa-play"></i>
                     </a>
                     <div class="home-video-copy">
                         <div class="home-video-eyebrow">
-                            {{ config('app.name') }} - Hơn cả một chuyến đi
+                            {{ $setting->site_name ?: config('app.name') }} - Hơn cả một chuyến đi
                         </div>
                         <h3>
-                            Cảm nhận vẻ đẹp Việt Nam qua từng thước phim
+                            {{ $homeSettings->video_title ?: 'Video giới thiệu' }}
                         </h3>
-                        <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="home-video-link">
+                        <a href="{{ $homeVideoUrl }}" data-fancybox class="home-video-link">
                             Xem video giới thiệu <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </section>
     @endif
@@ -329,7 +349,7 @@
                         Tin tức du lịch
                     </div>
                     <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900" style="font-family: 'Playfair Display', serif;">
-                        Cẩm nang & Kinh nghiệm
+                        {{ $homeSettings->posts_title ?: 'Cẩm nang & Kinh nghiệm' }}
                     </h2>
                 </div>
                 <a href="{{ route('frontend.posts.index') ?? '#' }}" class="hidden md:flex items-center gap-2 text-primary font-bold text-sm hover:text-dark-primary transition">
@@ -342,7 +362,7 @@
                     <article class="group cursor-pointer" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <a href="{{ $post->slug_url ?? '#' }}" class="block">
                             <div class="relative h-60 rounded-2xl overflow-hidden mb-6 shadow-md">
-                                <img src="{{ $post->image?->url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=900&auto=format&fit=crop' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $post->title }}">
+                                <img src="{{ $post->image?->url ?? asset('images/setting/no-image.png') }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $post->title }}">
                                 @if($post->category)
                                     <span class="absolute top-4 left-4 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-primary text-xs font-black uppercase tracking-wide shadow-sm">{{ $post->category->name }}</span>
                                 @endif
@@ -395,7 +415,7 @@
 
     <!-- CTA -->
     <section class="relative bg-primary rounded-t-[2.5rem] overflow-hidden mt-16 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]" data-aos="fade-up">
-        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1800&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" alt="CTA Background">
+        <img src="{{ asset('images/setting/cover03.jpg') }}" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40" alt="">
         <div class="absolute inset-0 bg-gradient-to-r from-dark-primary/95 to-primary/60"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-14 lg:py-20 flex flex-col md:flex-row md:items-center justify-between gap-8 text-white">
             <div class="max-w-2xl">
@@ -403,7 +423,7 @@
                     Bạn chưa biết nên đi đâu?
                 </h2>
                 <p class="text-white/80 text-lg md:text-xl">
-                    Để {{ config('app.name') }} tư vấn cho bạn! Nhận tư vấn miễn phí – Lên lịch trình theo yêu cầu.
+                    Để {{ $setting->site_name ?: config('app.name') }} tư vấn cho bạn! Nhận tư vấn miễn phí – Lên lịch trình theo yêu cầu.
                 </p>
             </div>
             <div class="shrink-0">

@@ -443,11 +443,13 @@
                             class="block w-full py-4 bg-primary text-white text-center font-bold text-lg rounded-xl shadow-lg shadow-primary/30 hover:bg-dark-primary transition-colors mb-4">
                             <i class="fas fa-paper-plane mr-2"></i> Yêu cầu tư vấn
                         </a>
-                        <a href="tel:{{ $setting->phone ?? '19001234' }}"
-                            class="block w-full py-3.5 bg-slate-50 text-slate-700 text-center font-bold border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors">
-                            <i class="fas fa-phone-alt text-primary mr-2"></i> Gọi tư vấn:
-                            {{ $setting->phone ?? '1900 1234' }}
-                        </a>
+                        @if(filled($setting->phone))
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $setting->phone) }}"
+                                class="block w-full py-3.5 bg-slate-50 text-slate-700 text-center font-bold border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors">
+                                <i class="fas fa-phone-alt text-primary mr-2"></i> Gọi tư vấn:
+                                {{ $setting->phone_display ?: $setting->phone }}
+                            </a>
+                        @endif
 
                         <hr class="my-6 border-slate-100">
                         <div class="text-sm text-slate-600 space-y-3">
@@ -457,7 +459,7 @@
                             </div>
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-headset text-primary mt-1"></i>
-                                <div><b>Hỗ trợ tận tâm</b><br>Xử lý nhanh chóng 24/7</div>
+                                <div><b>Hỗ trợ tận tâm</b><br>Phản hồi trong thời gian sớm nhất</div>
                             </div>
                         </div>
                     </div>

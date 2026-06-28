@@ -65,7 +65,7 @@
 
             <aside class="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
                 <div class="flex items-start gap-4">
-                    <img src="{{ asset('images/setting/bat-tay.png') }}" onerror="this.src='https://placehold.co/120x120/png?text=Partner'" alt="Hợp tác đại lý" class="h-20 w-20 shrink-0 rounded-lg object-contain">
+                    <img src="{{ asset('images/setting/bat-tay.png') }}" onerror="this.src='{{ asset('images/setting/no-image.png') }}'" alt="Hợp tác đại lý" class="h-20 w-20 shrink-0 rounded-lg object-contain">
                     <div>
                         <h3 class="text-lg font-bold text-gray-950 dark:text-white">Phù hợp với</h3>
                         <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">Cửa hàng thiết bị, đơn vị triển khai POS, công ty tích hợp hệ thống và đối tác có tệp khách hàng doanh nghiệp.</p>

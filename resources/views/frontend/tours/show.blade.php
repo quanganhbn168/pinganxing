@@ -1,5 +1,23 @@
 @extends('layouts.master')
 @section('title', $tour->name)
+@php
+    $resolveTourMedia = function ($media): ?string {
+        if (! $media) {
+            return null;
+        }
+
+        $path = trim((string) ($media->path ?? ''));
+
+        if ($path === '' || preg_match('~(?:picsum\.photos|placehold\.co|images\.unsplash\.com)~i', $path)) {
+            return null;
+        }
+
+        return filter_var($path, FILTER_VALIDATE_URL) ? $path : $media->url;
+    };
+
+    $tourImageUrl = $resolveTourMedia($tour->image)
+        ?: $resolveTourMedia($tour->category?->image);
+@endphp
 @section('content')
     <div class="bg-white min-h-screen pt-24 pb-12">
         <div class="max-w-7xl mx-auto px-4 lg:px-8">
@@ -42,9 +60,9 @@
                     </div>
 
                     <!-- Images -->
-                    @if($tour->image)
+                    @if($tourImageUrl)
                         <div class="rounded-2xl overflow-hidden mb-8 shadow-sm">
-                            <img src="{{ url('storage/' . $tour->image->path) }}" alt="{{ $tour->name }}"
+                            <img src="{{ $tourImageUrl }}" alt="{{ $tour->name }}"
                                 class="w-full h-auto object-cover aspect-video">
                         </div>
                     @endif
@@ -99,21 +117,23 @@
                             class="block w-full py-4 bg-primary text-white text-center font-bold text-lg rounded-xl shadow-lg shadow-primary/30 hover:bg-dark-primary transition-colors mb-4">
                             <i class="fas fa-paper-plane mr-2"></i> Đặt tour ngay
                         </a>
-                        <a href="tel:{{ $setting->phone ?? '19001234' }}"
-                            class="block w-full py-3.5 bg-slate-50 text-slate-700 text-center font-bold border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors">
-                            <i class="fas fa-phone-alt text-primary mr-2"></i> Gọi tư vấn:
-                            {{ $setting->phone ?? '1900 1234' }}
-                        </a>
+                        @if(filled($setting->phone))
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $setting->phone) }}"
+                                class="block w-full py-3.5 bg-slate-50 text-slate-700 text-center font-bold border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors">
+                                <i class="fas fa-phone-alt text-primary mr-2"></i> Gọi tư vấn:
+                                {{ $setting->phone_display ?: $setting->phone }}
+                            </a>
+                        @endif
 
                         <hr class="my-6 border-slate-100">
                         <div class="text-sm text-slate-600 space-y-3">
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-shield-alt text-primary mt-1"></i>
-                                <div><b>Bảo hiểm du lịch</b><br>Lên đến 1 tỷ đồng</div>
+                                <div><b>Thông tin rõ ràng</b><br>Tư vấn chi tiết trước khi đặt tour</div>
                             </div>
                             <div class="flex items-start gap-3">
                                 <i class="fas fa-headset text-primary mt-1"></i>
-                                <div><b>Hỗ trợ 24/7</b><br>Luôn đồng hành cùng bạn</div>
+                                <div><b>Hỗ trợ tận tâm</b><br>Đồng hành cùng bạn trong suốt hành trình</div>
                             </div>
                         </div>
                     </div>

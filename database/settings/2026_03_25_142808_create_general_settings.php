@@ -18,23 +18,23 @@ return new class extends SettingsMigration
         $this->migrator->add('general.tax_code', null);
 
         // ── Liên hệ ──────────────────────────────────────────────
-        $this->migrator->add('general.phone', '0900.000.000');
+        $this->migrator->add('general.phone', null);
         $this->migrator->add('general.phone_display', null);
-        $this->migrator->add('general.email', 'admin@pinganxing.com');
-        $this->migrator->add('general.address', '123 ABC Street, Hanoi');
+        $this->migrator->add('general.email', null);
+        $this->migrator->add('general.address', null);
         $this->migrator->add('general.map', '');
-        $this->migrator->add('general.working_hours', 'T2 - T7: 08:00 - 17:30');
+        $this->migrator->add('general.working_hours', null);
 
         // ── Mạng xã hội ─────────────────────────────────────────
-        $this->migrator->add('general.zalo', 'https://zalo.me/');
-        $this->migrator->add('general.messenger', 'https://m.me/');
-        $this->migrator->add('general.youtube', 'https://youtube.com/');
-        $this->migrator->add('general.tiktok', 'https://tiktok.com/');
+        $this->migrator->add('general.zalo', null);
+        $this->migrator->add('general.messenger', null);
+        $this->migrator->add('general.youtube', null);
+        $this->migrator->add('general.tiktok', null);
         $this->migrator->add('general.bct_link', '');
 
         // ── SEO & Scripts ────────────────────────────────────────
         $this->migrator->add('general.meta_description', 'Ping An Xing - dịch vụ du lịch và đồng hành trọn gói');
-        $this->migrator->add('general.meta_keywords', 'cms, corporate');
+        $this->migrator->add('general.meta_keywords', 'du lịch, tour, vé máy bay, khách sạn, visa, thuê xe, Ping An Xing');
         $this->migrator->add('general.meta_image', null);
         $this->migrator->add('general.head_script', '');
         $this->migrator->add('general.body_start_script', null);

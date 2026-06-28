@@ -18,7 +18,7 @@ class TourController extends Controller
             ->get();
             
         $tours = Tour::where('status', 1)
-            ->with(['category', 'image'])
+            ->with(['category.image', 'image', 'tags'])
             ->latest()
             ->paginate(12);
 
@@ -36,7 +36,7 @@ class TourController extends Controller
             
         $tours = Tour::where('status', 1)
             ->where('tour_category_id', $category->id)
-            ->with(['category', 'image'])
+            ->with(['category.image', 'image', 'tags'])
             ->latest()
             ->paginate(12);
 
@@ -50,13 +50,13 @@ class TourController extends Controller
         $tour = Tour::where('slug', $slug)
             ->where('tour_category_id', $category->id)
             ->where('status', 1)
-            ->with(['category', 'image', 'banner'])
+            ->with(['category.image', 'image', 'banner', 'tags'])
             ->firstOrFail();
 
         $relatedTours = Tour::where('status', 1)
             ->where('tour_category_id', $category->id)
             ->where('id', '!=', $tour->id)
-            ->with(['category', 'image'])
+            ->with(['category.image', 'image', 'tags'])
             ->latest()
             ->take(4)
             ->get();

@@ -1,19 +1,40 @@
 @php
-    $isSale = $product->price_discount > 0 && $product->price_discount < $product->price;
-    $salePercent = $isSale ? round((($product->price - $product->price_discount) / $product->price) * 100) : 0;
-    
-    // Fake data for demo since these fields might not exist explicitly in DB
-    $rating = 4.9; // Or $product->rating if it exists
-    $reviewsCount = rand(50, 500);
-    $duration = '3N2Đ'; // Should come from $product->specifications or similar
-    $subtitle = 'Khởi hành hằng tuần • Bay Vietnam Airlines'; 
-    $features = ['Khách sạn 4 sao', 'Buffet sáng', 'Xe đưa đón'];
+    $price = (float) $product->price;
+    $discountPrice = (float) $product->price_discount;
+    $isSale = $price > 0 && $discountPrice > 0 && $discountPrice < $price;
+    $salePercent = $isSale ? round((($price - $discountPrice) / $price) * 100) : 0;
+    $rating = (float) ($product->rating ?? 0);
+    $reviewsCount = (int) ($product->review_count ?? 0);
+    $features = collect($product->features ?? [])->filter()->take(3);
+    $subtitle = collect([
+        $product->category?->name,
+        $product->departure,
+        $product->transport,
+    ])->filter()->implode(' • ');
+
+    $resolveMediaUrl = function ($media): ?string {
+        if (! $media) {
+            return null;
+        }
+
+        $path = trim((string) ($media->path ?? ''));
+
+        if ($path === '' || preg_match('~(?:picsum\.photos|placehold\.co|images\.unsplash\.com)~i', $path)) {
+            return null;
+        }
+
+        return filter_var($path, FILTER_VALIDATE_URL) ? $path : $media->url;
+    };
+
+    $productImageUrl = $resolveMediaUrl($product->image)
+        ?: $resolveMediaUrl($product->category?->image)
+        ?: asset('images/setting/no-image.png');
 @endphp
 
 <article class="bg-white rounded-3xl border border-slate-100 shadow-[0_12px_40px_rgba(15,23,42,0.06)] relative group overflow-hidden flex flex-col h-full hover:shadow-[0_20px_50px_rgba(15,23,42,0.12)] transition-shadow duration-300">
     <!-- Image Header -->
     <a href="{{ $product->slug_url ?? '#' }}" class="relative block h-56 overflow-hidden">
-        <img src="{{ $product->image?->url ?? 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=900&auto=format&fit=crop' }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <img src="{{ $productImageUrl }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
         <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent"></div>
         
         <!-- Badges (Top Left) -->
@@ -44,16 +65,24 @@
     <!-- Card Body -->
     <div class="p-6 flex flex-col flex-grow">
         <!-- Rating & Duration -->
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-1.5 text-sm">
-                <i class="fas fa-star text-yellow-brand text-xs"></i>
-                <span class="font-bold text-slate-700">{{ $rating }}</span>
-                <span class="text-slate-400 text-xs">({{ $reviewsCount }} đánh giá)</span>
+        @if($rating > 0 || filled($product->duration))
+            <div class="flex items-center justify-between mb-4">
+                @if($rating > 0)
+                    <div class="flex items-center gap-1.5 text-sm">
+                        <i class="fas fa-star text-yellow-brand text-xs"></i>
+                        <span class="font-bold text-slate-700">{{ number_format($rating, 1) }}</span>
+                        @if($reviewsCount > 0)
+                            <span class="text-slate-400 text-xs">({{ $reviewsCount }} đánh giá)</span>
+                        @endif
+                    </div>
+                @endif
+                @if(filled($product->duration))
+                    <div class="px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-extrabold">
+                        {{ $product->duration }}
+                    </div>
+                @endif
             </div>
-            <div class="px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-extrabold">
-                {{ $duration }}
-            </div>
-        </div>
+        @endif
 
         <!-- Title -->
         <a href="{{ $product->slug_url ?? '#' }}" class="block mb-2">
@@ -63,21 +92,25 @@
         </a>
 
         <!-- Subtitle -->
-        <p class="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-100">
-            {{ $subtitle }}
-        </p>
+        @if($subtitle !== '')
+            <p class="text-sm text-slate-500 mb-5 pb-5 border-b border-slate-100">
+                {{ $subtitle }}
+            </p>
+        @endif
 
         <!-- Features -->
-        <ul class="space-y-2.5 mb-6 flex-grow">
-            @foreach($features as $feature)
-                <li class="flex items-start gap-2.5 text-sm text-slate-600">
-                    <div class="mt-0.5 text-primary text-[10px]">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <span>{{ $feature }}</span>
-                </li>
-            @endforeach
-        </ul>
+        @if($features->isNotEmpty())
+            <ul class="space-y-2.5 mb-6 flex-grow">
+                @foreach($features as $feature)
+                    <li class="flex items-start gap-2.5 text-sm text-slate-600">
+                        <div class="mt-0.5 text-primary text-[10px]">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <span>{{ $feature }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
 
         <!-- Footer: Price & CTA -->
         <div class="flex items-end justify-between mt-auto pt-2">

@@ -44,7 +44,7 @@
 
                     <div class="cta-action">
                         <a href="{{ route('contact.show') }}" class="btn ml-2 btn-register btn-hero">Đặt lịch ngay</a>
-                        <a href="#" class="btn btn-price btn-hero">Xem bảng giá</a>
+                        <a href="{{ route('contact.show') }}" class="btn btn-price btn-hero">Xem bảng giá</a>
                     </div>
                 </div>
             </div>

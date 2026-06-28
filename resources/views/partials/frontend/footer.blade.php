@@ -23,7 +23,20 @@
                 @endif
 
                 @php
-                    $footerPlaceholderSocialLinks = ['http://zalo.me', 'https://zalo.me', 'http://m.me', 'https://m.me'];
+                    $footerPlaceholderSocialLinks = [
+                        'http://zalo.me',
+                        'https://zalo.me',
+                        'http://m.me',
+                        'https://m.me',
+                        'http://youtube.com',
+                        'https://youtube.com',
+                        'http://www.youtube.com',
+                        'https://www.youtube.com',
+                        'http://tiktok.com',
+                        'https://tiktok.com',
+                        'http://www.tiktok.com',
+                        'https://www.tiktok.com',
+                    ];
 
                     $footerSocialValue = function (string|array $keys) use ($setting, $footerPlaceholderSocialLinks) {
                         foreach ((array) $keys as $key) {
@@ -64,7 +77,7 @@
             </div>
 
             <div>
-                <h3 class="font-extrabold text-yellow-brand mb-5">{{ $setting->footer_col_2_title ?? 'Về chúng tôi' }}</h3>
+                <h3 class="font-extrabold text-yellow-brand mb-5">{{ $setting->footer_col_2_title ?: 'Về chúng tôi' }}</h3>
                 <ul class="space-y-3 text-white/65">
                     @if(isset($footerCol2Menu) && $footerCol2Menu->count() > 0)
                         @foreach($footerCol2Menu as $menuItem)
@@ -75,16 +88,16 @@
                             <li><a href="{{ $link['url'] ?? '#' }}" class="hover:text-yellow-brand transition-colors">{{ $link['label'] ?? '' }}</a></li>
                         @endforeach
                     @else
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Giới thiệu</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Tuyển dụng</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Tin tức</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Liên hệ</a></li>
+                        <li><a href="{{ route('frontend.intro.index') }}" class="hover:text-yellow-brand transition-colors">Giới thiệu</a></li>
+                        <li><a href="{{ route('frontend.careers.index') }}" class="hover:text-yellow-brand transition-colors">Tuyển dụng</a></li>
+                        <li><a href="{{ route('frontend.posts.index') }}" class="hover:text-yellow-brand transition-colors">Tin tức</a></li>
+                        <li><a href="{{ route('contact.show') }}" class="hover:text-yellow-brand transition-colors">Liên hệ</a></li>
                     @endif
                 </ul>
             </div>
 
             <div>
-                <h3 class="font-extrabold text-yellow-brand mb-5">{{ $setting->footer_col_3_title ?? 'Chính sách' }}</h3>
+                <h3 class="font-extrabold text-yellow-brand mb-5">{{ $setting->footer_col_3_title ?: 'Chính sách' }}</h3>
                 <ul class="space-y-3 text-white/65">
                     @if(isset($footerCol3Menu) && $footerCol3Menu->count() > 0)
                         @foreach($footerCol3Menu as $menuItem)
@@ -95,10 +108,10 @@
                             <li><a href="{{ $link['url'] ?? '#' }}" class="hover:text-yellow-brand transition-colors">{{ $link['label'] ?? '' }}</a></li>
                         @endforeach
                     @else
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Chính sách bảo mật</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Điều khoản dịch vụ</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Hướng dẫn đặt tour</a></li>
-                        <li><a href="#" class="hover:text-yellow-brand transition-colors">Chính sách hoàn hủy</a></li>
+                        <li><a href="{{ url('/chinh-sach-bao-mat-thong-tin') }}" class="hover:text-yellow-brand transition-colors">Chính sách bảo mật</a></li>
+                        <li><a href="{{ url('/dieu-khoan-dich-vu') }}" class="hover:text-yellow-brand transition-colors">Điều khoản dịch vụ</a></li>
+                        <li><a href="{{ url('/chinh-sach-van-chuyen') }}" class="hover:text-yellow-brand transition-colors">Chính sách vận chuyển</a></li>
+                        <li><a href="{{ url('/chinh-sach-doi-tra') }}" class="hover:text-yellow-brand transition-colors">Chính sách hoàn hủy</a></li>
                     @endif
                 </ul>
             </div>
@@ -115,13 +128,13 @@
                     @if(filled($setting->phone_display) || filled($setting->phone))
                         <li class="flex items-start gap-2">
                             <i class="fas fa-phone-alt mt-1 text-yellow-brand"></i>
-                            <span>{{ $setting->phone_display ?: $setting->phone }}</span>
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $setting->phone ?: $setting->phone_display) }}" class="hover:text-yellow-brand">{{ $setting->phone_display ?: $setting->phone }}</a>
                         </li>
                     @endif
                     @if(filled($setting->email))
                         <li class="flex items-start gap-2">
                             <i class="fas fa-envelope mt-1 text-yellow-brand"></i>
-                            <span>{{ $setting->email }}</span>
+                            <a href="mailto:{{ $setting->email }}" class="break-all hover:text-yellow-brand">{{ $setting->email }}</a>
                         </li>
                     @endif
                     @if(filled($setting->working_hours))
@@ -134,7 +147,9 @@
                 @if(!empty($setting->bct_link))
                 <div class="mt-4">
                     <a href="{{ $setting->bct_link }}" target="_blank" rel="nofollow">
-                        <img src="https://theme.hstatic.net/1000026602/1001190558/14/logo-bct.png?v=210" alt="Đã thông báo Bộ Công Thương" class="h-10 object-contain filter brightness-0 invert opacity-80">
+                        <span class="inline-flex items-center gap-2 rounded border border-white/20 px-3 py-2 text-xs font-bold text-white/80">
+                            <i class="fas fa-shield-alt text-yellow-brand"></i> Bộ Công Thương
+                        </span>
                     </a>
                 </div>
                 @endif

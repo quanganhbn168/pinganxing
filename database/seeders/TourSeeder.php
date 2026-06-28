@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Tour;
 use App\Models\TourCategory;
-use Awcodes\Curator\Models\Media;
 use Illuminate\Support\Str;
 
 class TourSeeder extends Seeder
@@ -23,27 +22,13 @@ class TourSeeder extends Seeder
             ['name' => 'Tour Sapa - Fansipan 2 Ngày 1 Đêm', 'category' => 'Sapa', 'price' => 2200000],
         ];
 
-        foreach ($tours as $index => $tourData) {
+        foreach ($tours as $tourData) {
             $cat = TourCategory::where('name', $tourData['category'])->first();
             if ($cat) {
-                $media = Media::firstOrCreate(
-                    ['name' => 'tour-image-' . $index],
-                    [
-                        'disk' => 'public',
-                        'directory' => 'media',
-                        'visibility' => 'public',
-                        'path' => 'https://picsum.photos/1280/720?random=' . ($index + 20),
-                        'type' => 'image/jpeg',
-                        'ext' => 'jpg',
-                        'alt' => $tourData['name'],
-                    ]
-                );
-
                 Tour::create([
                     'tour_category_id' => $cat->id,
                     'name' => $tourData['name'],
                     'slug' => Str::slug($tourData['name']),
-                    'image_id' => $media->id,
                     'price' => $tourData['price'],
                     'price_discount' => $tourData['price'] * 0.9,
                     'rating' => 5,

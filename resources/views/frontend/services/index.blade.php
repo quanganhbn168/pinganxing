@@ -1,6 +1,21 @@
 @extends('layouts.master')
 @section('title', 'Dịch vụ của chúng tôi')
 @section('content')
+    @php
+        $resolveServiceImage = function ($media): ?string {
+            if (! $media) {
+                return null;
+            }
+
+            $path = trim((string) ($media->path ?? ''));
+
+            if ($path === '' || preg_match('~(?:picsum\.photos|placehold\.co|images\.unsplash\.com)~i', $path)) {
+                return null;
+            }
+
+            return filter_var($path, FILTER_VALIDATE_URL) ? $path : $media->url;
+        };
+    @endphp
     <div class="bg-slate-50 min-h-screen pt-24 pb-12">
         <div class="max-w-7xl mx-auto px-4 lg:px-8">
             <h1 class="text-4xl font-serif font-bold text-slate-900 mb-8" style="font-family: 'Playfair Display', serif;">
@@ -36,11 +51,12 @@
             @if(isset($category))
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($services as $service)
+                        @php($serviceImage = $resolveServiceImage($service->image))
                         <a href="{{ $service->slug_url }}"
                             class="group block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
                             <div class="relative aspect-video bg-slate-100 overflow-hidden">
-                                @if($service->image)
-                                    <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
+                                @if($serviceImage)
+                                    <img src="{{ $serviceImage }}" alt="{{ $service->name }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 @else
                                     <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
@@ -72,11 +88,12 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             @foreach($cat->services->take(6) as $service)
+                                @php($serviceImage = $resolveServiceImage($service->image))
                                 <a href="{{ $service->slug_url }}"
                                     class="group block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all">
                                     <div class="relative aspect-video bg-slate-100 overflow-hidden">
-                                        @if($service->image)
-                                            <img src="{{ url('storage/' . $service->image->path) }}" alt="{{ $service->name }}"
+                                        @if($serviceImage)
+                                            <img src="{{ $serviceImage }}" alt="{{ $service->name }}"
                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         @else
                                             <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">

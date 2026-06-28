@@ -74,6 +74,7 @@ class ServiceController extends Controller
             ->with([
                 'services' => fn ($query) => $query
                     ->where('status', 1)
+                    ->with('image')
                     ->latest(),
             ])
             ->orderBy('position')
@@ -98,6 +99,7 @@ class ServiceController extends Controller
         // Lấy các dịch vụ chỉ thuộc về danh mục đã cho
         $services = $category->services()
             ->where('status', 1)
+            ->with('image')
             ->latest()
             ->paginate(10);
         
@@ -223,6 +225,10 @@ class ServiceController extends Controller
     private function resolveMediaUrl(?Media $media): ?string
     {
         if (! $media) {
+            return null;
+        }
+
+        if (preg_match('~(?:picsum\.photos|placehold\.co|images\.unsplash\.com)~i', (string) $media->path)) {
             return null;
         }
 
