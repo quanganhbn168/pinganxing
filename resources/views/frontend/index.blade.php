@@ -147,60 +147,51 @@
     <!-- Why Choose -->
     <section id="about" class="py-16">
         <div class="max-w-7xl mx-auto px-4 lg:px-8">
-            @php
-                $aboutCounters = collect($homeSettings->counters ?? [])
-                    ->filter(fn ($counter) => filled($counter['value'] ?? null) && filled($counter['label'] ?? null))
-                    ->take(6)
-                    ->values();
-                $counterIcons = [
-                    'clock' => 'fa-clock',
-                    'check-circle' => 'fa-check-circle',
-                    'users' => 'fa-users',
-                    'briefcase' => 'fa-briefcase',
-                    'building-office' => 'fa-building',
-                    'globe-alt' => 'fa-globe-asia',
-                    'trophy' => 'fa-trophy',
-                    'star' => 'fa-star',
-                    'heart' => 'fa-heart',
-                    'rocket-launch' => 'fa-rocket',
-                ];
-                $counterStyles = [
-                    'blue' => 'bg-blue-50 text-blue-700',
-                    'emerald' => 'bg-emerald-50 text-emerald-700',
-                    'amber' => 'bg-amber-50 text-amber-700',
-                    'violet' => 'bg-violet-50 text-violet-700',
-                    'rose' => 'bg-rose-50 text-rose-700',
-                    'cyan' => 'bg-cyan-50 text-cyan-700',
-                    'orange' => 'bg-orange-50 text-orange-700',
-                ];
-            @endphp
             <div class="grid lg:grid-cols-4 gap-5">
-                <div class="{{ $aboutCounters->isEmpty() ? 'lg:col-span-4' : 'lg:col-span-2' }} bg-slate-50 rounded-3xl p-8 md:p-10" data-aos="fade-right">
+                <div class="lg:row-span-2 bg-slate-50 rounded-3xl p-8 md:p-10" data-aos="fade-right">
                     <div class="text-xs uppercase tracking-[0.2em] font-extrabold text-yellow-brand mb-4">
                         Vì sao chọn {{ $setting->site_name ?: config('app.name') }}?
                     </div>
                     <h2 class="text-3xl font-serif font-bold text-slate-900 mb-5 leading-tight" style="font-family: 'Playfair Display', serif;">
-                        {{ $homeSettings->intro_title ?: 'Uy tín tạo nên thương hiệu' }}
+                        Uy tín tạo nên thương hiệu
                     </h2>
-                    <div class="text-slate-500 leading-7">
-                        {!! $homeSettings->intro_description ?: 'Chúng tôi cam kết mang đến những hành trình rõ ràng, an toàn và đáng nhớ cho mỗi khách hàng.' !!}
-                    </div>
+                    <p class="text-slate-500 leading-7">
+                        Với hơn 15 năm kinh nghiệm, chúng tôi cam kết mang đến hành trình chân thực, an toàn và đáng nhớ nhất cho mỗi khách hàng.
+                    </p>
                     <a href="{{ route('frontend.intro.index') ?? '#' }}" class="inline-flex items-center gap-2 mt-8 px-6 py-3.5 rounded-xl bg-primary text-white font-bold hover:bg-dark-primary transition shadow-lg shadow-primary/30">
                         Tìm hiểu thêm <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
-                @foreach($aboutCounters as $counter)
-                    @php
-                        $counterStyle = $counterStyles[$counter['color'] ?? 'blue'] ?? $counterStyles['blue'];
-                        $counterIcon = $counterIcons[$counter['icon'] ?? 'star'] ?? 'fa-star';
-                    @endphp
-                    <div class="{{ $counterStyle }} rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
-                        <div class="text-2xl mb-3"><i class="fas {{ $counterIcon }}"></i></div>
-                        <div class="text-4xl md:text-5xl font-extrabold mb-2">{{ $counter['value'] }}</div>
-                        <p class="text-sm font-medium opacity-80">{{ $counter['label'] }}</p>
-                    </div>
-                @endforeach
+                <div class="bg-primary text-white rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up">
+                    <div class="text-4xl md:text-5xl font-extrabold mb-2">15+</div>
+                    <p class="text-white/80 text-sm font-medium">Năm kinh nghiệm trong lĩnh vực du lịch</p>
+                </div>
+
+                <div class="bg-orange-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="50">
+                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">10K+</div>
+                    <p class="text-slate-600 text-sm font-medium">Khách hàng tin tưởng</p>
+                </div>
+
+                <div class="bg-teal-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">98%</div>
+                    <p class="text-slate-600 text-sm font-medium">Khách hàng hài lòng</p>
+                </div>
+
+                <div class="bg-teal-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up">
+                    <div class="text-4xl md:text-5xl font-extrabold text-primary mb-2">100+</div>
+                    <p class="text-slate-600 text-sm font-medium">Điểm đến hấp dẫn trong và ngoài nước</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center border border-slate-100" data-aos="fade-up" data-aos-delay="50">
+                    <div class="text-4xl mb-3 text-primary"><i class="fas fa-user-tie"></i></div>
+                    <p class="font-bold text-slate-900">Đội ngũ HDV chuyên nghiệp</p>
+                </div>
+
+                <div class="bg-yellow-50 rounded-3xl p-8 text-center flex flex-col justify-center items-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-4xl mb-3 text-yellow-brand"><i class="fas fa-headset"></i></div>
+                    <p class="font-bold text-slate-900">Hỗ trợ 24/7 mọi lúc mọi nơi</p>
+                </div>
             </div>
         </div>
     </section>
@@ -265,19 +256,14 @@
                 @endforeach
             </div>
 
-            @php
-                $homeVideoUrl = $homeSettings->video_file ?: $homeSettings->video_url;
-                $homeVideoPoster = $homeSettings->intro_image ?: asset('images/setting/cover02.jpg');
-            @endphp
-            @if($homeVideoUrl)
             <!-- Video -->
             <div class="home-video-showcase mt-12" data-aos="fade-up">
-                <img src="{{ $homeVideoPoster }}" class="home-video-bg" alt="Video giới thiệu {{ $setting->site_name ?: config('app.name') }}">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop" class="home-video-bg" alt="{{ $setting->site_name ?: config('app.name') }} Video">
                 <div class="home-video-color"></div>
                 <div class="home-video-shade"></div>
                 
                 <div class="home-video-content">
-                    <a href="{{ $homeVideoUrl }}" data-fancybox class="glightbox-video home-video-play" aria-label="Xem video giới thiệu">
+                    <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="glightbox-video home-video-play" aria-label="Xem video giới thiệu">
                         <i class="fas fa-play"></i>
                     </a>
                     <div class="home-video-copy">
@@ -285,15 +271,14 @@
                             {{ $setting->site_name ?: config('app.name') }} - Hơn cả một chuyến đi
                         </div>
                         <h3>
-                            {{ $homeSettings->video_title ?: 'Video giới thiệu' }}
+                            Cảm nhận vẻ đẹp Việt Nam qua từng thước phim
                         </h3>
-                        <a href="{{ $homeVideoUrl }}" data-fancybox class="home-video-link">
+                        <a href="https://www.youtube.com/watch?v=Scxs7L0vhZ4" data-fancybox class="home-video-link">
                             Xem video giới thiệu <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
             </div>
-            @endif
         </div>
     </section>
     @endif
