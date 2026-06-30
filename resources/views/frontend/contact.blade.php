@@ -60,10 +60,14 @@
         ['label' => 'Zalo', 'href' => $setting->zalo, 'image' => asset('images/setting/Icon_of_Zalo.svg'), 'color' => 'text-[#0068FF]'],
         ['label' => 'Messenger', 'href' => $setting->messenger, 'icon' => 'fab fa-facebook-messenger', 'color' => 'text-[#00B2FF]'],
         ['label' => 'WhatsApp', 'href' => $setting->whatsapp, 'icon' => 'fab fa-whatsapp', 'color' => 'text-[#25D366]'],
-        ['label' => 'WeChat', 'href' => $setting->wechat, 'icon' => 'fab fa-weixin', 'color' => 'text-[#07C160]'],
+        ['label' => 'WeChat', 'href' => $setting->wechat, 'opens_qr' => filled($setting->wechat_qr), 'icon' => 'fab fa-weixin', 'color' => 'text-[#07C160]'],
         ['label' => 'YouTube', 'href' => $setting->youtube, 'icon' => 'fab fa-youtube', 'color' => 'text-[#FF0000]'],
         ['label' => 'TikTok', 'href' => $setting->tiktok, 'icon' => 'fab fa-tiktok', 'color' => 'text-gray-900'],
     ])->filter(function (array $link) use ($placeholderSocialLinks): bool {
+        if (! empty($link['opens_qr'])) {
+            return true;
+        }
+
         if (blank($link['href'])) {
             return false;
         }
@@ -387,6 +391,15 @@
 
                 <div class="flex flex-wrap gap-4 sm:gap-6">
                     @foreach($socialLinks as $link)
+                        @if(!empty($link['opens_qr']))
+                        <button type="button" data-wechat-qr-trigger class="flex flex-col items-center group cursor-pointer" aria-label="Hiển thị mã QR {{ $link['label'] }} của {{ $siteName }}">
+                            <span class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center {{ $link['color'] }} text-xl mb-2 group-hover:-translate-y-1 transition-all">
+                                <i class="{{ $link['icon'] }}"></i>
+                            </span>
+                            <span class="text-xs font-bold text-gray-900">{{ $link['label'] }}</span>
+                            <span class="text-[10px] text-gray-500 mt-0.5">{{ $siteName }}</span>
+                        </button>
+                        @else
                         <a href="{{ $link['href'] }}" target="_blank" rel="noopener noreferrer" class="flex flex-col items-center group" aria-label="{{ $link['label'] }} {{ $siteName }}">
                             <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center {{ $link['color'] }} text-xl mb-2 group-hover:-translate-y-1 transition-all">
                                 @if(isset($link['image']))
@@ -398,6 +411,7 @@
                             <span class="text-xs font-bold text-gray-900">{{ $link['label'] }}</span>
                             <span class="text-[10px] text-gray-500 mt-0.5">{{ $siteName }}</span>
                         </a>
+                        @endif
                     @endforeach
                 </div>
             </div>

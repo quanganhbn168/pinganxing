@@ -27,6 +27,7 @@ class GlobalSettingsComposer
             $view->with('globalMetaImageUrl', '');
             $view->with('globalLogoUrl', '');
             $view->with('globalFooterBackgroundUrl', '');
+            $view->with('globalWechatQrUrl', '');
             return;
         }
 
@@ -51,12 +52,14 @@ class GlobalSettingsComposer
         $metaMedia = $resolveMedia($this->setting->meta_image);
         $logoMedia = $resolveMedia($this->setting->logo);
         $footerBgMedia = $resolveMedia($this->setting->footer_background);
+        $wechatQrMedia = $resolveMedia($this->setting->wechat_qr);
 
         $urls = [
             'globalFaviconUrl' => $favMedia ? url($favMedia->url) : asset('favicon.ico'),
             'globalMetaImageUrl' => $metaMedia ? url($metaMedia->url) : '',
             'globalLogoUrl' => $logoMedia ? url($logoMedia->url) : '',
-            'globalFooterBackgroundUrl' => $footerBgMedia ? url($footerBgMedia->url) : ''
+            'globalFooterBackgroundUrl' => $footerBgMedia ? url($footerBgMedia->url) : '',
+            'globalWechatQrUrl' => $wechatQrMedia ? url($wechatQrMedia->url) : '',
         ];
 
         foreach ($urls as $key => $url) {

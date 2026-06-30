@@ -128,6 +128,11 @@ class ManageSettings extends SettingsPage
                                     ->label('Link WeChat')
                                     ->url()
                                     ->helperText('Bỏ trống nếu không dùng'),
+                                CuratorPicker::make('wechat_qr')
+                                    ->label('Ảnh QR WeChat')
+                                    ->acceptedFileTypes(['image/*'])
+                                    ->multiple(false)
+                                    ->helperText('Ảnh QR sẽ hiển thị trong popup khi khách bấm vào biểu tượng WeChat.'),
                                 TextInput::make('youtube')
                                     ->label('Link Youtube'),
                                 TextInput::make('tiktok')

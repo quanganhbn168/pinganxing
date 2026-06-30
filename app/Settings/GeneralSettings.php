@@ -31,6 +31,7 @@ class GeneralSettings extends Settings
     public ?string $messenger;
     public ?string $whatsapp;
     public ?string $wechat;
+    public ?string $wechat_qr;
     public ?string $youtube;
     public ?string $tiktok;
     public ?string $bct_link;

@@ -59,16 +59,31 @@
             'key' => 'wechat',
             'label' => 'WeChat',
             'href' => $settingValue('wechat'),
+            'opens_qr' => filled($globalWechatQrUrl ?? null),
             'icon' => 'fab fa-weixin',
             'external' => true,
         ],
-    ])->filter(fn (array $action) => filled($action['href']))->values();
+    ])->filter(fn (array $action) => filled($action['href']) || !empty($action['opens_qr']))->values();
 @endphp
 
 @if($floatingActions->isNotEmpty())
 <div class="floating-contact" x-data="{ open: false }" @keydown.escape.window="open = false">
     <div class="floating-contact__panel" :class="{ 'is-open': open }">
         @foreach($floatingActions as $action)
+            @if(!empty($action['opens_qr']))
+            <button
+                type="button"
+                data-wechat-qr-trigger
+                @click="open = false"
+                class="floating-contact__item is-{{ $action['key'] }}"
+                aria-label="Hiển thị mã QR {{ $action['label'] }}"
+            >
+                <span class="floating-contact__icon">
+                    <i class="{{ $action['icon'] }}"></i>
+                </span>
+                <span class="floating-contact__label">Quét QR {{ $action['label'] }}</span>
+            </button>
+            @else
             <a
                 href="{{ $action['href'] }}"
                 @if($action['external']) target="_blank" rel="noopener noreferrer" @endif
@@ -84,6 +99,7 @@
                 </span>
                 <span class="floating-contact__label">{{ $action['label'] }}</span>
             </a>
+            @endif
         @endforeach
     </div>
 

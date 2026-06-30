@@ -58,6 +58,8 @@
 
     @include('partials.frontend.floating-actions')
 
+    @include('partials.frontend.wechat-qr-modal')
+
     {{-- Bundle Frontend JS via Vite --}}
     @vite(['resources/js/frontend.js'])
 

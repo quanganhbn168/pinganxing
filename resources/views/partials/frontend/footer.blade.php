@@ -57,14 +57,19 @@
                         ['label' => 'Zalo', 'href' => $footerSocialValue('zalo'), 'class' => 'hover:bg-[#0068FF]', 'image' => asset('images/setting/Icon_of_Zalo.svg')],
                         ['label' => 'Messenger', 'href' => $footerSocialValue(['messenger', 'mess']), 'class' => 'hover:bg-[#00B2FF]', 'icon' => 'fab fa-facebook-messenger'],
                         ['label' => 'WhatsApp', 'href' => $footerSocialValue('whatsapp'), 'class' => 'hover:bg-[#25D366]', 'icon' => 'fab fa-whatsapp'],
-                        ['label' => 'WeChat', 'href' => $footerSocialValue('wechat'), 'class' => 'hover:bg-[#07C160]', 'icon' => 'fab fa-weixin'],
+                        ['label' => 'WeChat', 'href' => $footerSocialValue('wechat'), 'opens_qr' => filled($globalWechatQrUrl ?? null), 'class' => 'hover:bg-[#07C160]', 'icon' => 'fab fa-weixin'],
                         ['label' => 'Youtube', 'href' => $footerSocialValue('youtube'), 'class' => 'hover:bg-[#FF0000]', 'icon' => 'fab fa-youtube'],
                         ['label' => 'Tiktok', 'href' => $footerSocialValue('tiktok'), 'class' => 'hover:bg-black', 'icon' => 'fab fa-tiktok'],
-                    ])->filter(fn (array $link) => filled($link['href']))->values();
+                    ])->filter(fn (array $link) => filled($link['href']) || !empty($link['opens_qr']))->values();
                 @endphp
 
                 <div class="flex flex-wrap gap-3 mt-6">
                     @foreach($footerSocialLinks as $link)
+                        @if(!empty($link['opens_qr']))
+                        <button type="button" data-wechat-qr-trigger aria-label="Hiển thị mã QR {{ $link['label'] }}" class="w-10 h-10 rounded-full bg-white/10 {{ $link['class'] }} transition-colors flex items-center justify-center p-2.5 cursor-pointer">
+                            <i class="{{ $link['icon'] }} text-white"></i>
+                        </button>
+                        @else
                         <a href="{{ $link['href'] }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $link['label'] }}" class="w-10 h-10 rounded-full bg-white/10 {{ $link['class'] }} transition-colors flex items-center justify-center p-2.5">
                             @if(!empty($link['image']))
                                 <img src="{{ $link['image'] }}" onerror="this.src='{{ asset('images/setting/zalo.png') }}'; this.onerror=null;" alt="{{ $link['label'] }}" class="w-full h-full object-contain">
@@ -72,6 +77,7 @@
                                 <i class="{{ $link['icon'] }} text-white"></i>
                             @endif
                         </a>
+                        @endif
                     @endforeach
                 </div>
             </div>
